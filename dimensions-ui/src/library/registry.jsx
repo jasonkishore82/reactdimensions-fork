@@ -5,6 +5,7 @@ import MeasureText from '../lib/MeasureText.jsx'
 import DecodeText from '../lib/DecodeText.jsx'
 import DraftingGrid from '../lib/DraftingGrid.jsx'
 import LightSweep from '../lib/LightSweep.jsx'
+import Cyclorama from '../lib/Cyclorama.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -707,10 +708,35 @@ export const COMPONENTS = [
     files: ['LightSweep.jsx'],
     deps: [],
   },
+  {
+    slug: 'cyclorama',
+    name: 'Cyclorama',
+    category: 'Backgrounds',
+    isNew: true,
+    description: 'A seamless curved studio backdrop in a single tinted colour.',
+    controls: [
+      { name: 'tint', type: 'color', default: '#d9d4ca' },
+      { name: 'horizon', type: 'range', min: 30, max: 85, step: 1, default: 62, unit: '%' },
+      { name: 'curve', type: 'range', min: 2, max: 40, step: 1, default: 18, unit: '%' },
+      { name: 'light', type: 'range', min: 0, max: 1, step: 0.05, default: 0.45 },
+      { name: 'vignette', type: 'range', min: 0, max: 0.8, step: 0.05, default: 0.35 },
+      { name: 'shadow', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => (
+      <Cyclorama {...p} style={{ position: 'absolute', inset: 0 }}>
+        <div className="demo-center">
+          <span className="demo-bg-title">Studio sweep</span>
+        </div>
+      </Cyclorama>
+    ),
+    files: ['Cyclorama.jsx'],
+    deps: [],
+  },
 ]
 
 // Components that take children, so usage shows them as wrappers.
-export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'SpringButton', 'MagneticButton']
+export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'SpringButton', 'MagneticButton']
 
 export const sourceFor = (c) => c.files.map((f) => ({ file: f, code: src(f) }))
 
