@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { CATEGORIES, COMPONENTS, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
 import { highlight } from './highlight.js'
 import { markdownFor, promptFor, sourceText, typesFor } from './ai.js'
@@ -236,9 +236,20 @@ function Section({ id, title, note, actions, children }) {
   )
 }
 
-function Sidebar({ active, open, onClose, favs }) {
+const catSlug = (c) => c.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
+// The sidebar remounts between pages, so remember the chosen category here.
+let lastCat = 'All'
+
+function Sidebar({ active, open, onClose, favs, category }) {
+  const navigate = useNavigate()
   const [hover, setHover] = useState(null)
-  const [cat, setCat] = useState('All')
+  const [cat, setCat] = useState(category ?? lastCat)
+  useEffect(() => {
+    if (!category) return
+    lastCat = category
+    setCat(category)
+  }, [category])
   const [query, setQuery] = useState('')
   const [edge, setEdge] = useState({ top: true, bottom: false })
   const scroller = useRef(null)
@@ -279,10 +290,16 @@ function Sidebar({ active, open, onClose, favs }) {
       <div className={`lib-backdrop${open ? ' show' : ''}`} onClick={onClose} />
       <aside className={`lib-side${open ? ' open' : ''}`} aria-label="Components">
         <div className="lib-side-top">
+          <Link className="lib-browse-all" to="/library/c/all" onClick={onClose}>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {CAT_ICON.All}
+            </svg>
+            Browse all components
+          </Link>
           <div className="cat-picker" role="tablist" aria-label="Category" style={{ '--n': tabs.length, '--i': tabs.indexOf(cat) }}>
             <span className="pill-bg" aria-hidden="true" />
             {tabs.map((t) => (
-              <button key={t} role="tab" aria-selected={cat === t} aria-label={t} title={t} onClick={() => setCat(t)}>
+              <button key={t} role="tab" aria-selected={cat === t} aria-label={t} title={t} onClick={() => { onClose(); navigate(`/library/c/${catSlug(t)}`) }}>
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   {CAT_ICON[t]}
                 </svg>
@@ -328,6 +345,133 @@ function Sidebar({ active, open, onClose, favs }) {
         </div>
       )}
     </>
+  )
+}
+
+const SORTS = [
+  ['az', 'A to Z'],
+  ['za', 'Z to A'],
+]
+
+function SortMenu({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const root = useRef(null)
+  const trigger = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    root.current.querySelector('[aria-checked="true"]')?.focus()
+    const down = (e) => !root.current.contains(e.target) && setOpen(false)
+    const key = (e) => {
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      trigger.current.focus()
+    }
+    document.addEventListener('pointerdown', down)
+    document.addEventListener('keydown', key)
+    return () => {
+      document.removeEventListener('pointerdown', down)
+      document.removeEventListener('keydown', key)
+    }
+  }, [open])
+
+  const pick = (v) => {
+    onChange(v)
+    setOpen(false)
+    trigger.current.focus()
+  }
+  const arrows = (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+    e.preventDefault()
+    const items = [...e.currentTarget.querySelectorAll('button')]
+    const step = e.key === 'ArrowDown' ? 1 : -1
+    items[(items.indexOf(document.activeElement) + step + items.length) % items.length].focus()
+  }
+
+  return (
+    <div className="sort" ref={root}>
+      <button ref={trigger} className={`sort-btn${open ? ' open' : ''}`} aria-haspopup="menu" aria-expanded={open} aria-label="Sort" onClick={() => setOpen((o) => !o)}>
+        {SORTS.find(([v]) => v === value)[1]}
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m5.5 8 4.500 4.500L14.500 8" />
+        </svg>
+      </button>
+      {open && (
+        <div className="sort-menu" role="menu" onKeyDown={arrows}>
+          {SORTS.map(([v, label]) => (
+            <button key={v} role="menuitemradio" aria-checked={v === value} onClick={() => pick(v)}>
+              {label}
+              {v === value && (
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m4.500 10.500 3.500 3.500 7.500-8" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// A grid of every component in a category, opened from the sidebar's category icons.
+export function CategoryPage() {
+  const { cat } = useParams()
+  const name = cat === 'all' ? 'All' : CATEGORIES.find((c) => catSlug(c) === cat)
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState('az')
+  const [drawer, setDrawer] = useState(false)
+  const [favs] = useFavs()
+  const title = name === 'All' ? 'All components' : name
+
+  useEffect(() => {
+    setQuery('')
+    setDrawer(false)
+    if (name) document.title = `${title} — React Dimensions`
+    window.scrollTo({ top: 0 })
+  }, [cat])
+
+  useEffect(() => {
+    const on = () => setDrawer((d) => !d)
+    window.addEventListener('rd:sidebar', on)
+    return () => window.removeEventListener('rd:sidebar', on)
+  }, [])
+
+  if (!name) return <Navigate to="/library/c/all" replace />
+
+  const q = query.trim().toLowerCase()
+  const items = COMPONENTS.filter((c) => (name === 'All' || c.category === name) && (!q || c.name.toLowerCase().includes(q)))
+  items.sort((a, b) => (sort === 'az' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)))
+
+  return (
+    <div className="lib lib-browse">
+      <Sidebar open={drawer} onClose={() => setDrawer(false)} favs={favs} category={name} />
+      <div className="lib-main">
+        <header className="browse-head">
+          <h1 className="lib-title">{title}</h1>
+          <div className="browse-tools">
+            <div className="lib-filter">
+              {Icon.search}
+              <input placeholder="Search…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label={`Search ${title}`} />
+            </div>
+            <SortMenu value={sort} onChange={setSort} />
+          </div>
+        </header>
+        <div className="browse-grid">
+          {items.map((c) => (
+            <Link className="browse-card" key={c.slug} to={`/library/${c.slug}`}>
+              <img src={`/previews/${c.slug}.jpg`} alt="" loading="lazy" />
+              <strong>
+                {c.name}
+                {c.isNew && <span className="badge">New</span>}
+              </strong>
+              <small>{c.category}</small>
+            </Link>
+          ))}
+        </div>
+        {!items.length && <p className="lib-none">No matching components</p>}
+      </div>
+    </div>
   )
 }
 
