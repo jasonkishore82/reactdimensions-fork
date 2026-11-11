@@ -8,6 +8,7 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import FlatKit from '../lib/FlatKit.jsx'
 import FlatDocs from '../lib/FlatDocs.jsx'
 import FlatShop from '../lib/FlatShop.jsx'
 import FlatUtility from '../lib/FlatUtility.jsx'
@@ -871,6 +872,21 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <FlatDocs {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['FlatDocs.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-kit',
+    name: 'Flat UI Kit',
+    category: 'UI',
+    isNew: true,
+    description: 'A board of flat widgets: profile, calendar, player, controls and more.',
+    controls: [
+      { name: 'theme', type: 'select', options: ['warm', 'coral'], default: 'warm' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatKit {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatKit.jsx'],
     deps: [],
   },
 ]
