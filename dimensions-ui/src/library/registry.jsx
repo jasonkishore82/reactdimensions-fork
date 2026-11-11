@@ -7,7 +7,6 @@ import DraftingGrid from '../lib/DraftingGrid.jsx'
 import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
-import SwatchPicker from '../lib/SwatchPicker.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -759,28 +758,6 @@ export const COMPONENTS = [
       </GradientSweep>
     ),
     files: ['GradientSweep.jsx'],
-    deps: [],
-  },
-  {
-    slug: 'swatch-picker',
-    name: 'Swatch Picker',
-    category: 'UI',
-    isNew: true,
-    description: 'Product colour swatches with a sliding selection ring.',
-    controls: [
-      { name: 'options', type: 'text', default: 'Ember:#ff4d1a, Cobalt:#1a7bff, Moss:#4f7a3a, Bone:#e9e4d8, Graphite:#2b2d31' },
-      { name: 'size', type: 'range', min: 16, max: 56, step: 2, default: 28, unit: 'px' },
-      { name: 'gap', type: 'range', min: 4, max: 32, step: 2, default: 12, unit: 'px' },
-      { name: 'shape', type: 'select', options: ['circle', 'square'], default: 'circle' },
-      { name: 'showLabel', type: 'toggle', default: true },
-      { name: 'label', type: 'text', default: 'Colour' },
-    ],
-    preview: (p) => (
-      <div className="demo-center" style={{ pointerEvents: 'auto' }}>
-        <SwatchPicker {...p} />
-      </div>
-    ),
-    files: ['SwatchPicker.jsx'],
     deps: [],
   },
 ]
