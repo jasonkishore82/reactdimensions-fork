@@ -183,6 +183,33 @@ alone; use pressed versus raised to mean on versus off.
 Glass that bends and refracts what's behind it, with a moving highlight.
 Traits: lens-like distortion, specular edges, light that responds to motion.
 
+#### References
+
+Real examples and write-ups for the same use cases as the ideas below.
+
+- **Refractive tab bar**
+  - [Linear: building our own Liquid Glass tab bar](https://linear.app/now/linear-liquid-glass)
+  - [Apple newsroom: the new Liquid Glass software design](https://www.apple.com/ph/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/)
+- **Lens product viewer**
+  - [Liquid Glass in the Browser: refraction with CSS and SVG (kube.io)](https://kube.io/blog/liquid-glass-css-svg)
+  - [How to create liquid glass effects with CSS and SVG (LogRocket)](https://blog.logrocket.com/how-create-liquid-glass-effects-css-and-svg/)
+- **Liquid control centre**
+  - [iOS 26 review: Lock Screen and Control Center (MacStories)](https://www.macstories.net/stories/ios-and-ipados-26-the-macstories-review/6)
+  - [Liquid Glass: fragile UX (UX Collective)](https://uxdesign.cc/liquid-glass-fragile-ux-and-why-i-wanted-2-weeks-before-writing-about-it-5dccafb5c28f)
+- **Glass media controls**
+  - [Liquid Glass Player component (Framer)](https://www.framer.com/marketplace/components/liquid-glass-player/)
+  - [WWDC25: Build a UIKit app with the new design (Apple)](https://developer.apple.com/videos/play/wwdc2025/284/)
+- **Liquid landing hero**
+  - [Recreating Liquid Glass with physics-based refraction (DEV)](https://dev.to/maxgeris/recreating-apples-liquid-glass-effect-on-the-web-with-css-svg-and-physics-based-refraction-5cek)
+  - [Liquid glass effect with SVG filters (Envato Tuts+)](https://webdesign.tutsplus.com/liquid-glass-effect-svg-filters--cms-109200t)
+- **Background reading**
+  - [Liquid Glass on the web: recipes and when not to use them](https://www.buildmvpfast.com/blog/liquid-glass-css-backdrop-filter-recipes-2026)
+
+Takeaways: real refraction on the web uses an SVG displacement filter,
+which only Chromium browsers apply to the backdrop, so every piece needs
+a plain frosted fallback; glass hurts legibility over busy content, so add
+a tint behind text; keep the number of refracting layers small for speed.
+
 ### 4.1 Refractive tab bar
 - **Look:** Content scrolls under a floating bar made of thick glass that bends the content behind it.
 - **Buttons:** Glass droplet buttons with a bright rim highlight that follows the device tilt or pointer.
@@ -224,6 +251,32 @@ Traits: lens-like distortion, specular edges, light that responds to motion.
 
 Content arranged in tidy tiles of different sizes, like a bento box.
 Traits: modular grid, rounded cards, one idea per tile.
+
+#### References
+
+Real examples for the same use cases as the ideas below.
+
+- **Feature bento landing page**
+  - [Bento grid feature sections, live sites (One Page Love)](https://onepagelove.com/section/bento-grid)
+  - [Designing bento grids that actually work (SaaSFrame)](https://www.saasframe.io/blog/designing-bento-grids-that-actually-work-a-2026-practical-guide)
+- **Personal portfolio bento**
+  - [Bento grid landing pages and portfolios (Lapa Ninja)](https://www.lapa.ninja/category/bento-grid/page/2)
+  - [Portfolio Bento Grid component (Framer)](https://www.framer.com/marketplace/components/portfolio-bento-grid/)
+- **Bento analytics dashboard**
+  - [Analytics dashboard bento with charts (shadcnblocks)](https://www.shadcnblocks.com/block/bento39)
+  - [Modern bento grid layouts for SaaS dashboards (SHRTX)](https://shrtx-react.pages.dev/blog/guides/modern-bento-grid-layouts-for-saas-dashboards)
+- **Bento app home**
+  - [Bento grid, iOS 18 style (Kombai gallery)](https://kombai.com/gallery/inspirations/bento-grid-ios-18/)
+- **Bento product spec sheet**
+  - [Best bento grid design examples, incl. Procreate (Mockuuups)](https://mockuuups.studio/blog/post/best-bento-grid-design-examples/)
+  - [Best bento grid examples from brands (WannaThis)](https://wannathis.one/blog/best-bento-grid-examples)
+- **Background reading**
+  - [Understanding the bento layout trend (SaaSFrame)](https://www.saasframe.io/blog/the-bento-layout-trend)
+
+Takeaways: use one fixed grid and let tiles span cells so rows stay
+aligned (unlike masonry); one idea per tile, with the most important idea
+in the biggest tile; plan the phone order on purpose, because bento
+grids don't stack well on their own.
 
 ### 5.1 Feature bento landing page
 - **Look:** One large hero tile plus smaller tiles for features, each with an icon, short copy or a mini demo.
