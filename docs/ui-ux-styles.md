@@ -116,6 +116,31 @@ Traits: background blur, light translucent fill, thin bright border.
 Soft shapes that look pressed into or raised out of the same surface.
 Traits: one base colour, paired light and dark shadows, low contrast.
 
+#### References
+
+Real examples of neumorphism for the same use cases as the ideas below.
+
+- **Smart-home remote**
+  - [Home Control UI collection (Dribbble)](https://dribbble.com/craftedbymasood/collections/2648677-Home-Control-UI)
+  - [Smart Home App Inspiration (Dribbble)](https://dribbble.com/designspree/collections/5175489-Smart-Home-App-Inspiration)
+- **Calculator**
+  - [Neumorphic Calculator UI Design (Dribbble)](https://shop.dribbble.com/shots/22491687-Neumorphic-Calculator-UI-Design)
+  - [Calculator component (Framer)](https://www.framer.com/marketplace/components/calculator/)
+- **Fitness tracker**
+  - [Habit Tracker template (AIDesigner)](https://www.aidesigner.ai/templates/apps/mobile-ui/habit-tracker-app-1)
+- **Audio mixer / player**
+  - [Neomorphic Music Player UI (Dribbble)](https://dribbble.com/shots/10492247-Neomorphic-Music-Player-UI)
+  - [CSS music players roundup (freefrontend)](https://freefrontend.com/css-music-players/)
+- **Settings panel**
+  - [3D Neumorphic Toggle (Framer)](https://www.framer.com/marketplace/components/3d-neumorphic-toggle)
+  - [Neumorphism design guide (Setproduct)](https://setproduct.com/blog/neumorphism-design-guide)
+- **Background reading**
+  - [Neumorphic UI design overview (Toptal)](https://www.toptal.com/designers/ui/neumorphic-ui-design)
+
+Takeaways: keep text contrast readable and add one accent colour, since
+low contrast is the style's main weakness; never show a state by shadow
+alone; use pressed versus raised to mean on versus off.
+
 ### 3.1 Soft smart-home remote
 - **Look:** Light grey surface with raised circular dials for temperature and lights.
 - **Buttons:** Raised round buttons that look pressed in (inner shadow) when on; the active state adds a small coloured icon.
