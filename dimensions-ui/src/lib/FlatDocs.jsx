@@ -50,7 +50,8 @@ export default function FlatDocs({ accent = '#2563eb', codeTheme = 'light', show
         .fdoc-top b { font-weight: 800; font-size: 15px; }
         .fdoc-top b i { font-style: normal; color: var(--accent); }
         .fdoc-ver { font: 600 11px/1 ui-monospace, Menlo, monospace; color: var(--accent); border: 1px solid var(--accent); padding: 3px 6px; border-radius: 4px; }
-        .fdoc-search { margin-left: auto; width: 200px; max-width: 40%; background: #f3f4f6; border: 0; border-radius: 6px; padding: 7px 10px; color: #6b7280; font-size: 12.5px; }
+        .fdoc-search { margin-left: auto; width: 200px; max-width: 40%; background: #f3f4f6; border: 0; border-radius: 6px; padding: 7px 10px; color: #374151; font-size: 12.5px; }
+        .fdoc-search::placeholder { color: #4b5563; }
         .fdoc-body { display: grid; grid-template-columns: 190px 1fr; min-height: 0; }
         .fdoc-noside .fdoc-body { grid-template-columns: 1fr; }
         .fdoc-noside .fdoc-side { display: none; }

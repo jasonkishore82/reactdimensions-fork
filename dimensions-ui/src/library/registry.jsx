@@ -52,7 +52,7 @@ import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../liquid/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -821,9 +821,9 @@ export const COMPONENTS = [
     isNew: true,
     description: 'A flat colour-block analytics dashboard with a sidebar and tab pills.',
     controls: [
-      { name: 'brand', type: 'color', default: '#2f6bff' },
+      { name: 'brand', type: 'color', default: '#2563eb' },
       { name: 'sidebar', type: 'color', default: '#16224a' },
-      { name: 'kpiColors', type: 'text', default: '#2f6bff, #12b886, #f59f00, #f03e3e' },
+      { name: 'kpiColors', type: 'text', default: '#2563eb, #0d7a55, #b45309, #c92a2a' },
       { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
     ],
     fill: true,
@@ -939,7 +939,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <GlassWeather {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['GlassWeather.jsx'],
+    files: ['GlassWeather.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -955,7 +955,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <GlassLogin {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['GlassLogin.jsx'],
+    files: ['GlassLogin.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -972,7 +972,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <GlassFinance {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['GlassFinance.jsx'],
+    files: ['GlassFinance.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -987,7 +987,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <GlassDesktop {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['GlassDesktop.jsx'],
+    files: ['GlassDesktop.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -1030,7 +1030,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <NeuHome {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['NeuHome.jsx'],
+    files: ['NeuHome.jsx', 'ui/color.js'],
     deps: [],
   },
   {
@@ -1058,7 +1058,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <NeuCalc {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['NeuCalc.jsx'],
+    files: ['NeuCalc.jsx', 'ui/color.js'],
     deps: [],
   },
   {
@@ -1086,7 +1086,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <NeuFitness {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['NeuFitness.jsx'],
+    files: ['NeuFitness.jsx', 'ui/color.js'],
     deps: [],
   },
   {
@@ -1113,7 +1113,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <NeuMixer {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['NeuMixer.jsx'],
+    files: ['NeuMixer.jsx', 'ui/color.js', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -1140,7 +1140,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <NeuSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['NeuSettings.jsx'],
+    files: ['NeuSettings.jsx', 'ui/color.js'],
     deps: [],
   },
   {
@@ -1212,14 +1212,14 @@ export const COMPONENTS = [
     description: 'A landing hero where a drifting glass orb bends a giant headline.',
     controls: [
       { name: 'headline', type: 'text', default: 'Bend the light.' },
-      { name: 'accent', type: 'color', default: '#ff4f2e' },
+      { name: 'accent', type: 'color', default: '#e0401f' },
       { name: 'orbSize', type: 'range', min: 140, max: 400, step: 10, default: 260, unit: 'px' },
       { name: 'zoom', type: 'range', min: 1.1, max: 2.5, step: 0.05, default: 1.45, unit: '×' },
       { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
     ],
     fill: true,
     preview: (p) => <LiquidHero {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['LiquidHero.jsx', 'liquid/lens.js'],
+    files: ['LiquidHero.jsx', 'liquid/lens.js', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -1234,7 +1234,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <BentoFeatures {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['BentoFeatures.jsx'],
+    files: ['BentoFeatures.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -1249,7 +1249,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <BentoPortfolio {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['BentoPortfolio.jsx'],
+    files: ['BentoPortfolio.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {
@@ -1263,7 +1263,7 @@ export const COMPONENTS = [
     ],
     fill: true,
     preview: (p) => <BentoAnalytics {...p} style={{ position: 'absolute', inset: 0 }} />,
-    files: ['BentoAnalytics.jsx'],
+    files: ['BentoAnalytics.jsx', 'ui/onscreen.js'],
     deps: [],
   },
   {

@@ -1,3 +1,4 @@
+import { readableOn, textOn } from '../ui/color.js'
 import { useEffect, useState } from 'react'
 
 // Neumorphic activity tracker. A recessed circular track holds a raised
@@ -57,7 +58,7 @@ export default function NeuFitness({ surface = '#e6ebf2', accent = '#ff7a45', go
   const clock = `${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`
 
   return (
-    <div className="nf-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, ...style }}>
+    <div className="nf-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, '--accent-ink': readableOn(accent, t.base), '--on-accent': textOn(accent), ...style }}>
       <style>{`
         .nf-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: var(--base); color: var(--ink); font: 500 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.nf-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -70,7 +71,7 @@ export default function NeuFitness({ surface = '#e6ebf2', accent = '#ff7a45', go
         .nf-core b { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
         .nf-core small { color: var(--muted); font-size: 11.5px; }
         .nf-left { display: flex; flex-direction: column; gap: 18px; align-items: center; }
-        .nf-go { width: 100%; padding: 13px; border-radius: 999px; font-weight: 800; font-size: 14px; color: var(--accent); transition: box-shadow 160ms; display: flex; justify-content: center; gap: 8px; align-items: center; }
+        .nf-go { width: 100%; padding: 13px; border-radius: 999px; font-weight: 800; font-size: 14px; color: var(--accent-ink); transition: box-shadow 160ms; display: flex; justify-content: center; gap: 8px; align-items: center; }
         .nf-go[aria-pressed='true'] { box-shadow: inset 5px 5px 10px var(--lo), inset -5px -5px 10px var(--hi); }
         .nf-go i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
         .nf-go[aria-pressed='true'] i { animation: nf-pulse 1s ease-in-out infinite; }
@@ -88,13 +89,13 @@ export default function NeuFitness({ surface = '#e6ebf2', accent = '#ff7a45', go
         .nf-track { width: 14px; flex: 1; border-radius: 999px; display: flex; align-items: flex-end; overflow: hidden; }
         .nf-track i { display: block; width: 100%; border-radius: 999px; background: color-mix(in srgb, var(--muted) 45%, var(--base)); transition: height 300ms; }
         .nf-day.met .nf-track i { background: var(--accent); }
-        .nf-day[aria-pressed='true'] { color: var(--accent); }
+        .nf-day[aria-pressed='true'] { color: var(--accent-ink); }
         .nf-day .nf-dot { display: block; width: 5px; height: 5px; border-radius: 50%; background: transparent; }
         .nf-day.met .nf-dot { background: var(--accent); }
         .nf-tabs { grid-column: 1 / -1; display: flex; justify-content: space-around; border-radius: 22px; padding: 8px; }
         .nf-tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--muted); padding: 2px 10px; }
         .nf-tab span { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; transition: box-shadow 200ms; }
-        .nf-tab[aria-selected='true'] { color: var(--accent); }
+        .nf-tab[aria-selected='true'] { color: var(--accent-ink); }
         .nf-tab[aria-selected='true'] span { box-shadow: 4px 4px 9px var(--lo), -4px -4px 9px var(--hi); }
         @container (max-width: 640px) { .nf { grid-template-columns: 1fr; } .nf-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
         @media (prefers-reduced-motion: reduce) { .nf-wrap * { animation: none !important; } }

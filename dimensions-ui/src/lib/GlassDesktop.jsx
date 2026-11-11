@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Glassmorphism desktop: frosted widgets over a dusk landscape drawn in SVG
 // (layered ridges, a lake holding the sunset, the first stars). A glass menu
@@ -41,18 +42,24 @@ function Wallpaper() {
   )
 }
 
-function useClock() {
+function useClock(active) {
   const [now, setNow] = useState(() => new Date())
-  useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id) }, [])
+  useEffect(() => {
+    if (!active) return
+    setNow(new Date())
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [active])
   return now
 }
 
-function useMeters() {
+function useMeters(active) {
   const [m, setM] = useState([34, 58, 80])
   useEffect(() => {
+    if (!active) return
     const id = setInterval(() => setM((v) => [Math.min(95, Math.max(8, v[0] + (Math.random() * 18 - 9))), Math.min(90, Math.max(30, v[1] + (Math.random() * 6 - 3))), v[2]]), 1200)
     return () => clearInterval(id)
-  }, [])
+  }, [active])
   return m
 }
 
@@ -71,8 +78,10 @@ const Ring = ({ value, label, color, size = 64 }) => {
 }
 
 export default function GlassDesktop({ blur = 18, frost = 0.16, style }) {
-  const now = useClock()
-  const meters = useMeters()
+  const root = useRef(null)
+  const visible = useOnScreen(root)
+  const now = useClock(visible)
+  const meters = useMeters(visible)
   const [page, setPage] = useState(0)
   const [panel, setPanel] = useState(false)
   const [notes, setNotes] = useState(NOTES)
@@ -130,7 +139,7 @@ export default function GlassDesktop({ blur = 18, frost = 0.16, style }) {
   )
 
   return (
-    <div className="gd-wrap" style={{ '--blur': `${blur}px`, '--frost': frost, ...style }}>
+    <div ref={root} className="gd-wrap" data-paused={visible ? undefined : ''} style={{ '--blur': `${blur}px`, '--frost': frost, ...style }}>
       <style>{`
         .gd-wrap { container-type: inline-size; position: relative; width: 100%; height: 100%; overflow: hidden; color: #fff; background: #141b3b; font: 400 12.5px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.gd-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }

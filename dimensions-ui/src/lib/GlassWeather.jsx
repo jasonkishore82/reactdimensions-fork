@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Glassmorphism weather app. The sky behind the glass is drawn live for
 // each city's conditions: sun and drifting cloud, falling snow, driving
@@ -56,6 +57,8 @@ const Glyph = ({ kind, size = 22 }) => {
 }
 
 export default function GlassWeather({ blur = 16, frost = 0.18, unit = 'C', style }) {
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const [city, setCity] = useState(0)
   const [u, setU] = useState(unit)
   const [tab, setTab] = useState(0)
@@ -66,7 +69,7 @@ export default function GlassWeather({ blur = 16, frost = 0.18, unit = 'C', styl
   const hi = Math.max(...c.week.map((w) => w[0])) + 2
 
   return (
-    <div className="gw-wrap" style={{ '--blur': `${blur}px`, '--frost': frost, ...style }}>
+    <div ref={root} className="gw-wrap" data-paused={visible ? undefined : ''} style={{ '--blur': `${blur}px`, '--frost': frost, ...style }}>
       <style>{`
         .gw-wrap { container-type: inline-size; position: relative; width: 100%; height: 100%; overflow: hidden; color: #fff; font: 400 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.gw-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -119,6 +122,7 @@ export default function GlassWeather({ blur = 16, frost = 0.18, unit = 'C', styl
         .gw-blip { position: absolute; width: 18px; height: 12px; border-radius: 50%; background: rgba(120,220,140,.8); filter: blur(2px); }
         @container (max-width: 640px) { .gw { grid-template-columns: 1fr; grid-template-rows: auto 1fr; } .gw-side { flex-direction: row; overflow-x: auto; padding: 6px; } .gw-side h4 { display: none; } .gw-city { flex: none; } .gw-big { font-size: 44px; } }
         @media (prefers-reduced-motion: reduce) { .gw-wrap * { animation: none !important; } }
+        .gw-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <div className="gw-sky" style={{ background: SKY[c.scene] }} aria-hidden="true"><Scene kind={c.scene} /></div>

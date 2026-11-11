@@ -1,3 +1,4 @@
+import { readableOn, textOn } from '../ui/color.js'
 import { useRef, useState } from 'react'
 
 // Neumorphic smart-home remote. One soft surface: rooms are raised cards
@@ -62,7 +63,7 @@ export default function NeuHome({ surface = '#e6ebf2', accent = '#ff7a45', style
   const toggle = (d) => setOn({ ...on, [name]: on[name].includes(d) ? on[name].filter((x) => x !== d) : [...on[name], d] })
 
   return (
-    <div className="nh-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, ...style }}>
+    <div className="nh-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, '--accent-ink': readableOn(accent, t.base), '--on-accent': textOn(accent), ...style }}>
       <style>{`
         .nh-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: var(--base); color: var(--ink); font: 500 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.nh-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -75,7 +76,7 @@ export default function NeuHome({ surface = '#e6ebf2', accent = '#ff7a45', style
         .nh-room small { display: block; color: var(--muted); font-weight: 500; font-size: 11.5px; }
         .nh-room b { font-weight: 700; }
         .nh-room i { width: 8px; height: 8px; border-radius: 50%; background: transparent; }
-        .nh-room[aria-current='true'] { color: var(--accent); }
+        .nh-room[aria-current='true'] { color: var(--accent-ink); }
         .nh-room[aria-current='true'] i { background: var(--accent); }
         .nh-center { display: flex; flex-direction: column; align-items: center; gap: 16px; }
         .nh-dial { position: relative; width: 220px; height: 220px; border-radius: 50%; display: grid; place-items: center; touch-action: none; cursor: grab; }
@@ -89,14 +90,15 @@ export default function NeuHome({ surface = '#e6ebf2', accent = '#ff7a45', style
         .nh-round:active { box-shadow: inset 4px 4px 8px var(--lo), inset -4px -4px 8px var(--hi); }
         .nh-tabs { position: relative; display: grid; grid-template-columns: repeat(3, 84px); padding: 6px; border-radius: 999px; }
         .nh-tabs button { position: relative; z-index: 1; padding: 8px 0; font-weight: 700; font-size: 12px; color: var(--muted); }
-        .nh-tabs button[aria-selected='true'] { color: var(--accent); }
+        .nh-tabs button[aria-selected='true'] { color: var(--accent-ink); }
         .nh-tabs i { position: absolute; top: 6px; bottom: 6px; left: 6px; width: 84px; border-radius: 999px; transition: transform 280ms cubic-bezier(.3,1.3,.5,1); }
         .nh-devs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .nh-dev { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; border-radius: 18px; transition: box-shadow 200ms, color 200ms; }
         .nh-dev span { font-size: 11.5px; font-weight: 700; }
         .nh-dev small { font-size: 10.5px; color: var(--muted); font-weight: 600; }
-        .nh-dev[aria-pressed='true'] { color: var(--accent); box-shadow: inset 5px 5px 10px var(--lo), inset -5px -5px 10px var(--hi); }
-        .nh-dev[aria-pressed='true'] small { color: var(--accent); }
+        .nh-dev[aria-pressed='true'] { color: var(--accent-ink); box-shadow: inset 5px 5px 10px var(--lo), inset -5px -5px 10px var(--hi); }
+        .nh-dev[aria-pressed='true'] small { color: var(--accent-ink); }
+        .nh > section { min-width: 0; }
         @container (max-width: 760px) { .nh { grid-template-columns: 1fr; } .nh-rooms { flex-direction: row; overflow-x: auto; padding: 10px; margin: -10px; } .nh-room { flex: none; gap: 14px; } .nh-devs { grid-template-columns: repeat(4, 1fr); } }
       `}</style>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLens, specular } from '../liquid/lens.js'
+import { useOnScreen, useReducedMotion } from '../ui/onscreen.js'
 
 // Liquid glass landing hero: a huge headline sits behind a big glass orb
 // that drifts and follows the pointer, bending the letters as it passes.
@@ -8,7 +9,7 @@ import { useLens, specular } from '../liquid/lens.js'
 
 const LINKS = ['Product', 'Pricing', 'Stories', 'Docs']
 
-export default function LiquidHero({ headline = 'Bend the light.', accent = '#ff4f2e', orbSize = 260, zoom = 1.45, strength = 60, style }) {
+export default function LiquidHero({ headline = 'Bend the light.', accent = '#e0401f', orbSize = 260, zoom = 1.45, strength = 60, style }) {
   const wrap = useRef(null)
   const orb = useRef(null)
   const nav = useRef(null)
@@ -22,14 +23,18 @@ export default function LiquidHero({ headline = 'Bend the light.', accent = '#ff
   const [menu, setMenu] = useState(false)
   const target = useRef({ x: 0.62, y: 0.52, follow: false })
   const pos = useRef({ x: 0.62, y: 0.52 })
+  const visible = useOnScreen(wrap)
+  const still = useReducedMotion()
 
   // Ease the orb toward the pointer, or let it drift in a slow loop.
   useEffect(() => {
+    if (!visible) return
     let raf
     const tick = (now) => {
       const tg = target.current
-      const gx = tg.follow ? tg.x : 0.58 + Math.cos(now / 4200) * 0.14
-      const gy = tg.follow ? tg.y : 0.5 + Math.sin(now / 3100) * 0.12
+      const drift = still ? 0 : 1
+      const gx = tg.follow ? tg.x : 0.58 + Math.cos(now / 4200) * 0.14 * drift
+      const gy = tg.follow ? tg.y : 0.5 + Math.sin(now / 3100) * 0.12 * drift
       pos.current.x += (gx - pos.current.x) * 0.06
       pos.current.y += (gy - pos.current.y) * 0.06
       if (orb.current) {
@@ -40,7 +45,7 @@ export default function LiquidHero({ headline = 'Bend the light.', accent = '#ff
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [])
+  }, [visible, still])
 
   const move = (e) => {
     const r = wrap.current.getBoundingClientRect()

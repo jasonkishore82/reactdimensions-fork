@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Bento personal portfolio / link-in-bio: tiles for a portrait, bio, current
 // project, now playing, a map with local time, and social links. The pill
@@ -6,10 +7,10 @@ import { useEffect, useState } from 'react'
 // are buttons that lift and show an arrow on hover.
 
 const SOCIAL = [
-  ['Dribbble', '#ea4c89', '12.4k'],
+  ['Dribbble', '#c2185b', '12.4k'],
   ['GitHub', '#24292f', '3.1k'],
   ['Read.cv', '#1b1b1b', 'CV'],
-  ['Email', '#ff7a45', 'Say hi'],
+  ['Email', '#b8400e', 'Say hi'],
 ]
 const GROUPS = { Work: ['project', 'work2'], About: ['portrait', 'bio', 'music', 'map'], Contact: ['social', 'map'] }
 
@@ -28,6 +29,8 @@ function Portrait() {
 }
 
 export default function BentoPortfolio({ name = 'Lena Ortiz', accent = '#ff7a45', style }) {
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const [group, setGroup] = useState(null)
   const [now, setNow] = useState(() => new Date())
   const [playing, setPlaying] = useState(true)
@@ -37,7 +40,7 @@ export default function BentoPortfolio({ name = 'Lena Ortiz', accent = '#ff7a45'
   const cls = (id, extra = '') => `bp-tile ${extra}${lit(id) ? '' : ' dim'}`
 
   return (
-    <div className="bp-wrap" style={{ '--accent': accent, ...style }}>
+    <div ref={root} className="bp-wrap" data-paused={visible ? undefined : ''} style={{ '--accent': accent, ...style }}>
       <style>{`
         .bp-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: #f3efe8; color: #1b1b1b; font: 500 13px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.bp-wrap) button, :where(.bp-wrap) a { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
@@ -78,6 +81,7 @@ export default function BentoPortfolio({ name = 'Lena Ortiz', accent = '#ff7a45'
         .bp-social:hover .bp-go { opacity: 1; }
         @container (max-width: 700px) { .bp { grid-template-columns: repeat(2, 1fr); } .bp-bio, .bp-project { grid-column: span 2; } }
         @media (prefers-reduced-motion: reduce) { .bp-wrap * { animation: none !important; } }
+        .bp-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <header className="bp-top">
@@ -94,7 +98,7 @@ export default function BentoPortfolio({ name = 'Lena Ortiz', accent = '#ff7a45'
           <p>Product designer making calm software for busy people. Previously at a tiny studio in Porto.</p>
           <p style={{ marginTop: 8, fontWeight: 600, color: '#1b1b1b' }}><i />Open to freelance from January</p>
         </div>
-        <div className={cls('music', 'bp-music')} role="button" tabIndex={0} onClick={() => setPlaying(!playing)} aria-label={playing ? 'Pause music' : 'Play music'}>
+        <div className={cls('music', 'bp-music')} role="button" tabIndex={0} onClick={() => setPlaying(!playing)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPlaying(!playing) } }} aria-label={playing ? 'Pause music' : 'Play music'}>
           <small style={{ fontWeight: 700 }}>{playing ? 'Now playing' : 'Paused'}</small>
           <div className={`bp-bars${playing ? '' : ' off'}`}>{[0.1, 0.5, 0.3, 0.8, 0.2].map((d, i) => <i key={i} style={{ animationDelay: `${-d}s` }} />)}</div>
           <b>Kokoroko · Abusey Junction</b>

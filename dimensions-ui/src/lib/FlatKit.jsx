@@ -6,8 +6,8 @@ import { useState } from 'react'
 // beige-and-plum palette and a coral-and-charcoal one.
 
 const THEMES = {
-  warm: { bg: '#e6ddd1', card: '#f6f0e7', ink: '#5b4848', muted: '#a8968a', accent: '#ee9a6c', alt: '#8f5b60', line: '#e6dacb', dark: '#6b4c50' },
-  coral: { bg: '#e9eaee', card: '#ffffff', ink: '#3b3b42', muted: '#9c9ca6', accent: '#ef6f57', alt: '#3b3b42', line: '#ececf0', dark: '#34343b' },
+  warm: { bg: '#e6ddd1', card: '#f6f0e7', ink: '#5b4848', muted: '#76665c', accent: '#ee9a6c', alt: '#8f5b60', line: '#e6dacb', dark: '#6b4c50', onAccent: '#2b1a1c' },
+  coral: { bg: '#e9eaee', card: '#ffffff', ink: '#3b3b42', muted: '#66666f', accent: '#ef6f57', alt: '#3b3b42', line: '#ececf0', dark: '#34343b', onAccent: '#1e1214' },
 }
 
 const I = {
@@ -103,8 +103,8 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
         .fk-label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-align: center; }
         .fk-btn { background: var(--alt) !important; color: #fff !important; font-weight: 700 !important; border-radius: var(--r); padding: 8px 12px !important; text-align: center; transition: filter 120ms; }
         .fk-btn:hover { filter: brightness(1.1); }
-        .fk-btn.light { background: color-mix(in srgb, var(--accent) 55%, var(--card)) !important; }
-        .fk-btn.accent { background: var(--accent) !important; }
+        .fk-btn.light { background: color-mix(in srgb, var(--accent) 40%, var(--card)) !important; color: var(--onAccent) !important; }
+        .fk-btn.accent { background: var(--accent) !important; color: var(--onAccent) !important; }
 
         /* profile */
         .fk-profile { align-items: center; text-align: center; }
@@ -112,7 +112,7 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
         .fk-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
         .fk-avatar { position: absolute; inset: 10px; border-radius: 50%; background: var(--alt); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 22px; }
         .fk-profile h3 { margin: 0; font-size: 16px; font-weight: 600; }
-        .fk-profile small { color: var(--accent); font-weight: 700; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; }
+        .fk-profile small { color: var(--alt); font-weight: 700; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; }
         .fk-profile .fk-btn { align-self: stretch; }
 
         /* calendar */
@@ -121,18 +121,18 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
         .fk-calhead b { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
         .fk-calhead button { color: #fff; opacity: .8; display: grid; }
         .fk-calgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: color-mix(in srgb, var(--accent), white 18%); padding: 1px; }
-        .fk-dow { background: var(--accent); color: #fff; font-weight: 700; font-size: 10.5px; text-align: center; padding: 4px 0; opacity: .85; }
+        .fk-dow { background: var(--accent); color: var(--onAccent); font-weight: 700; font-size: 10.5px; text-align: center; padding: 4px 0; opacity: .85; }
         .fk-calgrid > span:not(.fk-dow) { background: var(--accent); }
-        .fk-day { background: var(--accent) !important; color: #fff !important; font-weight: 700 !important; padding: 5px 0 !important; }
+        .fk-day { background: var(--accent) !important; color: var(--onAccent) !important; font-weight: 700 !important; padding: 5px 0 !important; }
         .fk-day:hover { filter: brightness(1.08); }
-        .fk-day[aria-pressed='true'] { background: var(--dark) !important; }
+        .fk-day[aria-pressed='true'] { background: var(--dark) !important; color: #fff !important; }
 
         /* weather */
         .fk-weather { background: var(--alt); color: #fff; }
         .fk-weather .fk-now { display: flex; align-items: center; justify-content: space-between; }
         .fk-weather b { font-size: 30px; font-weight: 300; }
-        .fk-weather small { opacity: .75; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
-        .fk-days { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 4px; background: color-mix(in srgb, #fff 14%, transparent); border-radius: var(--r); padding: 8px 4px; font-size: 10.5px; }
+        .fk-weather small { opacity: 1; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+        .fk-days { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 4px; background: color-mix(in srgb, #000 14%, transparent); border-radius: var(--r); padding: 8px 4px; font-size: 10.5px; }
         .fk-days span b { display: block; font-size: 13px; font-weight: 600; }
 
         /* player */
@@ -142,7 +142,7 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
         .fk-track b { font-size: 13px; }
         .fk-track span { color: var(--muted); font-size: 11px; }
         .fk-ctrls { display: flex; gap: 6px; }
-        .fk-ctrls button { width: 28px; height: 28px; border-radius: var(--r); background: var(--accent) !important; color: #fff !important; display: grid; place-items: center; }
+        .fk-ctrls button { width: 28px; height: 28px; border-radius: var(--r); background: var(--accent) !important; color: var(--onAccent) !important; display: grid; place-items: center; }
 
         /* shared range */
         .fk-range { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px; background: linear-gradient(to right, var(--accent) var(--p), var(--line) var(--p)); margin: 0; cursor: pointer; }
@@ -151,18 +151,18 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
 
         /* nav bar */
         .fk-nav { grid-column: span 2; flex-direction: row; padding: 0; gap: 0; overflow: hidden; background: var(--accent); }
-        .fk-nav button { flex: 1; color: #fff !important; font-weight: 600; padding: 12px 6px !important; border-right: 1px solid color-mix(in srgb, #fff 25%, transparent) !important; }
+        .fk-nav button { flex: 1; color: var(--onAccent) !important; font-weight: 600; padding: 12px 6px !important; border-right: 1px solid color-mix(in srgb, #fff 25%, transparent) !important; }
         .fk-nav button:last-child { border-right: 0 !important; }
-        .fk-nav button[aria-current='page'] { background: var(--dark) !important; }
+        .fk-nav button[aria-current='page'] { background: var(--dark) !important; color: #fff !important; }
 
         /* mail menu */
         .fk-mail { padding: 8px; gap: 4px; }
         .fk-mail button { display: flex; align-items: center; gap: 10px; padding: 7px 10px !important; border-radius: var(--r); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink) !important; text-align: left; }
         .fk-mail button i { width: 22px; height: 22px; border-radius: 4px; display: grid; place-items: center; background: var(--line); color: var(--alt); flex: none; }
-        .fk-mail button .fk-count { margin-left: auto; font-style: normal; font-weight: 800; letter-spacing: 0; background: var(--accent); color: #fff; border-radius: 999px; padding: 1px 7px; font-size: 10px; }
-        .fk-mail button[aria-current='true'] { background: var(--accent) !important; color: #fff !important; }
-        .fk-mail button[aria-current='true'] i { background: color-mix(in srgb, #fff 25%, transparent); color: #fff; }
-        .fk-mail button[aria-current='true'] .fk-count { background: #fff; color: var(--accent); }
+        .fk-mail button .fk-count { margin-left: auto; font-style: normal; font-weight: 800; letter-spacing: 0; background: var(--accent); color: var(--onAccent); border-radius: 999px; padding: 1px 7px; font-size: 10px; }
+        .fk-mail button[aria-current='true'] { background: var(--accent) !important; color: var(--onAccent) !important; }
+        .fk-mail button[aria-current='true'] i { background: color-mix(in srgb, #fff 30%, transparent); color: var(--onAccent); }
+        .fk-mail button[aria-current='true'] .fk-count { background: #fff; color: var(--onAccent); }
 
         /* controls */
         .fk-ctl { justify-content: space-between; }
@@ -176,7 +176,7 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
 
         /* tags + rating */
         .fk-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-        .fk-tag { position: relative; padding: 4px 9px 4px 16px !important; background: color-mix(in srgb, var(--accent) 45%, var(--card)) !important; color: #fff !important; font-weight: 700; font-size: 11px; clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%); border-radius: 0 3px 3px 0; }
+        .fk-tag { position: relative; padding: 4px 9px 4px 16px !important; background: color-mix(in srgb, var(--accent) 35%, var(--card)) !important; color: var(--onAccent) !important; font-weight: 700; font-size: 11px; clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%); border-radius: 0 3px 3px 0; }
         .fk-tag::before { content: ''; position: absolute; left: 8px; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 50%; background: var(--card); }
         .fk-tag[aria-pressed='true'] { background: var(--accent) !important; }
         .fk-stars { display: flex; gap: 4px; justify-content: center; }
@@ -211,10 +211,10 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
 
         /* social counts */
         .fk-social { padding: 0; gap: 0; overflow: hidden; flex-direction: row; background: var(--accent); }
-        .fk-social button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #fff !important; padding: 16px 6px !important; font-weight: 700; font-size: 15px; transition: background 120ms; }
+        .fk-social button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--onAccent) !important; padding: 16px 6px !important; font-weight: 700; font-size: 15px; transition: background 120ms; }
         .fk-social button + button { border-left: 3px solid var(--card) !important; }
         .fk-social button small { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
-        .fk-social button[aria-pressed='true'] { background: var(--dark) !important; }
+        .fk-social button[aria-pressed='true'] { background: var(--dark) !important; color: #fff !important; }
 
         @container (max-width: 860px) { .fk { grid-template-columns: repeat(3, 1fr); } }
         @container (max-width: 640px) { .fk { grid-template-columns: repeat(2, 1fr); } .fk-player, .fk-nav { grid-column: span 2; } }

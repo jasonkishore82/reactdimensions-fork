@@ -29,7 +29,16 @@ function Tile({ className = '', strength, radius = 26, children, ...rest }) {
   return (
     <>
       {glass.filter}
-      <div ref={ref} className={`lc-tile ${className}`} style={glass.style} onPointerMove={specular} {...rest}>{children}</div>
+      <div
+        ref={ref}
+        className={`lc-tile ${className}`}
+        style={glass.style}
+        onPointerMove={specular}
+        onKeyDown={(e) => { if (rest.role === 'button' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); rest.onClick?.(e) } }}
+        {...rest}
+      >
+        {children}
+      </div>
     </>
   )
 }
@@ -115,6 +124,7 @@ export default function LiquidControl({ strength = 60, accent = '#2f80ff', style
         .lc-tray { position: absolute; right: 12px; top: 50%; width: 76px; padding: 10px 0; border-radius: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; transform: translate(130%, -50%); transition: transform 380ms cubic-bezier(.2,.9,.2,1); z-index: 4; background: rgba(20,20,28,.18); box-shadow: inset 0 1px 1px rgba(255,255,255,.75), inset 0 0 0 1px rgba(255,255,255,.2), 0 10px 26px rgba(0,0,0,.2); }
         .lc-tray.open { transform: translate(0, -50%); }
         .lc-tray button { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: rgba(255,255,255,.2); }
+        @media (prefers-reduced-motion: reduce) { .lc-ripple { animation: none; display: none; } .lc-tray { transition: none; } }
         @container (max-width: 520px) { .lc-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 78px; } .lc-connect, .lc-music, .lc-focus { grid-column: span 2; } }
       `}</style>
 

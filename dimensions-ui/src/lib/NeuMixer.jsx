@@ -1,4 +1,6 @@
+import { readableOn, textOn } from '../ui/color.js'
 import { useEffect, useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Neumorphic audio mixer. Each channel is a strip with a recessed fader
 // track and a raised cap you drag, an LED meter that dances while playing,
@@ -83,20 +85,22 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
   const [eq, setEq] = useState([55, 48, 50, 60, 52])
   const [playing, setPlaying] = useState(true)
   const [meters, setMeters] = useState(levels)
+  const root = useRef(null)
+  const visible = useOnScreen(root)
 
   const anySolo = solo.some(Boolean)
   const audible = (i) => (i === 5 ? !mute[5] : !mute[i] && (!anySolo || solo[i]))
 
   useEffect(() => {
-    if (!playing) { setMeters(levels.map(() => 0)); return }
+    if (!playing || !visible) { setMeters(levels.map(() => 0)); return }
     const id = setInterval(() => setMeters(levels.map((l, i) => (audible(i) ? Math.max(0, Math.min(100, l * (0.7 + Math.random() * 0.3))) : 0))), 140)
     return () => clearInterval(id)
-  }, [playing, levels, mute, solo]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playing, visible, levels, mute, solo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const flip = (arr, set, i) => set(arr.map((v, k) => (k === i ? !v : v)))
 
   return (
-    <div className="nm-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, ...style }}>
+    <div ref={root} className="nm-wrap" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, '--accent-ink': readableOn(accent, t.base), '--on-accent': textOn(accent), ...style }}>
       <style>{`
         .nm-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: var(--base); color: var(--ink); font: 600 12px/1.3 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.nm-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -105,18 +109,18 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
         .nm { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; min-height: 100%; box-sizing: border-box; }
         .nm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
         .nm-play { display: flex; align-items: center; gap: 10px; }
-        .nm-play button { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); transition: box-shadow 150ms; }
+        .nm-play button { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--accent-ink); transition: box-shadow 150ms; }
         .nm-play button[aria-pressed='true'] { box-shadow: inset 4px 4px 9px var(--lo), inset -4px -4px 9px var(--hi); }
         .nm-play b { font-size: 14px; }
         .nm-play small { display: block; color: var(--muted); font-weight: 500; }
         .nm-seg { position: relative; display: grid; grid-template-columns: repeat(3, 72px); padding: 4px; border-radius: 999px; }
         .nm-seg button { position: relative; z-index: 1; padding: 7px 0; color: var(--muted); }
-        .nm-seg button[aria-selected='true'] { color: var(--accent); }
+        .nm-seg button[aria-selected='true'] { color: var(--accent-ink); }
         .nm-seg i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: 72px; border-radius: 999px; transition: transform 260ms cubic-bezier(.3,1.3,.5,1); }
         .nm-strips { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; min-height: 250px; }
         .nm-strip { border-radius: 18px; padding: 10px 6px; display: grid; grid-template-rows: auto 1fr auto auto; justify-items: center; gap: 8px; transition: box-shadow 200ms; cursor: pointer; }
         .nm-strip.sel { box-shadow: inset 4px 4px 9px var(--lo), inset -4px -4px 9px var(--hi); }
-        .nm-strip.sel .nm-name { color: var(--accent); }
+        .nm-strip.sel .nm-name { color: var(--accent-ink); }
         .nm-name { font-size: 11.5px; }
         .nm-body { display: flex; gap: 8px; height: 100%; min-height: 120px; }
         .nm-fader { position: relative; width: 12px; height: 100%; border-radius: 999px; touch-action: none; cursor: ns-resize; }
@@ -137,7 +141,7 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
         .nm-eq { flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: center; border-radius: 20px; padding: 18px; }
         .nm-knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .nm-knob-wrap span { color: var(--muted); }
-        .nm-knob-wrap b { font-variant-numeric: tabular-nums; color: var(--accent); }
+        .nm-knob-wrap b { font-variant-numeric: tabular-nums; color: var(--accent-ink); }
         .nm-knob { position: relative; width: 64px; height: 64px; border-radius: 50%; touch-action: none; cursor: ns-resize; }
         .nm-knob i { position: absolute; left: 50%; top: 6px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: var(--accent); transform-origin: 50% 26px; }
         .nm-fx { flex: 1; display: grid; place-items: center; color: var(--muted); border-radius: 20px; }
@@ -161,7 +165,7 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
         {view === 0 && (
           <div className="nm-strips">
             {CHANNELS.map((c, i) => (
-              <div key={c} className={`nm-strip ${i === sel ? 'sel' : 'nm-up'}`} onClick={() => setSel(i)}>
+              <div key={c} className={`nm-strip ${i === sel ? 'sel' : 'nm-up'}`} onClick={() => setSel(i)} onFocus={() => setSel(i)}>
                 <span className="nm-name">{c}</span>
                 <div className="nm-body">
                   <Fader value={levels[i]} label={c} onChange={(v) => { setSel(i); setLevels(levels.map((l, k) => (k === i ? v : l))) }} />

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Bento analytics dashboard: tiles of different sizes for KPIs, a revenue
 // chart, a conversion funnel, live visitors, top countries and a goal ring.
@@ -19,6 +20,8 @@ const fmt = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}m` : n >= 1e4 ? `${Math.r
 const Icon = ({ d, size = 16 }) => <svg viewBox="0 0 20 20" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: 'none' }}><path d={d} /></svg>
 
 export default function BentoAnalytics({ accent = '#3b5bfd', style }) {
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const [range, setRange] = useState('7 days')
   const [board, setBoard] = useState(0)
   const [big, setBig] = useState(null)
@@ -35,7 +38,7 @@ export default function BentoAnalytics({ accent = '#3b5bfd', style }) {
   const tile = (id, cls, children) => (!big || big === id) && <section className={`ba-tile ${cls}${big === id ? ' ba-big' : ''}`}><Tools id={id} />{children}</section>
 
   return (
-    <div className="ba-wrap" style={{ '--accent': accent, ...style }}>
+    <div ref={root} className="ba-wrap" data-paused={visible ? undefined : ''} style={{ '--accent': accent, ...style }}>
       <style>{`
         .ba-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: hidden; background: #eef0f4; color: #141827; font: 500 12.5px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; display: grid; grid-template-columns: 60px 1fr; }
         :where(.ba-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -54,7 +57,7 @@ export default function BentoAnalytics({ accent = '#3b5bfd', style }) {
         .ba-tile.ba-big { grid-column: 1 / -1; grid-row: span 3; }
         .ba-tile small { color: #6b7287; font-weight: 600; }
         .ba-tile b.kpi { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-        .ba-up { color: #12a150; font-weight: 700; font-size: 11.5px; }
+        .ba-up { color: #0b7a3b; font-weight: 700; font-size: 11.5px; }
         .ba-tools { position: absolute; right: 8px; top: 8px; display: flex; gap: 2px; opacity: .55; transition: opacity 150ms; }
         .ba-tile:hover .ba-tools { opacity: 1; }
         .ba-tools button { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; color: #6b7287; }
@@ -79,7 +82,9 @@ export default function BentoAnalytics({ accent = '#3b5bfd', style }) {
         .ba-goal { grid-row: span 2; align-items: center; justify-content: center; text-align: center; }
         .ba-goal svg { transform: rotate(-90deg); }
         .ba-toast { position: absolute; right: 20px; bottom: 18px; background: #141827; color: #fff; padding: 8px 12px; border-radius: 10px; font-weight: 600; }
+        @media (prefers-reduced-motion: reduce) { .ba-dot { animation: none; } .ba-bars i, .ba-step i { transition: none; } }
         @container (max-width: 680px) { .ba-wrap { grid-template-columns: 1fr; } .ba-rail { display: none; } .ba-grid { grid-template-columns: repeat(2, 1fr); } }
+        .ba-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <nav className="ba-rail" aria-label="Dashboards">

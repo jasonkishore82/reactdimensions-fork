@@ -1,3 +1,4 @@
+import { readableOn, textOn } from '../ui/color.js'
 import { useEffect, useRef, useState } from 'react'
 
 // Neumorphic calculator. Keys are raised from the same surface and sink in
@@ -93,7 +94,7 @@ export default function NeuCalc({ surface = '#e6ebf2', accent = '#ff7a45', showH
 
 
   return (
-    <div ref={root} tabIndex={0} className="nc-wrap" aria-label="Calculator" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, ...style }}>
+    <div ref={root} tabIndex={0} className="nc-wrap" aria-label="Calculator" style={{ '--base': t.base, '--hi': t.hi, '--lo': t.lo, '--ink': t.ink, '--muted': t.muted, '--accent': accent, '--accent-ink': readableOn(accent, t.base), '--on-accent': textOn(accent), ...style }}>
       <style>{`
         .nc-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: var(--base); color: var(--ink); font: 600 15px/1 system-ui, -apple-system, 'Segoe UI', sans-serif; outline: none; }
         :where(.nc-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -104,7 +105,7 @@ export default function NeuCalc({ surface = '#e6ebf2', accent = '#ff7a45', showH
         .nc-top { display: flex; justify-content: space-between; align-items: center; }
         .nc-mode { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; width: 190px; }
         .nc-mode button { position: relative; z-index: 1; padding: 7px 0; font-size: 12px; color: var(--muted); }
-        .nc-mode button[aria-selected='true'] { color: var(--accent); }
+        .nc-mode button[aria-selected='true'] { color: var(--accent-ink); }
         .nc-mode i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; transition: transform 260ms cubic-bezier(.3,1.3,.5,1); }
         .nc-op { color: var(--muted); font-size: 12px; min-width: 20px; text-align: right; }
         .nc-screen { border-radius: 20px; padding: 10px 18px; text-align: right; }
@@ -113,12 +114,12 @@ export default function NeuCalc({ surface = '#e6ebf2', accent = '#ff7a45', showH
         .nc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; }
         .nc-key { height: 40px; border-radius: 14px; transition: box-shadow 90ms, transform 90ms; }
         .nc-key.down, .nc-key:active { box-shadow: inset 4px 4px 8px var(--lo), inset -4px -4px 8px var(--hi); transform: scale(.98); }
-        .nc-key.op { color: var(--accent); font-size: 20px; }
-        .nc-key.op.active { color: var(--base); background: var(--accent); box-shadow: inset 3px 3px 6px color-mix(in srgb, var(--accent), black 25%); }
+        .nc-key.op { color: var(--accent-ink); font-size: 20px; }
+        .nc-key.op.active { color: var(--on-accent); background: var(--accent); box-shadow: inset 3px 3px 6px color-mix(in srgb, var(--accent), black 25%); }
         .nc-key.fn { color: var(--muted); font-size: 14px; }
         .nc-key.sci { font-size: 13px; color: var(--muted); height: 32px; border-radius: 11px; }
         .nc-sci { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-        .nc-key.eq { background: var(--accent); color: #fff; font-size: 20px; }
+        .nc-key.eq { background: var(--accent); color: var(--on-accent); font-size: 20px; }
         .nc-tape { width: 180px; align-self: stretch; max-height: 380px; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow: auto; }
         .nc-tape h4 { margin: 0; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
         .nc-tape button { text-align: right; padding: 6px 4px; border-radius: 10px; }

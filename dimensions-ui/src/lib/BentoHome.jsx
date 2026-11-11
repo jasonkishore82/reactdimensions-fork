@@ -31,7 +31,7 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
         .bh-wrap { container-type: inline-size; position: relative; width: 100%; height: 100%; overflow: hidden; background: #f6f5fb; color: #1d1b2c; font: 500 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; display: grid; grid-template-columns: 150px 1fr; }
         :where(.bh-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
         .bh-pins { padding: 16px 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-        .bh-pins small { font-weight: 700; color: #8a86a3; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
+        .bh-pins small { font-weight: 700; color: #5f5b78; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; }
         .bh-pin { border-radius: 18px; padding: 12px; background: #fff; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
         .bh-main { overflow: auto; padding: 16px 16px 84px; }
         .bh-main h1 { margin: 0 0 12px; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
@@ -39,7 +39,7 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
         .bh-tile { position: relative; border-radius: 22px; padding: 14px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); display: flex; flex-direction: column; gap: 6px; overflow: hidden; transition: transform 120ms ease, box-shadow 150ms; }
         .bh-tile:hover { box-shadow: 0 8px 20px rgba(30,20,80,.08); }
         .bh-tile:active { transform: scale(.97); }
-        .bh-tile h3 { margin: 0; font-size: 12px; font-weight: 700; color: #8a86a3; letter-spacing: .06em; text-transform: uppercase; }
+        .bh-tile h3 { margin: 0; font-size: 12px; font-weight: 700; color: #5f5b78; letter-spacing: .06em; text-transform: uppercase; }
         .bh-actions { grid-column: span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; }
         .bh-act { border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-weight: 700; font-size: 11.5px; transition: transform 120ms; }
         .bh-act:active { transform: scale(.94); }
@@ -48,7 +48,7 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
         .bh-file:hover { background: #f6f5fb; }
         .bh-file i { width: 30px; height: 36px; border-radius: 6px; flex: none; position: relative; }
         .bh-file i::after { content: ''; position: absolute; right: 0; top: 0; border: 6px solid #fff; border-left-color: transparent; border-bottom-color: transparent; }
-        .bh-file small { display: block; color: #8a86a3; }
+        .bh-file small { display: block; color: #5f5b78; }
         .bh-cal { grid-column: span 2; grid-row: span 2; background: #1d1b2c; color: #fff; }
         .bh-cal h3 { color: #b3aecf; }
         .bh-date { display: flex; align-items: baseline; gap: 8px; }
@@ -61,9 +61,9 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
         .bh-weather b { font-size: 30px; font-weight: 300; margin-top: auto; line-height: 1; }
         .bh-weather span { font-size: 12px; opacity: .9; }
         .bh-focus { background: var(--accent); color: #fff; }
-        .bh-focus h3 { color: rgba(255,255,255,.8); }
+        .bh-focus h3 { color: #fff; }
         .bh-focus b { font-size: 26px; font-weight: 700; margin-top: auto; font-variant-numeric: tabular-nums; }
-        .bh-focus small { opacity: .85; }
+        .bh-focus small { font-weight: 600; }
         .bh-batt { grid-column: span 2; flex-direction: row; align-items: center; justify-content: space-around; }
         .bh-b { display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 700; font-size: 11.5px; }
         .bh-b svg { transform: rotate(-90deg); }
@@ -76,9 +76,9 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
 
       <aside className="bh-pins">
         <small>Pinned</small>
-        <button className="bh-pin" onClick={() => open('Design system')}><b>Design system</b><span style={{ color: '#8a86a3' }}>14 files</span></button>
-        <button className="bh-pin" onClick={() => open('Team wiki')}><b>Team wiki</b><span style={{ color: '#8a86a3' }}>Updated 3h ago</span></button>
-        <button className="bh-pin" onClick={() => open('Invoices')}><b>Invoices</b><span style={{ color: '#8a86a3' }}>2 due</span></button>
+        <button className="bh-pin" onClick={() => open('Design system')}><b>Design system</b><span style={{ color: '#5f5b78' }}>14 files</span></button>
+        <button className="bh-pin" onClick={() => open('Team wiki')}><b>Team wiki</b><span style={{ color: '#5f5b78' }}>Updated 3h ago</span></button>
+        <button className="bh-pin" onClick={() => open('Invoices')}><b>Invoices</b><span style={{ color: '#5f5b78' }}>2 due</span></button>
       </aside>
 
       <main className="bh-main">
@@ -112,7 +112,7 @@ export default function BentoHome({ greeting = 'Good morning, Sam', accent = '#7
       </main>
 
       <nav className="bh-tabs">
-        {TABS.map(([l, d], n) => <button key={l} aria-current={n === tab ? 'page' : undefined} onClick={() => setTab(n)}><Icon d={d} />{n === tab && l}</button>)}
+        {TABS.map(([l, d], n) => <button key={l} aria-label={l} aria-current={n === tab ? 'page' : undefined} onClick={() => setTab(n)}><Icon d={d} />{n === tab && l}</button>)}
       </nav>
       {opened && <div className="bh-toast" role="status">Opening {opened}…</div>}
     </div>

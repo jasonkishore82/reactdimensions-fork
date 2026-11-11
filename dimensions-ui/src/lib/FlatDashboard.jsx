@@ -37,9 +37,9 @@ const Icon = ({ d }) => (
 )
 
 export default function FlatDashboard({
-  brand = '#2f6bff',
+  brand = '#2563eb',
   sidebar = '#16224a',
-  kpiColors = '#2f6bff, #12b886, #f59f00, #f03e3e',
+  kpiColors = '#2563eb, #0d7a55, #b45309, #c92a2a',
   radius = 6,
   style,
 }) {
@@ -72,7 +72,7 @@ export default function FlatDashboard({
         .fd-btn:hover { background: color-mix(in srgb, var(--brand), black 18%); }
         .fd-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px 18px 0; }
         .fd-kpi { color: #fff; border-radius: var(--r); padding: 12px 14px; }
-        .fd-kpi span { display: block; font-size: 12px; opacity: .85; }
+        .fd-kpi span { display: block; font-size: 12px; font-weight: 600; }
         .fd-kpi b { display: block; font-size: 22px; font-weight: 800; margin-top: 4px; }
         .fd-row { display: grid; grid-template-columns: 1.7fr 1fr; gap: 12px; padding: 12px 18px 16px; min-height: 0; }
         .fd-panel { background: #fff; border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; min-height: 0; }
@@ -80,7 +80,7 @@ export default function FlatDashboard({
         .fd-head h3 { margin: 0; font-size: 14px; }
         .fd-bars { flex: 1; display: flex; align-items: flex-end; gap: 8px; min-height: 60px; border-bottom: 2px solid #e3e8f2; }
         .fd-bar { flex: 1; background: var(--brand); border-radius: 3px 3px 0 0; transition: height 300ms ease; }
-        .fd-bar:last-child { background: #f59f00; }
+        .fd-bar:last-child { background: #b45309; }
         .fd-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
         .fd-list li { display: flex; align-items: center; gap: 10px; }
         .fd-list i { width: 10px; height: 10px; border-radius: 2px; flex: none; }

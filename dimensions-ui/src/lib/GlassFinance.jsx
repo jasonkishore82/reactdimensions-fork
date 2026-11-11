@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Glassmorphism banking app on a near-black canvas lit by two slow light
 // leaks (amber and teal) instead of the usual purple orbs. A frosted balance
@@ -28,6 +29,8 @@ const Icon = ({ d, size = 18 }) => (
 const money = (v) => `${v < 0 ? '−' : '+'}$${Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export default function GlassFinance({ blur = 20, frost = 0.08, glowA = '#ffb547', glowB = '#2dd4bf', style }) {
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const [tab, setTab] = useState(0)
   const [rail, setRail] = useState(0)
   const [reveal, setReveal] = useState(false)
@@ -44,7 +47,7 @@ export default function GlassFinance({ blur = 20, frost = 0.08, glowA = '#ffb547
   )
 
   return (
-    <div className="gf-wrap" style={{ '--blur': `${blur}px`, '--frost': frost, '--ga': glowA, '--gb': glowB, ...style }}>
+    <div ref={root} className="gf-wrap" data-paused={visible ? undefined : ''} style={{ '--blur': `${blur}px`, '--frost': frost, '--ga': glowA, '--gb': glowB, ...style }}>
       <style>{`
         .gf-wrap { container-type: inline-size; position: relative; width: 100%; height: 100%; overflow: hidden; background: #07090f; color: #f2f4f8; font: 400 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.gf-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -103,6 +106,7 @@ export default function GlassFinance({ blur = 20, frost = 0.08, glowA = '#ffb547
         .gf-toast { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); border-radius: 999px; padding: 8px 14px; font-weight: 600; z-index: 4; }
         @container (max-width: 640px) { .gf-grid { grid-template-columns: 1fr; } .gf { grid-template-columns: 1fr; } .gf-rail { display: none; } .gf-pill { grid-template-columns: repeat(3, 76px); } .gf-pill i { width: 76px; } }
         @media (prefers-reduced-motion: reduce) { .gf-wrap * { animation: none !important; } }
+        .gf-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <div className="gf-leak a" aria-hidden="true" />

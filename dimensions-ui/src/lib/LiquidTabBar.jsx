@@ -54,7 +54,7 @@ export default function LiquidTabBar({ strength = 60, tint = 0.3, style }) {
         .lt-feed h1 { grid-column: 1 / -1; margin: 4px 0 2px; font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
         .lt-card { position: relative; border-radius: 22px; height: 230px; overflow: hidden; padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; }
         .lt-card b { font-size: 20px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; position: relative; }
-        .lt-card small { font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; opacity: .85; position: relative; }
+        .lt-card small { align-self: flex-start; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 10px; position: relative; color: #fff; background: rgba(0,0,0,.45); padding: 2px 7px; border-radius: 999px; margin-bottom: 4px; }
         .lt-card i { position: absolute; border-radius: 50%; }
         .lt-glass { background: rgba(18,18,26,var(--tint)); box-shadow: inset 0 1px 1px rgba(255,255,255,.7), inset 0 -1px 1px rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.35); }
         .lt-glass::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(circle at var(--gx, 30%) var(--gy, 0%), rgba(255,255,255,.45), transparent 45%); mix-blend-mode: soft-light; }
@@ -69,10 +69,11 @@ export default function LiquidTabBar({ strength = 60, tint = 0.3, style }) {
         .lt-sheet h3 { margin: 0 0 6px; font-size: 18px; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
         .lt-sheet button { text-align: left; padding: 10px 12px; border-radius: 14px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
         .lt-sheet button:hover { background: rgba(255,255,255,.14); }
+        @media (prefers-reduced-motion: reduce) { .lt-drop, .lt-sheet { transition: none; } .lt-drop.moving { animation: none; } }
         @container (max-width: 560px) { .lt-feed { grid-template-columns: repeat(2, 1fr); } .lt-bar { grid-template-columns: repeat(5, 62px); } .lt-drop { width: 62px; } }
       `}</style>
 
-      <div className="lt-feed">
+      <div className="lt-feed" tabIndex={0} role="region" aria-label="Feed">
         <h1>{TABS[tab][0] === 'Home' ? 'For you' : TABS[tab][0]}</h1>
         {[...FEED, ...FEED].map(([bg, fg, title, tag], i) => (
           <article key={i} className="lt-card" style={{ background: bg, color: i % 6 === 4 ? '#1a1a1a' : '#fff' }}>

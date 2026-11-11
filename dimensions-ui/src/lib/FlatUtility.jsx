@@ -79,7 +79,7 @@ export default function FlatUtility({ accent = '#3b82f6', tileRadius = 14, showL
         .fu-main { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; }
         .fu-head { display: flex; align-items: baseline; justify-content: space-between; padding: 16px 20px 6px; }
         .fu-head h2 { margin: 0; font-size: 18px; font-weight: 800; }
-        .fu-head span { color: #868e96; font-weight: 600; }
+        .fu-head span { color: #5c636a; font-weight: 600; }
         .fu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; padding: 10px 20px 14px; overflow: auto; align-content: start; }
         .fu-tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0; }
         .fu-box { width: 64px; height: 64px; border-radius: var(--tr); background: #fff; display: grid; place-items: center; color: var(--c); transition: background 140ms, color 140ms, transform 100ms; }
@@ -88,9 +88,9 @@ export default function FlatUtility({ accent = '#3b82f6', tileRadius = 14, showL
         .fu-tile[aria-pressed='true'] .fu-box { background: var(--c); color: #fff; }
         .fu-tile b { font-weight: 600; font-size: 12px; }
         .fu-tabs { display: flex; justify-content: space-around; background: #fff; border-top: 1px solid #e9ecef; padding: 8px 12px; }
-        .fu-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #868e96; padding: 0 6px; }
+        .fu-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #5c636a; padding: 0 6px; }
         .fu-pill { width: 52px; height: 28px; border-radius: 999px; display: grid; place-items: center; transition: background 160ms; }
-        .fu-tab[aria-selected='true'] { color: var(--accent); }
+        .fu-tab[aria-selected='true'] { color: color-mix(in srgb, var(--accent), black 32%); }
         .fu-tab[aria-selected='true'] .fu-pill { background: color-mix(in srgb, var(--accent) 16%, #fff); }
         @container (max-width: 520px) { .fu { grid-template-columns: 52px 1fr; } .fu .fu-toggle span, .fu .fu-chip span { display: none; } }
       `}</style>

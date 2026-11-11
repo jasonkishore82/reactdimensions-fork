@@ -74,7 +74,7 @@ export default function FlatShop({ buttonColor = '#111111', radius = 4, showFilt
         .fs-nofilters .fs-body { grid-template-columns: 1fr; }
         .fs-nofilters .fs-filters { display: none; }
         .fs-filters { padding: 14px 16px 14px 20px; border-right: 1px solid #eee; overflow: auto; }
-        .fs-filters h4 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #777; }
+        .fs-filters h4 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #5e5e5e; }
         .fs-filters section + section { margin-top: 14px; padding-top: 14px; border-top: 1px solid #eee; }
         .fs-check { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; }
         .fs-check input { appearance: none; width: 16px; height: 16px; border: 1.5px solid #111; border-radius: 3px; margin: 0; display: grid; place-items: center; cursor: pointer; }

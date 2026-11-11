@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 // where the current step stretches into a pill, and a skip link.
 
 const STEPS = [
-  { title: 'Build habits that stick', text: 'Pick a few small goals and check them off every day.', bg: '#ffe4d6', accent: '#ff5a36', art: 'calendar' },
-  { title: 'Watch your progress grow', text: 'Simple charts show your streaks week by week.', bg: '#d8f3e6', accent: '#139a62', art: 'chart' },
-  { title: 'Never miss a day', text: 'Gentle reminders arrive right when you need them.', bg: '#e1e5ff', accent: '#4053f0', art: 'bell' },
+  { title: 'Build habits that stick', text: 'Pick a few small goals and check them off every day.', bg: '#ffe4d6', accent: '#c2410c', art: 'calendar' },
+  { title: 'Watch your progress grow', text: 'Simple charts show your streaks week by week.', bg: '#d8f3e6', accent: '#0b7a4c', art: 'chart' },
+  { title: 'Never miss a day', text: 'Gentle reminders arrive right when you need them.', bg: '#e1e5ff', accent: '#3442d4', art: 'bell' },
 ]
 
 function Art({ kind, accent, bg }) {
@@ -73,7 +73,7 @@ export default function FlatOnboarding({ autoplay = false, interval = 3, buttonS
         .fo { container-type: size; position: relative; width: 100%; height: 100%; background: var(--bg); color: #1b1b1f; font: 400 14px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif; transition: background 400ms ease; overflow: hidden; display: grid; place-items: center; }
         .fo * { box-sizing: border-box; }
         .fo button { font: inherit; cursor: pointer; border: 0; }
-        .fo-skip { position: absolute; top: 14px; right: 18px; background: none; color: var(--accent); font-weight: 700; padding: 6px; }
+        .fo-skip { position: absolute; top: 14px; right: 18px; background: none; color: #1b1b1f; text-decoration: underline; text-underline-offset: 3px; font-weight: 700; padding: 6px; }
         .fo-col { width: min(360px, 100% - 40px); display: flex; flex-direction: column; align-items: center; text-align: center; gap: min(14px, 2.6cqh); }
         .fo-art { width: min(220px, 38cqh * 1.25); aspect-ratio: 200 / 160; }
         .fo-art svg { width: 100%; height: 100%; display: block; }

@@ -67,7 +67,7 @@ export default function BentoSpecs({ product = 'Nova', accent = '#ff9f43', style
         .bs-material { grid-column: span 2; flex-direction: row; align-items: center; justify-content: space-between; }
         .bs-swatches { display: flex; gap: 10px; }
         .bs-swatches button { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 -4px 8px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.28); outline-offset: 3px; }
-        .bs-swatches button[aria-pressed='true'] { outline: 2px solid #f5f5f7; }
+        .bs-swatches button[aria-checked='true'] { outline: 2px solid #f5f5f7; }
         .bs-buy { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 3; background: rgba(28,28,30,.86); backdrop-filter: blur(14px); border-radius: 20px; padding: 7px 7px 7px 16px; display: flex; align-items: center; gap: 10px; border: 1px solid #2c2c2e; }
         .bs-buy b { font-size: 15px; }
         .bs-buy small { display: block; color: #a1a1a6; }
@@ -122,7 +122,7 @@ export default function BentoSpecs({ product = 'Nova', accent = '#ff9f43', style
           <section className="bs-tile bs-material">
             <div><small>Frame</small><div className="bs-num" style={{ fontSize: 30 }}>{m.material}</div><small><Num value={m.weight} /> g</small></div>
             <div className="bs-swatches" role="radiogroup" aria-label="Colour">
-              {m.colours.map((c, i) => <button key={c} role="radio" aria-checked={i === colour} aria-pressed={i === colour} aria-label={`Colour ${i + 1}`} style={{ background: c }} onClick={() => setColour(i)} />)}
+              {m.colours.map((c, i) => <button key={c} role="radio" aria-checked={i === colour} aria-label={`Colour ${i + 1}`} style={{ background: c }} onClick={() => setColour(i)} />)}
             </div>
           </section>
         </div>

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Bento feature section for a landing page: one big hero tile and smaller
 // tiles, each showing one idea with a tiny live demo (a typing editor,
@@ -8,9 +9,13 @@ import { useEffect, useState } from 'react'
 const LINKS = ['Features', 'Pricing', 'Customers', 'Changelog']
 const CODE = 'deploy --prod ./site'
 
-function Typing() {
+function Typing({ active }) {
   const [n, setN] = useState(0)
-  useEffect(() => { const id = setInterval(() => setN((v) => (v + 1) % (CODE.length + 12)), 120); return () => clearInterval(id) }, [])
+  useEffect(() => {
+    if (!active) return
+    const id = setInterval(() => setN((v) => (v + 1) % (CODE.length + 12)), 120)
+    return () => clearInterval(id)
+  }, [active])
   return (
     <div className="bf-term">
       <div className="bf-dots"><i /><i /><i /></div>
@@ -33,9 +38,11 @@ function Counter({ to }) {
 
 export default function BentoFeatures({ accent = '#c6f432', dark = true, style }) {
   const [active, setActive] = useState(0)
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const ink = dark ? '#f4f4f0' : '#111'
   return (
-    <div className="bf-wrap" style={{ '--accent': accent, '--bg': dark ? '#0b0b0f' : '#f4f3ee', '--tile': dark ? '#16161c' : '#ffffff', '--ink': ink, '--muted': dark ? '#9a9aa6' : '#5d5d66', '--line': dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)', ...style }}>
+    <div ref={root} className="bf-wrap" data-paused={visible ? undefined : ''} style={{ '--accent': accent, '--bg': dark ? '#0b0b0f' : '#f4f3ee', '--tile': dark ? '#16161c' : '#ffffff', '--ink': ink, '--muted': dark ? '#9a9aa6' : '#5d5d66', '--line': dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)', ...style }}>
       <style>{`
         .bf-wrap { container-type: inline-size; width: 100%; height: 100%; overflow: auto; background: var(--bg); color: var(--ink); font: 500 13px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif; }
         :where(.bf-wrap) button, :where(.bf-wrap) a { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
@@ -77,6 +84,7 @@ export default function BentoFeatures({ accent = '#c6f432', dark = true, style }
         @container (max-width: 760px) { .bf { grid-template-columns: repeat(2, 1fr); } .bf-nav a:not(.bf-go) { display: none; } }
         @container (max-width: 440px) { .bf { grid-template-columns: 1fr; grid-auto-rows: minmax(150px, auto); } .bf-hero, .bf-wide { grid-column: span 1; } }
         @media (prefers-reduced-motion: reduce) { .bf-wrap * { animation: none !important; } }
+        .bf-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <nav className="bf-nav">
@@ -89,7 +97,7 @@ export default function BentoFeatures({ accent = '#c6f432', dark = true, style }
         <article className="bf-tile bf-hero">
           <h2>Ship the site.<br /><span>Skip the ops.</span></h2>
           <p>Push to deploy, previews for every branch, and rollbacks in one click.</p>
-          <Typing />
+          <Typing active={visible} />
         </article>
 
         <article className="bf-tile">

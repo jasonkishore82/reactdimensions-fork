@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useOnScreen } from '../ui/onscreen.js'
 
 // Glassmorphism sign-in over a Swiss-style poster: bold shapes and giant
 // type drift slowly behind one frosted card, so the blur always has
@@ -14,6 +15,8 @@ const POSTERS = {
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 
 export default function GlassLogin({ poster = 'vermillion', blur = 22, frost = 0.18, style }) {
+  const root = useRef(null)
+  const visible = useOnScreen(root)
   const p = POSTERS[poster] ?? POSTERS.vermillion
   const [mode, setMode] = useState(0)
   const [email, setEmail] = useState('')
@@ -34,7 +37,7 @@ export default function GlassLogin({ poster = 'vermillion', blur = 22, frost = 0
   }
 
   return (
-    <div className="gl-wrap" style={{ '--bg': p.bg, '--a': p.a, '--b': p.b, '--c': p.c, '--type': p.type, '--blur': `${blur}px`, '--frost': frost, ...style }}>
+    <div ref={root} className="gl-wrap" data-paused={visible ? undefined : ''} style={{ '--bg': p.bg, '--a': p.a, '--b': p.b, '--c': p.c, '--type': p.type, '--blur': `${blur}px`, '--frost': frost, ...style }}>
       <style>{`
         .gl-wrap { container-type: size; position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: #fff; font: 400 13px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif; display: grid; place-items: center; }
         :where(.gl-wrap) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -77,6 +80,7 @@ export default function GlassLogin({ poster = 'vermillion', blur = 22, frost = 0
         .gl-help { position: absolute; right: 16px; bottom: 16px; width: 38px; height: 38px; border-radius: 50%; font-weight: 800; font-size: 16px; }
         .gl-tip { position: absolute; right: 16px; bottom: 62px; width: 200px; border-radius: 14px; padding: 10px 12px; font-size: 12px; }
         @media (prefers-reduced-motion: reduce) { .gl-wrap * { animation: none !important; } }
+        .gl-wrap[data-paused] * { animation-play-state: paused !important; }
       `}</style>
 
       <div className="gl-poster" aria-hidden="true">
