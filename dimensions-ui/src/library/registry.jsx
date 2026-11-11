@@ -8,6 +8,16 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import BentoSpecs from '../lib/BentoSpecs.jsx'
+import BentoHome from '../lib/BentoHome.jsx'
+import BentoAnalytics from '../lib/BentoAnalytics.jsx'
+import BentoPortfolio from '../lib/BentoPortfolio.jsx'
+import BentoFeatures from '../lib/BentoFeatures.jsx'
+import LiquidHero from '../lib/LiquidHero.jsx'
+import LiquidMedia from '../lib/LiquidMedia.jsx'
+import LiquidControl from '../lib/LiquidControl.jsx'
+import LiquidLens from '../lib/LiquidLens.jsx'
+import LiquidTabBar from '../lib/LiquidTabBar.jsx'
 import NeuSettings from '../lib/NeuSettings.jsx'
 import NeuMixer from '../lib/NeuMixer.jsx'
 import NeuFitness from '../lib/NeuFitness.jsx'
@@ -42,7 +52,7 @@ import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../liquid/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1131,6 +1141,159 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <NeuSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['NeuSettings.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-tab-bar',
+    name: 'Liquid Tab Bar',
+    category: 'UI',
+    isNew: true,
+    description: 'A thick-glass tab bar that bends the feed beneath it, with a stretching droplet.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+      { name: 'tint', type: 'range', min: 0, max: 0.6, step: 0.02, default: 0.3 },
+    ],
+    fill: true,
+    preview: (p) => <LiquidTabBar {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidTabBar.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-lens',
+    name: 'Liquid Lens',
+    category: 'UI',
+    isNew: true,
+    description: 'A product viewer with a draggable glass lens, glass colour beads and a thick glass spec panel.',
+    controls: [
+      { name: 'zoom', type: 'range', min: 1.1, max: 3, step: 0.1, default: 1.8, unit: '×' },
+      { name: 'strength', type: 'range', min: 0, max: 180, step: 5, default: 90 },
+      { name: 'lensSize', type: 'range', min: 90, max: 240, step: 10, default: 150, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <LiquidLens {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidLens.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-control',
+    name: 'Liquid Control Centre',
+    category: 'UI',
+    isNew: true,
+    description: 'Glass control tiles that bend the wallpaper, with rippling toggles and glass-tube sliders.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+      { name: 'accent', type: 'color', default: '#2f80ff' },
+    ],
+    fill: true,
+    preview: (p) => <LiquidControl {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidControl.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-media',
+    name: 'Liquid Media Controls',
+    category: 'UI',
+    isNew: true,
+    description: 'Glass bubble video controls with a droplet scrubber over a living scene.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 70 },
+      { name: 'autoHide', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <LiquidMedia {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidMedia.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-hero',
+    name: 'Liquid Hero',
+    category: 'UI',
+    isNew: true,
+    description: 'A landing hero where a drifting glass orb bends a giant headline.',
+    controls: [
+      { name: 'headline', type: 'text', default: 'Bend the light.' },
+      { name: 'accent', type: 'color', default: '#ff4f2e' },
+      { name: 'orbSize', type: 'range', min: 140, max: 400, step: 10, default: 260, unit: 'px' },
+      { name: 'zoom', type: 'range', min: 1.1, max: 2.5, step: 0.05, default: 1.45, unit: '×' },
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+    ],
+    fill: true,
+    preview: (p) => <LiquidHero {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidHero.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'bento-features',
+    name: 'Bento Features',
+    category: 'UI',
+    isNew: true,
+    description: 'A bento feature section with live mini demos in each tile and a sticky nav pill.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#c6f432' },
+      { name: 'dark', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <BentoFeatures {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoFeatures.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bento-portfolio',
+    name: 'Bento Portfolio',
+    category: 'UI',
+    isNew: true,
+    description: 'A link-in-bio bento: portrait, bio, project, now playing, map and socials.',
+    controls: [
+      { name: 'name', type: 'text', default: 'Lena Ortiz' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <BentoPortfolio {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoPortfolio.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bento-analytics',
+    name: 'Bento Analytics',
+    category: 'UI',
+    isNew: true,
+    description: 'An analytics bento with a date-range pill, expandable tiles and export.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#3b5bfd' },
+    ],
+    fill: true,
+    preview: (p) => <BentoAnalytics {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoAnalytics.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bento-home',
+    name: 'Bento Home',
+    category: 'UI',
+    isNew: true,
+    description: 'An app home screen of pressable tiles with pinned items and a tab pill.',
+    controls: [
+      { name: 'greeting', type: 'text', default: 'Good morning, Sam' },
+      { name: 'accent', type: 'color', default: '#7048e8' },
+    ],
+    fill: true,
+    preview: (p) => <BentoHome {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoHome.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bento-specs',
+    name: 'Bento Specs',
+    category: 'UI',
+    isNew: true,
+    description: 'A product spec bento with animated numbers, model switcher and compare drawer.',
+    controls: [
+      { name: 'product', type: 'text', default: 'Nova' },
+      { name: 'accent', type: 'color', default: '#ff9f43' },
+    ],
+    fill: true,
+    preview: (p) => <BentoSpecs {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoSpecs.jsx'],
     deps: [],
   },
 ]
