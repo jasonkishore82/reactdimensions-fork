@@ -7,13 +7,15 @@ export const HEAD_D = 1.4 // the head and neck get extra rings for a smooth snou
 
 const CAP = 0.22 // length of the rounded snout
 
-// [distance, half-width, half-height]. The head is wide and flat, the neck
-// narrower, the body thick, then a long taper to the tail tip.
+// [distance, half-width, half-height]. The head is a broad, flat, viper-like
+// wedge that widens to the jaw, then a narrower neck, the body thick, then a
+// long taper to the tail tip.
 const KEYS = [
-  [CAP, 0.11, 0.066],
-  [0.5, 0.185, 0.095],
-  [0.85, 0.185, 0.108],
-  [1.15, 0.15, 0.138],
+  [CAP, 0.12, 0.068],
+  [0.45, 0.19, 0.09],
+  [0.74, 0.228, 0.1],
+  [0.98, 0.18, 0.118],
+  [1.2, 0.15, 0.138],
   [1.8, 0.172, 0.162],
   [3.0, 0.205, 0.192],
   [0.45 * LENGTH, 0.218, 0.203],

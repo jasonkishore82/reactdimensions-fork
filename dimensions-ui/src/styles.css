@@ -25,6 +25,8 @@
   --serif: 'Instrument Serif', 'Times New Roman', serif;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', sans-serif;
   --mono: 'IBM Plex Mono', 'Menlo', monospace;
+  /* titles and headings */
+  --display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 
   --nav-h: 56px;
   --nav-gap: 12px;
@@ -256,17 +258,60 @@ em {
 }
 .hero-copy { grid-area: copy; padding-top: 24px; }
 .hero-lander {
-  grid-template-areas: 'copy stage';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'copy';
   align-items: center;
   min-height: calc(100svh - var(--header-h));
   --lander-font: 'Noto Sans Meroitic', var(--sans);
 }
-.hero-lander .hero-copy { font-family: var(--lander-font); font-synthesis: none; }
+.hero-lander .hero-copy { font-family: var(--lander-font); font-synthesis: none; text-align: center; }
+.hero-lander .lede { margin-left: auto; margin-right: auto; }
+.hero-lander .actions { justify-content: center; }
+.hero-lander { position: relative; }
+.hero-lander .hero-copy { position: relative; z-index: 1; }
+
+/* Small component cards floating round the headline: they show what is inside. */
+.floaters { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.floater {
+  position: absolute;
+  width: clamp(120px, 12vw, 176px);
+  translate: -50% -50%;
+  pointer-events: auto;
+  display: block;
+  padding: 6px 6px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--paper-2);
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.35);
+  color: var(--ink-2);
+  text-decoration: none;
+  animation: fade 0.9s ease 0.5s backwards, floaty 7s ease-in-out var(--t, 0s) infinite;
+  transition: border-color 0.2s, color 0.2s;
+}
+.floater img { display: block; width: 100%; height: auto; border-radius: 9px; }
+.floater span { display: block; margin-top: 7px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.floater:hover { border-color: var(--signal); color: var(--ink); }
+@keyframes floaty {
+  0%, 100% { transform: rotate(var(--r, 0deg)) translateY(0); }
+  50% { transform: rotate(var(--r, 0deg)) translateY(-10px); }
+}
+@media (max-width: 960px) { .floaters { display: none; } }
+@media (prefers-reduced-motion: reduce) { .floater { animation: none; transform: rotate(var(--r, 0deg)); } }
 .hero-lander h1 {
   font: 400 clamp(42px, 5.4vw, 84px)/1.04 var(--lander-font);
   letter-spacing: -0.03em;
 }
-.hero-lander h1 em { font-family: var(--lander-font); font-style: normal; }
+.hero-lander h1 em {
+  font-family: var(--lander-font);
+  font-style: normal;
+  /* a permanent text-selection style highlight: white on the signal orange */
+  background: var(--signal);
+  color: #fff;
+  border-radius: 0.14em;
+  padding: 0 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
 .hero-lander .btn { font-family: var(--lander-font); font-weight: 400; }
 .eyebrow {
   display: flex;
@@ -280,8 +325,8 @@ em {
 }
 h1 {
   margin: 0;
-  font: 400 clamp(54px, 7.6vw, 118px)/0.92 var(--serif);
-  letter-spacing: -0.025em;
+  font: 700 clamp(54px, 7.6vw, 118px)/0.98 var(--display);
+  letter-spacing: -0.035em;
 }
 h1 em { padding-right: 0.04em; }
 .lede {
@@ -443,8 +488,8 @@ h1 em { padding-right: 0.04em; }
 h2 {
   margin: 0;
   max-width: 18ch;
-  font: 400 clamp(38px, 5.2vw, 76px)/0.98 var(--serif);
-  letter-spacing: -0.02em;
+  font: 700 clamp(38px, 5.2vw, 76px)/1.02 var(--display);
+  letter-spacing: -0.03em;
 }
 
 /* Primitives */

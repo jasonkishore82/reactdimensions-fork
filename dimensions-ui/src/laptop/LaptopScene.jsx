@@ -59,7 +59,7 @@ export default function LaptopScene({ autoRotate = true, ...props }) {
         />
         <Studio />
         <Laptop {...props} />
-        <ContactShadows position={[0, -0.005, 0]} opacity={0.45} scale={16} blur={2.6} far={3} resolution={512} color="#202328" />
+        <ContactShadows position={[0, -0.003, 0]} opacity={0.45} scale={16} blur={2.6} far={3} resolution={512} color="#202328" />
         <Rig />
         <OrbitControls
           makeDefault

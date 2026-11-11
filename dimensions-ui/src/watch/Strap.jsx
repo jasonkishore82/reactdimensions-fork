@@ -190,24 +190,23 @@ export default function Strap({ style = 'leather', color = '#4a2c17', accent = '
               side={THREE.DoubleSide}
             />
           </mesh>
-          {/* buckle: a frame round the strap with a tongue */}
+          {/* buckle: a frame that wraps right round the strap, with a tongue
+              lying along the top */}
           <group matrix={buckle} matrixAutoUpdate={false}>
-            <mesh position={[0, 0.02, 0]} castShadow>
-              <boxGeometry args={[STRAP_BASE_WIDTH * 1.16, 0.06, 0.07]} />
-              {metalMat}
-            </mesh>
-            <mesh position={[0, 0.02, 0.4]} castShadow>
-              <boxGeometry args={[STRAP_BASE_WIDTH * 1.16, 0.06, 0.07]} />
-              {metalMat}
-            </mesh>
-            {[-1, 1].map((sx) => (
-              <mesh key={sx} position={[sx * STRAP_BASE_WIDTH * 0.58, 0.02, 0.2]} castShadow>
-                <boxGeometry args={[0.07, 0.06, 0.47]} />
+            {[0, 0.4].map((z) => (
+              <mesh key={z} position={[0, THICK / 2 + 0.02, z]} castShadow>
+                <boxGeometry args={[STRAP_BASE_WIDTH * 1.16, 0.05, 0.07]} />
                 {metalMat}
               </mesh>
             ))}
-            <mesh position={[0, 0.07, 0.2]} castShadow>
-              <boxGeometry args={[0.045, 0.045, 0.34]} />
+            {[-1, 1].map((sx) => (
+              <mesh key={sx} position={[sx * STRAP_BASE_WIDTH * 0.58, 0, 0.2]} castShadow>
+                <boxGeometry args={[0.07, THICK + 0.1, 0.47]} />
+                {metalMat}
+              </mesh>
+            ))}
+            <mesh position={[0, THICK / 2 + 0.06, 0.2]} castShadow>
+              <boxGeometry args={[0.045, 0.04, 0.34]} />
               {metalMat}
             </mesh>
           </group>

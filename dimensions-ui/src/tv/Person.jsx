@@ -4,7 +4,7 @@ export default function Person({ color = '#b5b0a6' }) {
   return (
     <group>
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 3.1, 17.5, 0]} castShadow>
+        <mesh key={s} position={[s * 3.1, 17.2, 0]} castShadow>
           <capsuleGeometry args={[3.2, 28, 6, 16]} />
           {m}
         </mesh>

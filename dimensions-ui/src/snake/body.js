@@ -6,14 +6,23 @@ const HEAD_RINGS = 40
 const BODY_RINGS = 230
 
 // Where the eyes, nostrils and tongue sit, as distances from the snout.
-export const EYE_D = 0.36
-export const EYE_PHI = 1.3 // radians from the centre of the back
-export const NOSTRIL_D = 0.11
-export const NOSTRIL_PHI = 0.95
+export const EYE_D = 0.34
+export const EYE_PHI = 1.12 // radians from the centre of the back
+export const NOSTRIL_D = 0.085
+export const NOSTRIL_PHI = 0.72
 
 const BELLY_EXP = 2.7 // >2 makes the belly flatter than an ellipse
 
+// The head is held upright: over this stretch (distance from the snout) the
+// belly direction blends from the one carried up the body to straight down.
+const UPRIGHT_FULL = 0.95
+const UPRIGHT_NONE = 2.0
+
 const sgnpow = (x, e) => Math.sign(x) * Math.pow(Math.abs(x), e)
+const smoothstep = (a, b, x) => {
+  const t = Math.min(Math.max((x - a) / (b - a), 0), 1)
+  return t * t * (3 - 2 * t)
+}
 
 // Builds the tube once; `update` rewrites vertices from the spine each frame.
 export function createSnakeBody() {
@@ -63,6 +72,7 @@ export function createSnakeBody() {
   const t = new THREE.Vector3()
   const tPrev = new THREE.Vector3()
   const b = new THREE.Vector3()
+  const down = new THREE.Vector3()
   const back = new THREE.Vector3()
   const side = new THREE.Vector3()
   const q = new THREE.Quaternion()
@@ -114,6 +124,16 @@ export function createSnakeBody() {
         b.applyQuaternion(q)
       }
       b.addScaledVector(t, -b.dot(t)).normalize()
+      // Carried up a near-vertical neck, the belly direction can arrive at the
+      // head rolled onto its side, so turn the head's belly back towards the floor.
+      const w = 1 - smoothstep(UPRIGHT_FULL, UPRIGHT_NONE, dists[j])
+      if (w > 0) {
+        down.set(0, -1, 0).addScaledVector(t, t.y)
+        if (down.lengthSq() > 1e-4) {
+          down.normalize()
+          b.lerp(down, w).addScaledVector(t, -b.dot(t)).normalize()
+        }
+      }
       ringBelly[j * 3] = b.x
       ringBelly[j * 3 + 1] = b.y
       ringBelly[j * 3 + 2] = b.z

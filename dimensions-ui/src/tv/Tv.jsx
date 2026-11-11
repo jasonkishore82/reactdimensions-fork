@@ -13,6 +13,8 @@ const BASE = 55 // the panel is modelled at 55 inches and scaled
 const W0 = wOf(BASE)
 const H0 = hOf(BASE)
 const DEPTH = 1.05
+const BULGE_BACK = DEPTH / 2 + 0.55 + 0.7 // how far the electronics bulge reaches behind the panel's centre
+const PLATE_T = 0.5 // wall bracket thickness
 const WALL_Z = -10
 const CONSOLE_Z = -2
 const CT = 20 // console top height
@@ -108,7 +110,8 @@ export default function Tv({
     let zT
     if (w.mount === 'wall') {
       bottom = Math.max(CT + 8, WALL_CENTER_Y - H / 2)
-      zT = WALL_Z + DEPTH / 2 + 1.1
+      // the bulge hangs just clear of the bracket, which is flat on the wall
+      zT = WALL_Z + PLATE_T + BULGE_BACK + 0.05
     } else if (w.mount === 'pedestal') {
       bottom = CT + 5.1
       zT = CONSOLE_Z
@@ -134,7 +137,7 @@ export default function Tv({
     footL.current.position.x = -W * 0.36
     footR.current.position.x = W * 0.36
     pedestal.current.position.set(0, CT, CONSOLE_Z)
-    wallMount.current.position.set(0, s.y, s.z - DEPTH / 2 - 0.4)
+    wallMount.current.position.set(0, s.y, WALL_Z + PLATE_T / 2)
 
     // measuring lines
     const m = w.measure
@@ -157,9 +160,7 @@ export default function Tv({
     tvView.h = H
   })
 
-  useEffect(() => {
-    // colours ease: nudged each frame towards the wanted values
-  }, [])
+  // colours ease: nudged each frame towards the wanted values
   const wantC = useRef({})
   wantC.current = { frameColor, standColor }
   useFrame((_, delta) => {
@@ -253,7 +254,7 @@ export default function Tv({
             <mesh geometry={footGeo} material={standMat} position={[0, 0.5, 0]} castShadow />
             {/* the neck joins the foot to the panel */}
             <mesh material={standMat} position={[0, 2.4, 0]} castShadow>
-              <boxGeometry args={[2.2, 2.9, 1.1]} />
+              <boxGeometry args={[2.2, 2.9, 0.9]} />
             </mesh>
           </group>
         ))}
@@ -264,9 +265,13 @@ export default function Tv({
           <boxGeometry args={[3.4, 4.3, 1.4]} />
         </mesh>
       </group>
+      {/* wall bracket: a plate on the wall and an arm out to the panel's back */}
       <group ref={wallMount}>
         <mesh material={standMat} castShadow>
-          <boxGeometry args={[11, 7.5, 0.5]} />
+          <boxGeometry args={[11, 7.5, PLATE_T]} />
+        </mesh>
+        <mesh material={standMat} position={[0, 0, PLATE_T / 2 + 0.3]} castShadow>
+          <boxGeometry args={[7, 4.5, 0.6]} />
         </mesh>
       </group>
 

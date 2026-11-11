@@ -37,6 +37,26 @@ function crystalGeometry() {
   return g
 }
 
+// Diver bezel insert: a solid ring standing on the case top, with a small
+// chamfer on its outer edge. The printed scale goes on its top face.
+const BEZEL_TOP = 0.265
+function diverBezelGeometry() {
+  const prof = [
+    [0.93, 0.2],
+    [0.93, BEZEL_TOP],
+    [1.1, BEZEL_TOP],
+    [1.12, 0.235],
+    [1.12, 0.2],
+  ].map(([r, z]) => new THREE.Vector2(r, z))
+  const g = new THREE.LatheGeometry(prof, 96)
+  g.rotateX(Math.PI / 2)
+  return g
+}
+
+// Spring bar between a pair of lugs: what the strap wraps round.
+const LUG_X = 0.66
+const LUG_Y = 1.2
+
 // A tapered, flat watch hand as an extruded outline lying in x/y, length along +y.
 function handGeometry({ length, width, tail = 0.12, lume = false }) {
   const s = new THREE.Shape()
@@ -56,9 +76,16 @@ function handGeometry({ length, width, tail = 0.12, lume = false }) {
 export default function Analog({ caseColor, dialColor, handsColor, accent, dialStyle, bezelColor, shine, time }) {
   const caseGeo = useMemo(caseGeometry, [])
   const crystalGeo = useMemo(crystalGeometry, [])
+  const diverGeo = useMemo(diverBezelGeometry, [])
   const hourGeo = useMemo(() => handGeometry({ length: 0.5, width: 0.1, lume: true }), [])
   const minGeo = useMemo(() => handGeometry({ length: 0.8, width: 0.075, lume: true }), [])
   const secGeo = useMemo(() => handGeometry({ length: 0.86, width: 0.018, tail: 0.2 }), [])
+  useEffect(
+    () => () => {
+      for (const g of [caseGeo, crystalGeo, diverGeo, hourGeo, minGeo, secGeo]) g.dispose()
+    },
+    [caseGeo, crystalGeo, diverGeo, hourGeo, minGeo, secGeo],
+  )
 
   const dialKey = useSettled(`${dialColor}|${dialStyle}`)
   const dial = useMemo(() => {
@@ -103,30 +130,43 @@ export default function Analog({ caseColor, dialColor, handsColor, accent, dialS
         {metal}
       </mesh>
       {[
-        [-0.66, 1.2],
-        [0.66, 1.2],
-        [-0.66, -1.2],
-        [0.66, -1.2],
+        [-LUG_X, LUG_Y],
+        [LUG_X, LUG_Y],
+        [-LUG_X, -LUG_Y],
+        [LUG_X, -LUG_Y],
       ].map(([x, y], i) => (
         <RoundedBox key={i} args={[0.2, 0.62, 0.26]} radius={0.05} smoothness={3} position={[x, y, -0.05]} rotation={[y > 0 ? -0.1 : 0.1, 0, 0]} castShadow>
           {metal}
         </RoundedBox>
       ))}
+      {/* spring bars between the lugs, where the strap starts and ends */}
+      {[LUG_Y, -LUG_Y].map((y) => (
+        <mesh key={y} position={[0, y, -0.02]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.035, 0.035, LUG_X * 2, 12]} />
+          {metal}
+        </mesh>
+      ))}
+      {/* crown: stem into the case, with a knurled cap overlapping its end */}
       <mesh position={[1.22, 0, -0.02]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.15, 0.15, 0.3, 20]} />
         {metal}
       </mesh>
-      <mesh position={[1.4, 0, -0.02]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.13, 0.13, 0.04, 20]} />
+      <mesh position={[1.385, 0, -0.02]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.13, 0.13, 0.05, 20]} />
         {metal}
       </mesh>
 
       {/* bezel: a plain polished ring, or a dark rotating insert for the diver */}
       {diver ? (
-        <mesh position={[0, 0, 0.228]} rotation={[0, 0, 0]}>
-          <ringGeometry args={[0.93, 1.1, 96]} />
-          <meshPhysicalMaterial map={bezel} roughness={0.35} clearcoat={0.6} metalness={0.2} />
-        </mesh>
+        <>
+          <mesh geometry={diverGeo} castShadow>
+            <meshPhysicalMaterial color={bezelColor} roughness={0.4} clearcoat={0.5} metalness={0.2} />
+          </mesh>
+          <mesh position={[0, 0, BEZEL_TOP + 0.001]}>
+            <ringGeometry args={[0.93, 1.1, 96]} />
+            <meshPhysicalMaterial map={bezel} roughness={0.35} clearcoat={0.6} metalness={0.2} />
+          </mesh>
+        </>
       ) : (
         <mesh position={[0, 0, 0.215]} castShadow>
           <torusGeometry args={[1.0, 0.075, 16, 96]} />

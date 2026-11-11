@@ -3,15 +3,25 @@ import { useFrame } from '@react-three/fiber'
 import { useCursor } from '@react-three/drei'
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
-import Keyboard, { KB_D, KB_W, luminance } from './Keyboard.jsx'
+import Keyboard, { KB_D, KB_W, KEY_H, luminance } from './Keyboard.jsx'
 import Screen, { SCREEN_H } from './Screen.jsx'
 
+// Units: 1 unit is about 5 cm (the body is 6 wide, like a 30 cm laptop).
 const W = 6.0 // width
 const D = 4.0 // depth
 const T = 0.2 // base thickness
 const LID = 0.12 // lid thickness
+const FOOT = 0.04 // rubber feet lift the base this far off the desk
 const MAX_OPEN = 2.05 // radians when fully open (about 117 degrees)
 const KB_Z = -D / 2 + 0.28 + KB_D / 2
+
+// The hinge. The lid is a slab centred on the hinge axis, so its rounded back
+// edge turns inside the barrel and never cuts into the base, whatever the
+// angle. Closed, the lid clears the key tops by LID_GAP.
+const LID_GAP = 0.055
+const HINGE_Y = T + LID_GAP + LID / 2 // hinge axis height above the base's underside
+const HINGE_Z = -D / 2 // hinge axis, along the back edge
+const HINGE_R = LID / 2 + 0.02 // barrel radius: just wider than the lid
 
 function roundedRectShape(w, h, r) {
   const s = new THREE.Shape()
@@ -88,29 +98,45 @@ export default function Laptop({
 
   const bodyMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: bodyColor, metalness: 0.62, roughness: 0.38, clearcoat: 0.3, clearcoatRoughness: 0.3, envMapIntensity: 1.1 }), [])
   const keyMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: keyColor, roughness: 0.55, metalness: 0.1, clearcoat: 0.15 }), [])
+  const darkMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#020203', roughness: 0.3, metalness: 0, envMapIntensity: 0.25 }), [])
+  const portMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.9 }), [])
+  const hingeMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: '#26262a', metalness: 0.9, roughness: 0.35 }), [])
+  const rubberMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#1a1a1c', roughness: 0.95 }), [])
   useEffect(
     () => () => {
-      bodyMat.dispose()
-      keyMat.dispose()
+      for (const m of [bodyMat, keyMat, darkMat, portMat, hingeMat, rubberMat]) m.dispose()
     },
-    [bodyMat, keyMat],
+    [bodyMat, keyMat, darkMat, portMat, hingeMat, rubberMat],
   )
   useEffect(() => {
     bodyMat.roughness = 0.55 - shine * 0.35
   }, [bodyMat, shine])
 
-  const baseGeo = useMemo(() => new RoundedBoxGeometry(W, T, D, 5, 0.09), [])
-  const lidGeo = useMemo(() => new RoundedBoxGeometry(W, LID, D, 5, 0.06), [])
-  const trackGeo = useMemo(() => outlineGeometry(2.2, 1.35, 0.1, 0.012), [])
+  const geo = useMemo(
+    () => ({
+      // small corner radii keep the side walls flat, so ports sit flush in them
+      base: new RoundedBoxGeometry(W, T, D, 4, 0.05),
+      lid: new RoundedBoxGeometry(W, LID, D, 4, LID / 2),
+      track: outlineGeometry(2.2, 1.35, 0.1, 0.012),
+      well: new THREE.ShapeGeometry(roundedRectShape(KB_W + 0.26, KB_D + 0.26, 0.06), 8),
+      glass: new THREE.ShapeGeometry(roundedRectShape(W - LID, D - LID, 0.05), 10),
+      grille: new THREE.PlaneGeometry(0.2, 1.9),
+      port: new THREE.BoxGeometry(0.04, 0.07, 0.24),
+      jack: new THREE.CylinderGeometry(0.035, 0.035, 0.04, 16),
+      barrel: new THREE.CylinderGeometry(HINGE_R, HINGE_R, W * 0.72, 24),
+      mount: new THREE.BoxGeometry(0.5, 0.05, 0.2),
+      foot: new THREE.CylinderGeometry(0.11, 0.11, FOOT, 20),
+      camera: new THREE.CircleGeometry(0.025, 16),
+    }),
+    [],
+  )
   const grille = useMemo(grilleTexture, [])
   useEffect(
     () => () => {
-      baseGeo.dispose()
-      lidGeo.dispose()
-      trackGeo.dispose()
+      Object.values(geo).forEach((g) => g.dispose())
       grille.dispose()
     },
-    [baseGeo, lidGeo, trackGeo, grille],
+    [geo, grille],
   )
 
   const lidRef = useRef()
@@ -128,7 +154,12 @@ export default function Laptop({
     // lid on a lightly damped spring: it settles with a small bounce
     s.vel += ((w.open * MAX_OPEN - s.theta) * 70 - s.vel * 9) * dt
     s.theta += s.vel * dt
-    lidRef.current.rotation.x = -Math.max(s.theta, 0)
+    // the spring may overshoot below zero; the lid stops on the base
+    if (s.theta < 0) {
+      s.theta = 0
+      s.vel = Math.max(s.vel, 0) * 0.3
+    }
+    lidRef.current.rotation.x = -s.theta
     lid.current.theta = s.theta
     const e = 1 - Math.exp(-dt * 6)
     bodyMat.color.lerp(tBody.set(w.bodyColor), e)
@@ -136,11 +167,10 @@ export default function Laptop({
   })
 
   const legend = luminance(keyColor) > 0.5 ? '#1b1b1d' : '#ffffff'
-  const dark = <meshStandardMaterial color="#020203" roughness={0.3} metalness={0} envMapIntensity={0.25} />
-  const port = <meshStandardMaterial color="#050505" roughness={0.9} />
 
   return (
     <group
+      position={[0, FOOT, 0]}
       onClick={(e) => {
         e.stopPropagation()
         setOpen(open > 0.5 ? 0 : 0.9)
@@ -148,63 +178,53 @@ export default function Laptop({
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
     >
+      {/* rubber feet: the base stands on these */}
+      {[-1, 1].map((sx) =>
+        [-1, 1].map((sz) => <mesh key={`${sx}${sz}`} geometry={geo.foot} material={rubberMat} position={[sx * (W / 2 - 0.4), -FOOT / 2, sz * (D / 2 - 0.4)]} />),
+      )}
       {/* base */}
-      <mesh geometry={baseGeo} material={bodyMat} position={[0, T / 2, 0]} castShadow receiveShadow />
+      <mesh geometry={geo.base} material={bodyMat} position={[0, T / 2, 0]} castShadow receiveShadow />
       {/* keyboard well and keys */}
-      <mesh position={[0, T + 0.001, KB_Z]} rotation={[-Math.PI / 2, 0, 0]}>
-        <shapeGeometry args={[roundedRectShape(KB_W + 0.26, KB_D + 0.26, 0.06), 8]} />
+      <mesh geometry={geo.well} position={[0, T + 0.001, KB_Z]} rotation={[-Math.PI / 2, 0, 0]}>
         <meshStandardMaterial color="#070708" roughness={0.8} />
       </mesh>
       <group position={[0, 0, KB_Z]}>
         <Keyboard y={T} keyMat={<primitive object={keyMat} attach="material" />} legendColor={legend} />
       </group>
       {/* trackpad */}
-      <mesh geometry={trackGeo} position={[0, T + 0.0015, 1.1]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh geometry={geo.track} position={[0, T + 0.0015, 1.1]} rotation={[-Math.PI / 2, 0, 0]}>
         <meshBasicMaterial color="#000000" transparent opacity={0.3} depthWrite={false} />
       </mesh>
-      {/* speaker grilles */}
+      {/* speaker grilles, between the keyboard well and the rounded side edge */}
       {[-1, 1].map((sx) => (
-        <mesh key={sx} position={[sx * 2.84, T + 0.0015, KB_Z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.26, 1.9]} />
+        <mesh key={sx} geometry={geo.grille} position={[sx * 2.77, T + 0.0015, KB_Z]} rotation={[-Math.PI / 2, 0, 0]}>
           <meshBasicMaterial map={grille} transparent depthWrite={false} opacity={0.9} />
         </mesh>
       ))}
-      {/* ports */}
+      {/* ports: flush in the flat part of the side walls */}
       {[0.3, 0.64].map((z) => (
-        <mesh key={z} position={[-W / 2 + 0.004, T / 2, z]}>
-          <boxGeometry args={[0.04, 0.07, 0.24]} />
-          {port}
-        </mesh>
+        <mesh key={z} geometry={geo.port} material={portMat} position={[-W / 2 + 0.019, T / 2, z]} />
       ))}
-      <mesh position={[W / 2 - 0.004, T / 2, 0.5]}>
-        <boxGeometry args={[0.04, 0.07, 0.24]} />
-        {port}
-      </mesh>
-      <mesh position={[W / 2 - 0.004, T / 2, 0.95]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.04, 0.04, 0.04, 16]} />
-        {port}
-      </mesh>
-      {/* hinge */}
-      <mesh position={[0, T + 0.095, -D / 2 + 0.05]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.075, 0.075, W * 0.72, 24]} />
-        <meshPhysicalMaterial color="#26262a" metalness={0.9} roughness={0.35} />
-      </mesh>
+      <mesh geometry={geo.port} material={portMat} position={[W / 2 - 0.019, T / 2, 0.5]} />
+      <mesh geometry={geo.jack} material={portMat} position={[W / 2 - 0.019, T / 2, 0.95]} rotation={[0, 0, Math.PI / 2]} />
 
-      {/* lid: pivots on the hinge line along the back edge */}
-      <group ref={lidRef} position={[0, T + 0.075, -D / 2]}>
-        <mesh geometry={lidGeo} material={bodyMat} position={[0, LID / 2, D / 2]} castShadow />
-        {/* black glass over the whole inner face */}
-        <mesh position={[0, -0.002, D / 2]} rotation={[Math.PI / 2, 0, 0]}>
-          <shapeGeometry args={[roundedRectShape(W - 0.06, D - 0.06, 0.07), 10]} />
-          {dark}
-        </mesh>
+      {/* hinge: a barrel on the hinge axis, carried on two mounts on the base */}
+      <mesh geometry={geo.barrel} material={hingeMat} position={[0, HINGE_Y, HINGE_Z]} rotation={[0, 0, Math.PI / 2]} castShadow />
+      {[-1, 1].map((sx) => (
+        <mesh key={sx} geometry={geo.mount} material={hingeMat} position={[sx * 2.0, T + 0.025, HINGE_Z + 0.06]} />
+      ))}
+
+      {/* lid: a slab centred on the hinge axis, turning about it */}
+      <group ref={lidRef} position={[0, HINGE_Y, HINGE_Z]}>
+        <mesh geometry={geo.lid} material={bodyMat} position={[0, 0, D / 2]} castShadow />
+        {/* black glass over the flat part of the inner face */}
+        <mesh geometry={geo.glass} material={darkMat} position={[0, -LID / 2 - 0.001, D / 2]} rotation={[Math.PI / 2, 0, 0]} />
         {/* the display itself, in the glass, with a thin bezel */}
-        <group position={[0, -0.006, 0.255 + SCREEN_H / 2]} rotation={[Math.PI / 2, 0, 0]}>
+        <group position={[0, -LID / 2 - 0.004, 0.255 + SCREEN_H / 2]} rotation={[Math.PI / 2, 0, 0]}>
           <Screen wallpaper={wallpaper} on={screenOn} lid={lid} />
         </group>
-        {/* camera */}
-        <mesh position={[0, -0.007, D - 0.065]} rotation={[Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.025, 16]} />
+        {/* camera, in the bezel above the screen */}
+        <mesh geometry={geo.camera} position={[0, -LID / 2 - 0.005, 0.255 + SCREEN_H + (D - 0.255 - SCREEN_H) / 2]} rotation={[Math.PI / 2, 0, 0]}>
           <meshStandardMaterial color="#15151a" roughness={0.3} />
         </mesh>
       </group>
