@@ -50,6 +50,7 @@ export default function Vinyl({
   }, [sleeveKey])
   useEffect(() => () => sleeveTex.dispose(), [sleeveTex])
   const sheen = useMemo(() => sheenTexture(), [])
+  useEffect(() => () => sheen.dispose(), [sheen])
 
   const tiltRef = useRef()
   const recRef = useRef()

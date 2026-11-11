@@ -19,7 +19,10 @@ function useSettled(value, ms = 160) {
   return v
 }
 
-const EYE_R = 0.04
+const EYE_R = 0.046
+// The first few spine points form the skull, which is rigid: they are laid
+// out in a straight line so the head never bends with the neck.
+const SKULL_POINTS = 6
 
 // A shallow spherical cap that sits on the eyeball and carries the iris image.
 function makeIrisGeometry() {
@@ -32,21 +35,46 @@ function makeIrisGeometry() {
   return g
 }
 
+// A reptile eye: a streaked iris with a narrow vertical slit pupil.
 function irisTexture(color) {
+  const S = 256
   const c = document.createElement('canvas')
-  c.width = c.height = 128
+  c.width = c.height = S
   const g = c.getContext('2d')
+  const m = S / 2
   const base = new THREE.Color(color)
-  const lighter = base.clone().lerp(new THREE.Color('#ffffff'), 0.35)
-  const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64)
-  grad.addColorStop(0, '#000')
-  grad.addColorStop(0.3, '#000')
-  grad.addColorStop(0.36, `#${base.getHexString()}`)
-  grad.addColorStop(0.78, `#${lighter.getHexString()}`)
-  grad.addColorStop(0.95, '#0a0604')
-  grad.addColorStop(1, '#0a0604')
+  const hexOf = (col) => `#${col.getHexString()}`
+  const lighter = base.clone().lerp(new THREE.Color('#fff6d8'), 0.45)
+  const darker = base.clone().multiplyScalar(0.45)
+  const grad = g.createRadialGradient(m, m, 0, m, m, m)
+  grad.addColorStop(0, hexOf(lighter))
+  grad.addColorStop(0.55, hexOf(base))
+  grad.addColorStop(0.86, hexOf(darker))
+  grad.addColorStop(0.94, '#120a04')
+  grad.addColorStop(1, '#120a04')
   g.fillStyle = grad
-  g.fillRect(0, 0, 128, 128)
+  g.fillRect(0, 0, S, S)
+  // fine radial streaks in the iris
+  g.lineWidth = 1.4
+  for (let i = 0; i < 90; i++) {
+    const a = (i / 90) * Math.PI * 2
+    const r0 = m * (0.12 + ((i * 37) % 11) / 100)
+    const r1 = m * (0.7 + ((i * 53) % 17) / 100)
+    g.strokeStyle = i % 2 ? 'rgba(255,240,200,0.18)' : 'rgba(40,20,5,0.22)'
+    g.beginPath()
+    g.moveTo(m + Math.cos(a) * r0, m + Math.sin(a) * r0)
+    g.lineTo(m + Math.cos(a) * r1, m + Math.sin(a) * r1)
+    g.stroke()
+  }
+  // slit pupil, with a soft dark rim around it
+  g.fillStyle = 'rgba(10,6,2,0.45)'
+  g.beginPath()
+  g.ellipse(m, m, S * 0.075, S * 0.4, 0, 0, Math.PI * 2)
+  g.fill()
+  g.fillStyle = '#020101'
+  g.beginPath()
+  g.ellipse(m, m, S * 0.045, S * 0.37, 0, 0, Math.PI * 2)
+  g.fill()
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
   return t
@@ -58,11 +86,11 @@ export default function Snake({
   mode = 'rear',
   followPointer = true,
   tongue = true,
-  back = '#171b2b',
-  belly = '#d9c9a6',
-  pattern = '#8a93ad',
-  eye = '#6b3d18',
-  tongueColor = '#e0627a',
+  back = '#b9861c',
+  belly = '#ecd38c',
+  pattern = '#f0c449',
+  eye = '#d4a72c',
+  tongueColor = '#5a2228',
   patternAmount = 0.65,
   scales = 18,
   gloss = 0.7,
@@ -251,6 +279,15 @@ export default function Snake({
       }
     }
 
+    // Rigid skull: keep the snout where it is and lay the head points out in a
+    // straight line back to the neck.
+    const nk = D[SKULL_POINTS]
+    sim.tmp.subVectors(D[0], nk)
+    if (sim.tmp.lengthSq() > 1e-8) {
+      sim.tmp.normalize()
+      for (let i = 0; i < SKULL_POINTS; i++) D[i].copy(nk).addScaledVector(sim.tmp, (SKULL_POINTS - i) * SEG)
+    }
+
     body.update(D, Math.sin(time * 1.5) * 0.02)
 
     // --- Head details ---
@@ -258,7 +295,7 @@ export default function Snake({
     for (const [ref, sgn] of [[eyeR, 1], [eyeL, -1]]) {
       const o = ref.current
       if (!o) continue
-      body.surfacePoint(D, EYE_D, EYE_PHI, sgn, -0.012, f)
+      body.surfacePoint(D, EYE_D, EYE_PHI, sgn, -0.022, f)
       o.position.copy(f.pos)
       o.lookAt(sim.tmp.copy(f.pos).add(f.nrm))
     }
@@ -331,8 +368,8 @@ export default function Snake({
       ))}
 
       {[nosR, nosL].map((r, i) => (
-        <mesh key={i} ref={r} scale={[1.6, 0.7, 0.5]}>
-          <sphereGeometry args={[0.012, 10, 8]} />
+        <mesh key={i} ref={r} scale={[1.5, 1, 0.55]}>
+          <sphereGeometry args={[0.016, 12, 8]} />
           <meshStandardMaterial color="#050403" roughness={0.6} />
         </mesh>
       ))}

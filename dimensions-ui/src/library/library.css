@@ -224,7 +224,7 @@
 .lib-crumb { margin: 0 0 14px; font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
 .lib-crumb span { margin: 0 6px; color: var(--line-strong); }
 .lib-crumb b { color: var(--signal-ink); font-weight: 500; }
-.lib-title { font-size: clamp(44px, 6vw, 78px); line-height: 0.95; margin: 0; }
+.lib-title { font-size: clamp(36px, 4.4vw, 56px); line-height: 1.05; letter-spacing: -0.035em; margin: 0; }
 .lib-desc { max-width: 62ch; color: var(--ink-2); margin: 14px 0 16px; }
 .lib-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
 .lib-meta span { font: 500 11px/1 var(--mono); letter-spacing: 0.06em; color: var(--ink-2); padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); }
@@ -320,7 +320,7 @@
 /* sections under the stage */
 .lib-section { margin-top: 38px; scroll-margin-top: 84px; }
 .lib-section > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-.lib-section h2 { margin: 0; font: 400 30px/1 var(--serif); letter-spacing: -0.01em; }
+.lib-section h2 { margin: 0; font: 700 26px/1.1 var(--display); letter-spacing: -0.025em; }
 .lib-section h2 small { margin-left: 12px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--signal-ink); }
 .lib-reset { border: 0; background: none; font: 500 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--signal-ink); cursor: pointer; }
 .dep-list { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -470,7 +470,7 @@
 
 /* related + pager */
 .lib-related { margin-top: 56px; }
-.lib-related h2 { margin: 0 0 14px; font: 400 30px/1 var(--serif); }
+.lib-related h2 { margin: 0 0 14px; font: 700 26px/1.1 var(--display); letter-spacing: -0.025em; }
 .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .related-grid a {
   display: flex;
@@ -485,10 +485,10 @@
 }
 .related-grid a:hover { border-color: var(--line-strong); background: var(--glass-2); transform: translateY(-2px); }
 .related-grid .rel-cat { font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
-.related-grid strong { display: flex; align-items: center; gap: 8px; font: 400 24px/1.1 var(--serif); }
+.related-grid strong { display: flex; align-items: center; gap: 8px; font: 600 19px/1.2 var(--display); letter-spacing: -0.015em; }
 .related-grid small { font: 400 13px/1.45 var(--sans); color: var(--ink-3); }
 .lib-pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
-.lib-pager a { display: flex; flex-direction: column; gap: 6px; text-decoration: none; font: 400 24px/1.1 var(--serif); transition: color 0.2s; }
+.lib-pager a { display: flex; flex-direction: column; gap: 6px; text-decoration: none; font: 600 19px/1.2 var(--display); letter-spacing: -0.015em; transition: color 0.2s; }
 .lib-pager a:hover { color: var(--signal-ink); }
 .lib-pager a.next { text-align: right; margin-left: auto; }
 .lib-pager small { font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
@@ -580,7 +580,7 @@
 @keyframes hc-in { from { opacity: 0; transform: translateX(-6px) scale(0.98); } }
 .hover-card img { display: block; width: 100%; height: 190px; object-fit: cover; background: var(--paper-3); }
 .hover-card div { padding: 10px 14px 12px; }
-.hover-card strong { display: block; font: 400 22px/1.1 var(--serif); }
+.hover-card strong { display: block; font: 600 18px/1.2 var(--display); letter-spacing: -0.015em; }
 .hover-card small { font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 .lib-cat.favs h4 { color: var(--signal-ink); }
 
@@ -641,5 +641,5 @@
 @media (max-width: 520px) {
   .pillswitch { width: 100%; }
   .docs-toolbar { gap: 8px; }
-  .lib-title { font-size: 44px; }
+  .lib-title { font-size: 34px; }
 }

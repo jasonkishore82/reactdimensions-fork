@@ -17,9 +17,11 @@ import BottleModel from '../lib/BottleModel.jsx'
 import TvModel from '../lib/TvModel.jsx'
 import PhoneModel from '../lib/PhoneModel.jsx'
 import HeadphonesModel from '../lib/HeadphonesModel.jsx'
+import IpadModel from '../lib/IpadModel.jsx'
+import TabletModel from '../lib/TabletModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -36,7 +38,7 @@ export const COMPONENTS = [
     name: 'Measure Text',
     category: 'Text',
     isNew: true,
-    description: 'Letters rise in with a stagger, then a dimension line draws underneath, labelled with the rendered width.',
+    description: 'Text that rises in and measures its own width.',
     controls: [
       { name: 'text', type: 'text', default: 'Measured.' },
       { name: 'stagger', type: 'range', min: 10, max: 150, step: 5, default: 45, unit: 'ms' },
@@ -53,7 +55,7 @@ export const COMPONENTS = [
     slug: 'decode-text',
     name: 'Decode Text',
     category: 'Text',
-    description: 'Scrambles through random characters, then locks each letter in from left to right. Plays on mount or on hover.',
+    description: 'Text that scrambles, then resolves letter by letter.',
     controls: [
       { name: 'text', type: 'text', default: 'REACT DIMENSIONS' },
       { name: 'speed', type: 'range', min: 15, max: 120, step: 5, default: 40, unit: 'ms' },
@@ -69,9 +71,9 @@ export const COMPONENTS = [
     slug: 'tilt-card',
     name: 'Tilt Card',
     category: 'Interactions',
-    description: 'Tilts toward the pointer in 3D on a damped spring, with a glare that follows the light.',
+    description: 'A card that tilts toward the pointer with moving glare.',
     controls: [
-      { name: 'maxTilt', type: 'range', min: 2, max: 30, step: 1, default: 14, unit: '°' },
+      { name: 'maxTilt', type: 'range', min: 2, max: 30, step: 1, default: 14, unit: 'Â°' },
       { name: 'scale', type: 'range', min: 1, max: 1.15, step: 0.01, default: 1.04 },
       { name: 'stiffness', type: 'range', min: 40, max: 400, step: 10, default: 170 },
       { name: 'damping', type: 'range', min: 4, max: 40, step: 1, default: 16 },
@@ -85,7 +87,7 @@ export const COMPONENTS = [
           <span className="demo-tilt-title">
             Tilt <em>me</em>
           </span>
-          <span className="demo-tilt-foot">240 × 320 px · spring</span>
+          <span className="demo-tilt-foot">240 Ã— 320 px Â· spring</span>
         </div>
       </TiltCard>
     ),
@@ -97,7 +99,7 @@ export const COMPONENTS = [
     name: 'Spring Button',
     category: 'Interactions',
     isNew: true,
-    description: 'A button that physically presses in and springs back with a little overshoot. Its shadow follows the depth.',
+    description: 'A button that presses in and springs back.',
     controls: [
       { name: 'depth', type: 'range', min: 2, max: 14, step: 1, default: 6, unit: 'px' },
       { name: 'stiffness', type: 'range', min: 100, max: 900, step: 20, default: 420 },
@@ -112,7 +114,7 @@ export const COMPONENTS = [
     slug: 'magnetic-button',
     name: 'Magnetic Button',
     category: 'Interactions',
-    description: 'Gets pulled toward the cursor once it comes close, then springs back. The label lags behind for parallax.',
+    description: 'A button that pulls toward the cursor when it gets close.',
     controls: [
       { name: 'strength', type: 'range', min: 0.1, max: 1, step: 0.05, default: 0.4 },
       { name: 'radius', type: 'range', min: 40, max: 300, step: 10, default: 140, unit: 'px' },
@@ -128,7 +130,7 @@ export const COMPONENTS = [
     name: 'Clear-coat Card',
     category: '3D & Materials',
     isNew: true,
-    description: 'A real-time 3D card with clear-coat, foil lettering, a gold chip and spring physics. Drag, flick to flip, double-click to turn over.',
+    description: 'A glossy 3D card you can drag, flip and customize.',
     controls: [
       { name: 'stiffness', type: 'range', min: 10, max: 200, step: 5, default: 55 },
       { name: 'damping', type: 'range', min: 1, max: 30, step: 0.5, default: 7.5 },
@@ -144,7 +146,7 @@ export const COMPONENTS = [
       { name: 'expiry', type: 'text', default: '00-00' },
       { name: 'holder', type: 'text', default: 'FOUNDING MEMBER' },
       { name: 'cvv', type: 'text', default: '123' },
-      { name: 'signatureNote', type: 'text', default: 'AUTHORIZED SIGNATURE — NOT VALID UNLESS SIGNED' },
+      { name: 'signatureNote', type: 'text', default: 'AUTHORIZED SIGNATURE â€” NOT VALID UNLESS SIGNED' },
       { name: 'backLine1', type: 'text', default: 'Rendered in real time. No image assets were used to make this card.' },
       { name: 'backLine2', type: 'text', default: '85.60 x 53.98 mm  /  clear-coat PBR  /  spring physics' },
       { name: 'backName', type: 'text', default: 'react-dimensions' },
@@ -159,8 +161,7 @@ export const COMPONENTS = [
     name: 'Pickup',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'An angular electric pickup built from flat panels: brushed stainless steel, tinted glass, off-road tyres, headlights that light the floor and a damped suspension. Drag to orbit, or switch on driving and use the keyboard.',
+    description: 'An angular electric pickup you can orbit and drive.',
     controls: [
       { name: 'drivable', type: 'toggle', default: false },
       { name: 'lightsOn', type: 'toggle', default: true },
@@ -178,13 +179,13 @@ export const COMPONENTS = [
     name: 'Snake',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A procedural 3D snake with overlapping scales, belly plates, glossy eyes and a flicking forked tongue. Its head follows your pointer; switch to slither and it crawls after you along the floor. Every colour is a prop.',
+    description: 'A coiled 3D snake whose head follows the pointer.',
     controls: [
       {
         name: 'palette',
         type: 'presets',
         options: [
+          { name: 'Golden', values: { back: '#b9861c', belly: '#ecd38c', pattern: '#f0c449', eye: '#d4a72c', tongueColor: '#5a2228' } },
           { name: 'Obsidian', values: { back: '#171b2b', belly: '#d9c9a6', pattern: '#8a93ad', eye: '#6b3d18', tongueColor: '#e0627a' } },
           { name: 'Coral', values: { back: '#b83a22', belly: '#f3e7cc', pattern: '#1b1411', eye: '#e8c25a', tongueColor: '#c94a5a' } },
           { name: 'Viper', values: { back: '#3c5a2a', belly: '#d8d29a', pattern: '#1c2a14', eye: '#d9a521', tongueColor: '#d6455a' } },
@@ -196,11 +197,11 @@ export const COMPONENTS = [
       { name: 'mode', type: 'select', options: ['rear', 'slither'], default: 'rear' },
       { name: 'followPointer', type: 'toggle', default: true },
       { name: 'tongue', type: 'toggle', default: true },
-      { name: 'back', type: 'color', default: '#171b2b' },
-      { name: 'belly', type: 'color', default: '#d9c9a6' },
-      { name: 'pattern', type: 'color', default: '#8a93ad' },
-      { name: 'eye', type: 'color', default: '#6b3d18' },
-      { name: 'tongueColor', type: 'color', default: '#e0627a' },
+      { name: 'back', type: 'color', default: '#b9861c' },
+      { name: 'belly', type: 'color', default: '#ecd38c' },
+      { name: 'pattern', type: 'color', default: '#f0c449' },
+      { name: 'eye', type: 'color', default: '#d4a72c' },
+      { name: 'tongueColor', type: 'color', default: '#5a2228' },
       { name: 'patternAmount', type: 'range', min: 0, max: 1, step: 0.05, default: 0.65 },
       { name: 'scales', type: 'range', min: 12, max: 36, step: 1, default: 18 },
       { name: 'gloss', type: 'range', min: 0, max: 1, step: 0.02, default: 0.7 },
@@ -215,8 +216,7 @@ export const COMPONENTS = [
     name: 'Turntable',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A playable 3D record player: a wooden deck, grooved vinyl with a printed label, a tonearm with counterweight and cartridge. Press power, drag the arm onto the record, flip the speed knob, or grab the record and scratch it. Pull the record past its edge to lift it off the deck, then drag it back on. Turn sound on to hear a lo-fi loop that bends with the platter.',
+    description: 'A record player you can power on, cue and scratch.',
     controls: [
       {
         name: 'palette',
@@ -262,8 +262,7 @@ export const COMPONENTS = [
     name: 'Vinyl Record',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A 3D vinyl record with microgrooves, track gaps, a printed label and a drifting sheen of light, in solid, marbled or splatter finishes. Drag it to spin it by hand and let go to feel its momentum. Stand it in a paper sleeve and slide it out.',
+    description: 'A spinning vinyl record with a printed label and sleeve.',
     controls: [
       {
         name: 'palette',
@@ -299,8 +298,7 @@ export const COMPONENTS = [
     name: 'Sunglasses',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'Parametric 3D sunglasses. Pick a frame shape, then reshape it: lens width and height, bridge, rim thickness, wrap and arm length. Choose a finish, colour the frame, tips and lenses, add a gradient tint or a mirror coating, and fold the arms.',
+    description: 'Parametric sunglasses with six frame shapes and tinted lenses.',
     controls: [
       {
         name: 'palette',
@@ -333,7 +331,8 @@ export const COMPONENTS = [
       { name: 'fold', type: 'range', min: 0, max: 1, step: 0.02, default: 0 },
       { name: 'autoRotate', type: 'toggle', default: true },
     ],
-    preview: (p) => <SunglassesModel {...p} height="100%" />,
+    // `set` lets the scene update the controls (clicking the glasses folds them).
+    preview: (p, set) => <SunglassesModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['SunglassesModel.jsx', 'sunglasses/SunglassesScene.jsx', 'sunglasses/Sunglasses.jsx', 'sunglasses/build.js', 'sunglasses/shapes.js', 'sunglasses/textures.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
@@ -343,8 +342,7 @@ export const COMPONENTS = [
     name: 'Watch',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A 3D watch on a strap, analog or smart. Swap the watch or the strap in one click: the old one pops off and the new one pops on. Choose leather, sport, nylon or a metal bracelet, and colour the case, strap, dial, hands and accents. The analog hands and the smart screen show the real time.',
+    description: 'An analog or smart watch with swappable straps.',
     controls: [
       {
         name: 'palette',
@@ -384,8 +382,7 @@ export const COMPONENTS = [
     name: 'Laptop',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A 3D laptop with a thin aluminium body, an island keyboard with printed keys, a large trackpad, speaker grilles and ports, and a display running a live desktop. Orange by default. Swap the colour in one click and the body, keys and wallpaper ease to the new look. Click it to open or close the lid.',
+    description: 'A thin aluminium laptop with a lid that opens and closes.',
     controls: [
       {
         name: 'palette',
@@ -420,8 +417,7 @@ export const COMPONENTS = [
     name: 'Glass Bottle',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'An empty glass swing-top bottle with real refracting glass, a ceramic stopper on a red gasket and a wire clamp that swings open. Tint the glass, recolour the stopper, gasket and wire, add condensation or frost. Click it to open or close the top.',
+    description: 'A swing-top glass bottle with real refraction.',
     controls: [
       {
         name: 'palette',
@@ -457,23 +453,22 @@ export const COMPONENTS = [
     name: 'TV',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A 3D television you can size from 32 to 100 inches. The screen is true 16:9 at real-world scale, so a bigger size really looks bigger next to the console and the person beside it. Width and height are measured live. Mount it on feet, a pedestal or the wall, and recolour the frame, stand, wallpaper and room.',
+    description: 'A TV you can resize from 32 to 100 inches at true scale.',
     controls: [
       {
         name: 'quickSize',
         type: 'presets',
         options: [
-          { name: '32″', values: { size: 32 } },
-          { name: '43″', values: { size: 43 } },
-          { name: '55″', values: { size: 55 } },
-          { name: '65″', values: { size: 65 } },
-          { name: '75″', values: { size: 75 } },
-          { name: '85″', values: { size: 85 } },
-          { name: '100″', values: { size: 100 } },
+          { name: '32â€³', values: { size: 32 } },
+          { name: '43â€³', values: { size: 43 } },
+          { name: '55â€³', values: { size: 55 } },
+          { name: '65â€³', values: { size: 65 } },
+          { name: '75â€³', values: { size: 75 } },
+          { name: '85â€³', values: { size: 85 } },
+          { name: '100â€³', values: { size: 100 } },
         ],
       },
-      { name: 'size', type: 'range', min: 32, max: 100, step: 1, default: 55, unit: '″' },
+      { name: 'size', type: 'range', min: 32, max: 100, step: 1, default: 55, unit: 'â€³' },
       { name: 'mount', type: 'select', options: ['feet', 'pedestal', 'wall'], default: 'feet' },
       { name: 'content', type: 'select', options: ['home', 'wallpaper', 'off'], default: 'home' },
       { name: 'frameColor', type: 'color', default: '#15161a' },
@@ -497,8 +492,7 @@ export const COMPONENTS = [
     name: 'Phone',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'A 3D smartphone in the style of a modern flagship, with no logos: flat metal sides, a glass back with a three-lens camera bump, a pill cut-out, side buttons and a USB-C port, to real size. Colour the frame, back, camera trim and wallpaper separately, choose a matte or glossy back, and click it to flip it over.',
+    description: 'A modern smartphone at real size that flips on click.',
     controls: [
       {
         name: 'palette',
@@ -535,8 +529,7 @@ export const COMPONENTS = [
     name: 'Headphones',
     category: '3D & Materials',
     isNew: true,
-    description:
-      'Over-ear headphones with a thick padded headband, round ear cups, soft oval cushions and fabric speaker grilles. Colour the band, cushions, shells and metal pins separately, pick leather, matte or gloss, slide the cups down, and click it to fold the cups flat.',
+    description: 'Over-ear headphones with cups that slide and fold.',
     controls: [
       {
         name: 'palette',
@@ -568,10 +561,76 @@ export const COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'ipad-bot',
+    name: 'Tablet Bot',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A tablet on a rolling stand whose screen is a face: eyes that follow you, six moods and a talking mouth.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Silver blue', values: { bodyColor: '#e2e3e5', eyeColor: '#2f7bff' } },
+          { name: 'Space grey', values: { bodyColor: '#6d7076', eyeColor: '#4dffb8' } },
+          { name: 'Starlight', values: { bodyColor: '#e9dfcf', eyeColor: '#ff9d3d' } },
+          { name: 'Rose', values: { bodyColor: '#e8b4b8', eyeColor: '#ff5f9e' } },
+          { name: 'Midnight', values: { bodyColor: '#1d2433', eyeColor: '#7aa8ff' } },
+          { name: 'Sage', values: { bodyColor: '#a9b8a0', eyeColor: '#d6ff5c' } },
+        ],
+      },
+      { name: 'mood', type: 'select', options: ['idle', 'curious', 'happy', 'surprised', 'sleepy', 'asleep'], default: 'idle' },
+      { name: 'speaking', type: 'toggle', default: false },
+      { name: 'follow', type: 'toggle', default: true },
+      { name: 'bodyColor', type: 'color', default: '#e2e3e5' },
+      { name: 'eyeColor', type: 'color', default: '#2f7bff' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking it puts it to sleep).
+    preview: (p, set) => <IpadModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['IpadModel.jsx', 'ipad/IpadScene.jsx', 'ipad/Ipad.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'tablet',
+    name: 'Tablet',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A slim aluminium tablet with a live home screen, in landscape or portrait, that flips over to show its back.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Silver', values: { bodyColor: '#e2e3e5', wallpaper: '#3a7bff' } },
+          { name: 'Space grey', values: { bodyColor: '#6d7076', wallpaper: '#a45cff' } },
+          { name: 'Starlight', values: { bodyColor: '#e9dfcf', wallpaper: '#ff9d3d' } },
+          { name: 'Rose', values: { bodyColor: '#e8b4b8', wallpaper: '#ff5f9e' } },
+          { name: 'Midnight', values: { bodyColor: '#1d2433', wallpaper: '#2fd0c4' } },
+          { name: 'Sage', values: { bodyColor: '#a9b8a0', wallpaper: '#a6e04a' } },
+        ],
+      },
+      { name: 'bodyColor', type: 'color', default: '#e2e3e5' },
+      { name: 'wallpaper', type: 'color', default: '#3a7bff' },
+      { name: 'orientation', type: 'select', options: ['landscape', 'portrait'], default: 'landscape' },
+      { name: 'screenOn', type: 'toggle', default: true },
+      { name: 'flip', type: 'range', min: 0, max: 1, step: 0.02, default: 0 },
+      { name: 'shine', type: 'range', min: 0, max: 1, step: 0.05, default: 0.5 },
+      { name: 'tilt', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking the tablet flips it).
+    preview: (p, set) => <TabletModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['TabletModel.jsx', 'tablet/TabletScene.jsx', 'tablet/Tablet.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'drafting-grid',
     name: 'Drafting Grid',
     category: 'Backgrounds',
-    description: 'Drafting-paper background with major and minor grid lines, plus a crosshair that reads out cursor coordinates.',
+    description: 'A drafting-paper grid background with a cursor crosshair.',
     controls: [
       { name: 'cell', type: 'range', min: 8, max: 64, step: 2, default: 24, unit: 'px' },
       { name: 'major', type: 'range', min: 2, max: 10, step: 1, default: 5 },
@@ -593,11 +652,11 @@ export const COMPONENTS = [
     slug: 'light-sweep',
     name: 'Light Sweep',
     category: 'Backgrounds',
-    description: 'A band of specular light sweeps across the surface on a loop, like a studio light passing over polished metal.',
+    description: 'A band of light that sweeps across a surface on a loop.',
     controls: [
       { name: 'speed', type: 'range', min: 1, max: 8, step: 0.5, default: 3.5, unit: 's' },
       { name: 'pause', type: 'range', min: 0, max: 4, step: 0.2, default: 1.2, unit: 's' },
-      { name: 'angle', type: 'range', min: 0, max: 180, step: 5, default: 115, unit: '°' },
+      { name: 'angle', type: 'range', min: 0, max: 180, step: 5, default: 115, unit: 'Â°' },
       { name: 'intensity', type: 'range', min: 0.1, max: 1, step: 0.05, default: 0.55 },
       { name: 'width', type: 'range', min: 5, max: 50, step: 1, default: 22, unit: '%' },
       { name: 'base', type: 'color', default: '#15171a' },

@@ -6,17 +6,19 @@ import Phone, { PHONE_H } from './Phone.jsx'
 
 const BG = '#e8e9ec'
 
-// Metal and glass reflect what is around them, so the studio has long strip
-// lights on each side and a softbox above.
+// Metal and glass reflect what is around them. A darker studio with bright,
+// separate softboxes gives the frame and lenses real highlights and shadows,
+// instead of an even grey that makes every surface look flat.
 function Studio() {
   return (
     <Environment resolution={256}>
-      <color attach="background" args={['#8d9299']} />
-      <Lightformer form="rect" intensity={3} color="#ffffff" position={[0, 260, 80]} rotation-x={Math.PI / 2} scale={[300, 200, 1]} />
-      <Lightformer form="rect" intensity={4} color="#fff1dc" position={[-230, 40, 90]} rotation-y={Math.PI / 2.4} scale={[40, 300, 1]} />
-      <Lightformer form="rect" intensity={4} color="#e3eeff" position={[230, 40, 90]} rotation-y={-Math.PI / 2.4} scale={[40, 300, 1]} />
-      <Lightformer form="rect" intensity={2.2} color="#ffffff" position={[0, 30, 260]} scale={[200, 120, 1]} />
-      <Lightformer form="rect" intensity={2.2} color="#ffffff" position={[0, 30, -260]} rotation-y={Math.PI} scale={[200, 120, 1]} />
+      <color attach="background" args={['#3a3d44']} />
+      <Lightformer form="rect" intensity={4} color="#ffffff" position={[0, 260, 60]} rotation-x={Math.PI / 2} scale={[260, 140, 1]} />
+      <Lightformer form="rect" intensity={7} color="#fff3e2" position={[-230, 40, 90]} rotation-y={Math.PI / 2.4} scale={[30, 320, 1]} />
+      <Lightformer form="rect" intensity={6} color="#eaf1ff" position={[230, 40, 90]} rotation-y={-Math.PI / 2.4} scale={[30, 320, 1]} />
+      <Lightformer form="rect" intensity={3} color="#ffffff" position={[-60, 30, 260]} scale={[120, 160, 1]} />
+      <Lightformer form="rect" intensity={3} color="#ffffff" position={[60, 30, -260]} rotation-y={Math.PI} scale={[120, 160, 1]} />
+      <Lightformer form="rect" intensity={1.2} color="#dfe6f2" position={[0, -220, 0]} rotation-x={-Math.PI / 2} scale={[300, 300, 1]} />
     </Environment>
   )
 }

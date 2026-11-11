@@ -5,8 +5,30 @@ import * as THREE from 'three'
 
 // Units are centimetres. The head sits at the origin, +y is up, +z is forward.
 const A = 10.4 // half-width of the headband at its ends
-const END_Y = 4.2 // height where the headband ends and the yoke starts
+const END_Y = 4.2 // height where the headband ends and the slider housing starts
 const TOP = 18 // top of the arch
+const BAND_A = 1.3 // half depth of the band (front to back)
+const BAND_B = 0.92 // half thickness of the band
+
+// The slider: a pin that runs from inside the band's end housing down into
+// the cup. It moves with the cup, so the housing is long enough to keep the
+// pin's top inside it at full extension.
+const ADJUST_MAX = 2.2 // how far the cup slides down
+const PIN_W = 0.9 // the slider is a flat bar, wide across x
+const PIN_D = 0.36 // and slim front to back
+const PIN_TOP = 0.6 // relative to END_Y
+const HOUSING_Y = -0.4 // centre of the housing, relative to END_Y
+const HOUSING_H = 1.6 // half height: bottom at -2.0, below the pin's top at full extension (-1.6)
+
+// The cup: a shallow drum (its axis along x, pointing out from the head) with a
+// dome on the outside and the cushion seated on the inside face. Its top sits
+// just under the pin, which goes 0.3 into it.
+const CUP_Y = -7.85 // cup centre, relative to the slider pin's origin
+const CUP_RY = 5.3 // half height of the drum
+const CUP_RZ = 4.1 // half depth of the drum
+const DRUM_HW = 0.9 // half width of the drum (along x)
+const PIN_BOTTOM = CUP_Y + CUP_RY - 0.3
+export const LOWEST = END_Y + CUP_Y - 5.55 - ADJUST_MAX // bottom of the cushion at full extension
 
 function rng(seed) {
   return () => {
@@ -114,9 +136,21 @@ function sweepBand(curve, a, b, N = 260, M = 32) {
     nrm.setXYZ(l, nx, ny, nz)
   }
   const uv = []
-  for (let i = 0; i <= N; i++) for (let j = 0; j <= M; j++) uv.push(j / M, i / N * 6)
+  for (let i = 0; i <= N; i++) for (let j = 0; j <= M; j++) uv.push(j / M, (i / N) * 6)
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2))
   return g
+}
+
+// A stitch line along the band's outer face, `z` off the centre line. It sits
+// on the oval surface, so it reads as a seam rather than disappearing inside.
+function seamGeometry(curve, z) {
+  const lift = BAND_B * Math.sqrt(1 - (z / BAND_A) ** 2) - 0.008
+  const pts = curve.getPoints(160).map((p, i, arr) => {
+    const t = curve.getTangentAt(i / (arr.length - 1))
+    const n = new THREE.Vector3(-t.y, t.x, 0).normalize()
+    return p.addScaledVector(n, lift).add(new THREE.Vector3(0, 0, z))
+  })
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 200, 0.025, 6, false)
 }
 
 function useTwoWay(prop, key, onChange) {
@@ -132,7 +166,7 @@ function useTwoWay(prop, key, onChange) {
 }
 
 // bandColor: the padded headband. padColor: the ear cushions. cupColor: the
-// outer shells. accentColor: the metal yoke pins. finish: 'leather' | 'matte' |
+// outer shells. accentColor: the metal sliders. finish: 'leather' | 'matte' |
 // 'gloss'. fold: 0 worn .. 1 folded flat. adjust: how far the cups slide down.
 export default function Headphones({
   bandColor = '#262c3d',
@@ -148,7 +182,7 @@ export default function Headphones({
   const [hover, setHover] = useState(false)
   useCursor(hover, 'pointer')
 
-  const { bandGeo, seamGeo, capGeo } = useMemo(() => {
+  const geo = useMemo(() => {
     // [x, how far up from the yoke to the top of the arch: 0 .. 1]
     const half = [
       [0, 1],
@@ -162,25 +196,26 @@ export default function Headphones({
     ].map(([x, f]) => [x, END_Y + (TOP - END_Y) * f])
     const pts = [...half.slice(1).reverse().map(([x, y]) => new THREE.Vector3(-x, y, 0)), ...half.map(([x, y]) => new THREE.Vector3(x, y, 0))]
     const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal')
-    // a thin stitched seam running along the outer face of the band
-    const seamPts = curve.getPoints(160).map((p, i, arr) => {
-      const t = curve.getTangentAt(i / (arr.length - 1))
-      const n = new THREE.Vector3(-t.y, t.x, 0).normalize()
-      return p.addScaledVector(n, 0.1).add(new THREE.Vector3(0, 0, 1.28))
-    })
+    const drum = new THREE.CylinderGeometry(1, 1, DRUM_HW * 2, 64, 1)
+    drum.rotateZ(Math.PI / 2) // axis along x
     return {
-      bandGeo: sweepBand(curve, 1.3, 0.92),
-      seamGeo: new THREE.TubeGeometry(new THREE.CatmullRomCurve3(seamPts), 200, 0.03, 6, false),
-      capGeo: new THREE.SphereGeometry(1, 32, 20),
+      band: sweepBand(curve, BAND_A, BAND_B),
+      seams: [seamGeometry(curve, 0.95), seamGeometry(curve, -0.95)],
+      sphere: new THREE.SphereGeometry(1, 48, 32),
+      drum,
+      pin: new THREE.BoxGeometry(PIN_W, PIN_TOP - PIN_BOTTOM, PIN_D),
+      boss: new THREE.SphereGeometry(1, 32, 20, 0, Math.PI * 2, 0, Math.PI / 2),
+      pad: new THREE.TorusGeometry(3.8, 1.25, 28, 72),
+      fabric: new THREE.CircleGeometry(1, 48),
     }
   }, [])
   useEffect(
     () => () => {
-      bandGeo.dispose()
-      seamGeo.dispose()
-      capGeo.dispose()
+      Object.values(geo)
+        .flat()
+        .forEach((g) => g.dispose())
     },
-    [bandGeo, seamGeo, capGeo],
+    [geo],
   )
 
   const grain = useMemo(grainTexture, [])
@@ -202,14 +237,13 @@ export default function Headphones({
     return m
   }, [grain])
   const pinMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: accentColor, metalness: 1, roughness: 0.22, clearcoat: 0.5, envMapIntensity: 1.4 }), [])
+  const seamMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#000000', roughness: 1, transparent: true, opacity: 0.35 }), [])
+  const fabricMat = useMemo(() => new THREE.MeshStandardMaterial({ map: fabric, roughness: 0.95 }), [fabric])
   useEffect(
     () => () => {
-      bandMat.dispose()
-      padMat.dispose()
-      cupMat.dispose()
-      pinMat.dispose()
+      for (const m of [bandMat, padMat, cupMat, pinMat, seamMat, fabricMat]) m.dispose()
     },
-    [bandMat, padMat, cupMat, pinMat],
+    [bandMat, padMat, cupMat, pinMat, seamMat, fabricMat],
   )
 
   const want = useRef({})
@@ -228,10 +262,11 @@ export default function Headphones({
     s.adj += (w.adjust - s.adj) * (1 - Math.exp(-dt * 8))
     cups.current.forEach((c) => {
       if (!c) return
+      // swivel about the slider pin; slide down it
       c.rotation.y = s.f * (Math.PI / 2)
-      c.position.y = END_Y - s.adj * 2.2
+      c.position.y = END_Y - s.adj * ADJUST_MAX
     })
-    root.current.position.y = -6 + Math.sin(state.clock.elapsedTime * 0.9) * 0.18
+    root.current.position.y = -6 + Math.sin(state.clock.elapsedTime * 0.9) * 0.12
 
     const e = 1 - Math.exp(-dt * 6)
     bandMat.color.lerp(tc[0].set(w.bandColor), e)
@@ -249,24 +284,22 @@ export default function Headphones({
     }
   })
 
-  // one ear cup, built on the right; the left is a mirror image
+  // One ear cup, built on the right; the left is a mirror image. The group's
+  // origin is the slider pin's axis at the band end, so the cup swivels about
+  // the pin and slides along it.
   const cup = (i) => (
     <group ref={(el) => (cups.current[i] = el)} position={[A, END_Y, 0]}>
-      {/* yoke pin joining the band to the cup */}
-      <mesh position={[0, -0.9, 0]} material={pinMat} castShadow>
-        <cylinderGeometry args={[0.5, 0.5, 2.6, 24]} />
-      </mesh>
-      {/* outer shell: a smooth dome */}
-      <mesh geometry={capGeo} material={cupMat} position={[1.7, -7.6, 0]} scale={[2.6, 5.7, 5.0]} castShadow />
-      {/* ear cushion: a thick oval ring */}
-      <mesh material={padMat} position={[-1.7, -7.6, 0]} rotation={[0, Math.PI / 2, 0]} scale={[1.18, 0.96, 0.9]} castShadow>
-        <torusGeometry args={[4.0, 1.4, 28, 72]} />
-      </mesh>
-      {/* speaker fabric inside the cushion */}
-      <mesh position={[-0.95, -7.6, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[2.9, 3.9, 1]}>
-        <circleGeometry args={[1, 48]} />
-        <meshStandardMaterial map={fabric} roughness={0.95} side={THREE.DoubleSide} />
-      </mesh>
+      {/* slider arm: a flat bar from inside the housing down into the cup */}
+      <mesh geometry={geo.pin} material={pinMat} position={[0, (PIN_TOP + PIN_BOTTOM) / 2, 0]} castShadow />
+      {/* swivel boss: a low dome on top of the cup that the arm plugs into */}
+      <mesh geometry={geo.boss} material={pinMat} position={[0, CUP_Y + CUP_RY - 0.12, 0]} scale={[1.3, 0.55, 1.1]} castShadow />
+      {/* drum with a dome on the outside */}
+      <mesh geometry={geo.drum} material={cupMat} position={[0, CUP_Y, 0]} scale={[1, CUP_RY, CUP_RZ]} castShadow />
+      <mesh geometry={geo.sphere} material={cupMat} position={[DRUM_HW, CUP_Y, 0]} scale={[1.5, CUP_RY, CUP_RZ]} castShadow />
+      {/* ear cushion: a thick oval ring seated on the drum's inner face */}
+      <mesh geometry={geo.pad} material={padMat} position={[-1.6, CUP_Y, 0]} rotation={[0, Math.PI / 2, 0]} scale={[0.85, 1.1, 0.9]} castShadow />
+      {/* speaker fabric inside the cushion, just proud of the drum face */}
+      <mesh geometry={geo.fabric} material={fabricMat} position={[-1.0, CUP_Y, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[2.0, 2.6, 1]} />
     </group>
   )
 
@@ -280,13 +313,13 @@ export default function Headphones({
       onPointerOut={() => setHover(false)}
     >
       <group ref={root} position={[0, -6, 0]}>
-        <mesh geometry={bandGeo} material={bandMat} castShadow />
-        <mesh geometry={seamGeo}>
-          <meshStandardMaterial color="#000000" roughness={1} transparent opacity={0.35} />
-        </mesh>
-        {/* rounded caps where the band ends */}
+        <mesh geometry={geo.band} material={bandMat} castShadow />
+        {geo.seams.map((g, i) => (
+          <mesh key={i} geometry={g} material={seamMat} />
+        ))}
+        {/* slider housings at the band ends: the pins run up inside them */}
         {[-1, 1].map((s) => (
-          <mesh key={s} geometry={capGeo} material={bandMat} position={[s * A, END_Y, 0]} scale={[0.98, 1.05, 1.33]} castShadow />
+          <mesh key={s} geometry={geo.sphere} material={bandMat} position={[s * A, END_Y + HOUSING_Y, 0]} scale={[0.98, HOUSING_H, 1.33]} castShadow />
         ))}
         {cup(0)}
         <group scale={[-1, 1, 1]}>{cup(1)}</group>

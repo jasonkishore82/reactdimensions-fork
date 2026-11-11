@@ -1,0 +1,84 @@
+# 50 interaction ideas
+
+Interaction patterns for the library's components, pages and 3D scenes,
+grouped by the kind of input they use. Existing pieces already cover click to
+open or fold, drag to orbit, drag to spin, double-tap to bounce and keyboard
+driving; these build out from there. Each should respect reduced-motion
+settings and work with touch as well as a mouse.
+
+## Pointer and hover
+
+1. Peek: hovering a card lifts it and shows its back edge
+2. Hover scrub: moving across a thumbnail scrubs a short clip
+3. Cursor trail that fades, with the trail colour taken from what it passes over
+4. Custom cursor that changes shape over draggable, clickable and text targets
+5. Tilt-to-reveal: a hidden layer shows through as the card tilts
+6. Proximity glow on borders near the pointer
+7. Long-hover tooltip that expands into a full preview
+8. Edge hover: moving to the viewport edge peeks the hidden nav
+
+## Drag and throw
+
+9. Drag with inertia and a snap-to-grid on release
+10. Throwable cards that bounce off the viewport walls
+11. Drag to reorder with live reflow and a ghost placeholder
+12. Pull-to-refresh with a stretchy rubber-band indicator
+13. Drag a slider past its end for an over-scroll rubber feel
+14. Drag the 3D model itself to move it, with a drop shadow that follows
+15. Rope: drag one end of a cable and the whole thing sways
+16. Drawer that follows the finger and settles to open or closed
+
+## Click and tap
+
+17. Multi-stage button: press, hold to confirm, release to commit
+18. Ripple from the exact tap point
+19. Tap to cycle through presets, with a small radial indicator of position
+20. Double-tap to like with a burst, single tap to open
+21. Tap a 3D part to isolate it and dim everything else
+22. Long-press to enter edit mode with a wobble
+23. Tap-and-hold to preview, release to go back
+24. Click a hotspot on the model to open an annotation card
+
+## Scroll
+
+25. Scroll-linked model assembly: parts fly in as you scroll
+26. Scroll to rotate the 3D model a full turn across the section
+27. Horizontal gallery driven by vertical scroll
+28. Scroll velocity drives blur or skew that settles when you stop
+29. Snapping sections with a progress rail
+30. Scroll-to-explode: a model separates into layers and reassembles
+31. Sticky product shot that changes colour per text block passed
+32. Reading progress drawn as a filling 3D ring
+
+## Keyboard
+
+33. Arrow keys nudge the selected 3D part by one unit, with a readout
+34. Type-to-search that filters as you type and highlights matches
+35. Keyboard-driven carousel with a visible focus ring on the active slide
+36. Hotkeys shown on hover (press ? to list them)
+37. Spacebar press-and-hold to pause all motion
+38. Shift-drag constrains movement to one axis
+
+## Gesture and device
+
+39. Pinch to zoom the model and two-finger twist to rotate it
+40. Device tilt (gyroscope) to orbit the camera on phones
+41. Shake to reset (snow globe, dice, reset controls)
+42. Swipe up on a card to dismiss it with a throw
+43. Two-finger scroll on a trackpad to scrub a timeline
+44. Camera-based head tracking for a parallax window effect
+
+## Time and state
+
+45. Idle attract loop: after a pause the model performs a short demo
+46. Undo and redo for control changes with a visible history strip
+47. Autosave of control values to the URL for sharing a state
+48. Comparison slider between two prop presets, split down the middle
+49. Record and replay a sequence of interactions as a short clip
+50. Presence: cursors of other viewers shown on the same model
+
+## Where to start
+
+Scroll to rotate (26), hotspot annotations (24) and the comparison slider
+(48) make the biggest difference to the landing page, and all three reuse the
+existing camera rig and two-way prop pattern in the 3D scenes.
