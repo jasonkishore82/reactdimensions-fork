@@ -8,6 +8,7 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import GlassDashboard from '../lib/GlassDashboard.jsx'
 import GlassDesktop from '../lib/GlassDesktop.jsx'
 import GlassFinance from '../lib/GlassFinance.jsx'
 import GlassLogin from '../lib/GlassLogin.jsx'
@@ -972,6 +973,22 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <GlassDesktop {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['GlassDesktop.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-dashboard',
+    name: 'Glass Dashboard',
+    category: 'UI',
+    isNew: true,
+    description: 'A dark glass finance dashboard floating in a warm, dim room.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#ff6a2b' },
+      { name: 'blur', type: 'range', min: 6, max: 48, step: 1, default: 26, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0, max: 0.3, step: 0.02, default: 0.06 },
+    ],
+    fill: true,
+    preview: (p) => <GlassDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassDashboard.jsx'],
     deps: [],
   },
 ]
