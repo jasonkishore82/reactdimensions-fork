@@ -8,6 +8,12 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import SkeuConsole from '../lib/SkeuConsole.jsx'
+import SkeuCalendar from '../lib/SkeuCalendar.jsx'
+import SkeuHifi from '../lib/SkeuHifi.jsx'
+import SkeuCamera from '../lib/SkeuCamera.jsx'
+import SkeuJournal from '../lib/SkeuJournal.jsx'
+import SkeuDelay from '../lib/SkeuDelay.jsx'
 import MinDashboard from '../lib/MinDashboard.jsx'
 import MinSettings from '../lib/MinSettings.jsx'
 import MinCheckout from '../lib/MinCheckout.jsx'
@@ -74,7 +80,7 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
 
 // The UI section is grouped by visual style, in this order.
-export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism']
+export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism', 'Skeuomorphism']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -1510,6 +1516,96 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <MinDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['MinDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-delay',
+    name: 'Skeu Delay',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A stereo delay plugin with glossy knobs, physical faders and raised keys, in light, dark or split.',
+    controls: [
+      { name: 'theme', type: 'select', options: ['split', 'light', 'dark'], default: 'split' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuDelay {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuDelay.jsx', 'ui/dial.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-journal',
+    name: 'Skeu Journal',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A stitched leather journal with a brass clasp, lined pages you can write on, a ribbon, section tabs and an index-card drawer.',
+    controls: [
+      { name: 'owner', type: 'text', default: 'June' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuJournal {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuJournal.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-camera',
+    name: 'Skeu Camera',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'An analogue camera with knurled ISO and shutter dials that change the viewfinder exposure, a mode switch, a chrome shutter and a film strip.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuCamera {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuCamera.jsx', 'ui/dial.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-hifi',
+    name: 'Skeu Hi-Fi',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A walnut hi-fi with a spinning record and swinging tonearm, glowing VU meters, chrome knobs, source push-buttons and a record crate.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuHifi {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuHifi.jsx', 'ui/dial.js', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-calendar',
+    name: 'Skeu Calendar',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A tear-off desk calendar with ring-binder Day/Week/Month tabs, a DONE rubber stamp and a corkboard of sticky notes.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuCalendar {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuCalendar.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-console',
+    name: 'Skeu Console',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'An original retro handheld with a CRT menu, d-pad and A/B buttons that press down (keyboard too) and cartridges that slide in from a shelf.',
+    controls: [
+      { name: 'shell', type: 'color', default: '#8fcfc0' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuConsole {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuConsole.jsx', 'ui/onscreen.js'],
     deps: [],
   },
 ]

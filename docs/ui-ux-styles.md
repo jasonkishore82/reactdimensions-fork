@@ -467,6 +467,33 @@ use colour freely but keep motion calm and touch targets big.
 Interfaces that imitate real objects and materials.
 Traits: realistic textures, physical controls, depth and lighting.
 
+#### References
+
+Real examples and write-ups for skeuomorphism today.
+
+- **Live websites and apps**
+  - [Poolsuite FM, a music site recreating a retro Mac desktop (Awwwards)](https://www.awwwards.com/inspiration/music-website-inspired-by-a-90s-os-poolside)
+  - [Poolside FM case study (Dutch Digital Design)](https://dutchdigital.design//cases/poolside-fm)
+  - [(Not Boring) Timer, chunky object-like utility apps (Screensdesign)](https://screensdesign.com/showcase/not-boring-timer)
+  - [Playdate by Panic and Teenage Engineering (Domus)](https://domusweb.it/en/design/gallery/2022/06/24/playdate-a-game-boy-designed-for-the-netflix-era.html)
+  - [Teenage Engineering design study (Blake Crosley)](https://blakecrosley.com/de/guides/design/teenage-engineering)
+- **Galleries**
+  - [Skeuomorphism websites (One Page Love)](https://onepagelove.com/tag/skeuomorphism)
+  - [20 skeuomorphic design examples (Mockplus)](https://www.mockplus.com/blog/post/skeuomorphic-design-examples)
+  - [Interactive skeuomorphic elements: knobs, switches, dials (Speckyboy)](https://speckyboy.com/interactive-skeuomorphic-design-elements.md)
+  - [Skeuomorphism in food websites (Onextrapixel)](https://onextrapixel.com/?p=42734)
+- **Background reading**
+  - [Skeuomorphism best practices for 2026 (Clay)](https://clay.global/blog/skeuomorphism-ui)
+  - [Is skeuomorphism back on the menu? (Simone)](https://blog.simone.computer/is-skeumorphism-back)
+  - [Bring back the bezels (Design Lobster)](https://designlobster.substack.com/p/bring-back-the-bezels?open=false)
+  - [Retro and brutalist UI design: a 2026 field guide (Setproduct)](https://www.setproduct.com/blog/retro-brutalist-ui-design-2026)
+  - [Apple shouldn't make software look like real objects (Scientific American)](https://www.scientificamerican.com/article/apple-shouldnt-make-software-look-like-real-objects/)
+
+Takeaways: the modern version (neo-skeuomorphism) keeps real-world cues
+such as depth, light, texture and physical controls, but stays readable
+and restrained; controls should behave like the object they imitate
+(knobs turn, switches click, pages turn) and still work with a keyboard.
+
 ### 8.1 Leather notebook journal
 - **Look:** A stitched leather cover opens onto lined paper pages with a ribbon bookmark.
 - **Buttons:** Embossed leather tabs and a metal clasp for locking entries.
