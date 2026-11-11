@@ -46,7 +46,8 @@ A component browser in the style of React Bits. Sidebar with search (press `/`),
 | --- | --- |
 | Text | Measure Text, Decode Text |
 | Interactions | Tilt Card, Spring Button, Magnetic Button |
-| UI | Flat Dashboard, Flat Onboarding, Flat Utility, Flat Shop, Flat Docs, Flat UI Kit, Glass Player, Glass Weather, Glass Login, Glass Finance, Glass Desktop, Glass Dashboard, Neu Home Remote, Neu Calculator, Neu Fitness, Neu Mixer, Neu Settings, Liquid Tab Bar, Liquid Lens, Liquid Control Centre, Liquid Media Controls, Liquid Hero, Bento Features, Bento Portfolio, Bento Analytics, Bento Home, Bento Specs |
+| UI | **Flat:** Flat Dashboard, Flat Onboarding, Flat Utility, Flat Shop, Flat Docs, Flat UI Kit · **Glassmorphism:** Glass Player, Glass Weather, Glass Login, Glass Finance, Glass Desktop, Glass Dashboard · **Neumorphism:** Neu Home Remote, Neu Calculator, Neu Fitness, Neu Mixer, Neu Settings · **Liquid glass:** Liquid Tab Bar, Liquid Lens, Liquid Control Centre, Liquid Media Controls, Liquid Hero · **Bento:** Bento Features, Bento Portfolio, Bento Analytics, Bento Home, Bento Specs |
+| Phone UI | (coming soon) |
 | 3D & Materials | Clear-coat Card (three.js), Pickup (three.js, optionally drivable), Snake (three.js, procedural), Turntable (three.js, playable), Vinyl Record (three.js), Sunglasses (three.js, parametric), Watch (three.js, analog and smart), Laptop (three.js), Glass Bottle (three.js), TV (three.js), Phone (three.js), Headphones (three.js) |
 | Backgrounds | Drafting Grid, Light Sweep, Cyclorama, Gradient Sweep, Soft Horizon |
 

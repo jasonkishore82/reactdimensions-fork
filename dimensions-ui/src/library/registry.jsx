@@ -60,7 +60,10 @@ const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx'
 // Files are named 'X.jsx' (in lib/ or src/) or 'pickup/X.jsx'.
 const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 
-export const CATEGORIES = ['Text', 'Interactions', 'UI', '3D & Materials', 'Backgrounds']
+export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
+
+// The UI section is grouped by visual style, in this order.
+export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -818,6 +821,7 @@ export const COMPONENTS = [
     slug: 'flat-dashboard',
     name: 'Flat Dashboard',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'A flat colour-block analytics dashboard with a sidebar and tab pills.',
     controls: [
@@ -835,6 +839,7 @@ export const COMPONENTS = [
     slug: 'flat-onboarding',
     name: 'Flat Onboarding',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'Two-tone flat onboarding screens with a stretching progress pill.',
     controls: [
@@ -851,6 +856,7 @@ export const COMPONENTS = [
     slug: 'flat-utility',
     name: 'Flat Utility',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'An icon-first flat tool launcher with category chips and a tab bar.',
     controls: [
@@ -867,6 +873,7 @@ export const COMPONENTS = [
     slug: 'flat-shop',
     name: 'Flat Shop',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'A flat product catalogue with category pills, filters and add-to-bag.',
     controls: [
@@ -883,6 +890,7 @@ export const COMPONENTS = [
     slug: 'flat-docs',
     name: 'Flat Docs',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'A flat documentation page with a framework switcher and accent sidebar.',
     controls: [
@@ -899,6 +907,7 @@ export const COMPONENTS = [
     slug: 'flat-kit',
     name: 'Flat UI Kit',
     category: 'UI',
+    style: 'Flat',
     isNew: true,
     description: 'A board of flat widgets: profile, calendar, player, controls and more.',
     controls: [
@@ -914,6 +923,7 @@ export const COMPONENTS = [
     slug: 'glass-player',
     name: 'Glass Player',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'A frosted music player over its own blurred album art, with a glass queue.',
     controls: [
@@ -930,6 +940,7 @@ export const COMPONENTS = [
     slug: 'glass-weather',
     name: 'Glass Weather',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'Frosted weather cards over a live sky: sun, snow, rain or stars.',
     controls: [
@@ -946,6 +957,7 @@ export const COMPONENTS = [
     slug: 'glass-login',
     name: 'Glass Login',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'A frosted sign-in card over a drifting Swiss-style poster.',
     controls: [
@@ -962,6 +974,7 @@ export const COMPONENTS = [
     slug: 'glass-finance',
     name: 'Glass Finance',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'A dark glass banking app lit by amber and teal light leaks.',
     controls: [
@@ -979,6 +992,7 @@ export const COMPONENTS = [
     slug: 'glass-desktop',
     name: 'Glass Desktop',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'Frosted desktop widgets over a dusk landscape, with a dock and notifications.',
     controls: [
@@ -994,6 +1008,7 @@ export const COMPONENTS = [
     slug: 'glass-dashboard',
     name: 'Glass Dashboard',
     category: 'UI',
+    style: 'Glassmorphism',
     isNew: true,
     description: 'A dark glass finance dashboard floating in a warm, dim room.',
     controls: [
@@ -1010,6 +1025,7 @@ export const COMPONENTS = [
     slug: 'neu-home',
     name: 'Neu Home Remote',
     category: 'UI',
+    style: 'Neumorphism',
     isNew: true,
     description: 'A soft smart-home remote: rooms, a draggable thermostat dial and device keys.',
     controls: [
@@ -1037,6 +1053,7 @@ export const COMPONENTS = [
     slug: 'neu-calc',
     name: 'Neu Calculator',
     category: 'UI',
+    style: 'Neumorphism',
     isNew: true,
     description: 'A working soft-UI calculator with scientific mode, history and keyboard input.',
     controls: [
@@ -1065,6 +1082,7 @@ export const COMPONENTS = [
     slug: 'neu-fitness',
     name: 'Neu Fitness',
     category: 'UI',
+    style: 'Neumorphism',
     isNew: true,
     description: 'A soft activity tracker with a progress ring, workout timer and week view.',
     controls: [
@@ -1093,6 +1111,7 @@ export const COMPONENTS = [
     slug: 'neu-mixer',
     name: 'Neu Mixer',
     category: 'UI',
+    style: 'Neumorphism',
     isNew: true,
     description: 'A soft audio mixer with draggable faders, live meters, mute/solo and EQ knobs.',
     controls: [
@@ -1120,6 +1139,7 @@ export const COMPONENTS = [
     slug: 'neu-settings',
     name: 'Neu Settings',
     category: 'UI',
+    style: 'Neumorphism',
     isNew: true,
     description: 'A soft settings panel with real toggles, a live light/dark switch and save state.',
     controls: [
@@ -1147,6 +1167,7 @@ export const COMPONENTS = [
     slug: 'liquid-tab-bar',
     name: 'Liquid Tab Bar',
     category: 'UI',
+    style: 'Liquid glass',
     isNew: true,
     description: 'A thick-glass tab bar that bends the feed beneath it, with a stretching droplet.',
     controls: [
@@ -1162,6 +1183,7 @@ export const COMPONENTS = [
     slug: 'liquid-lens',
     name: 'Liquid Lens',
     category: 'UI',
+    style: 'Liquid glass',
     isNew: true,
     description: 'A product viewer with a draggable glass lens, glass colour beads and a thick glass spec panel.',
     controls: [
@@ -1178,6 +1200,7 @@ export const COMPONENTS = [
     slug: 'liquid-control',
     name: 'Liquid Control Centre',
     category: 'UI',
+    style: 'Liquid glass',
     isNew: true,
     description: 'Glass control tiles that bend the wallpaper, with rippling toggles and glass-tube sliders.',
     controls: [
@@ -1193,6 +1216,7 @@ export const COMPONENTS = [
     slug: 'liquid-media',
     name: 'Liquid Media Controls',
     category: 'UI',
+    style: 'Liquid glass',
     isNew: true,
     description: 'Glass bubble video controls with a droplet scrubber over a living scene.',
     controls: [
@@ -1208,6 +1232,7 @@ export const COMPONENTS = [
     slug: 'liquid-hero',
     name: 'Liquid Hero',
     category: 'UI',
+    style: 'Liquid glass',
     isNew: true,
     description: 'A landing hero where a drifting glass orb bends a giant headline.',
     controls: [
@@ -1226,6 +1251,7 @@ export const COMPONENTS = [
     slug: 'bento-features',
     name: 'Bento Features',
     category: 'UI',
+    style: 'Bento',
     isNew: true,
     description: 'A bento feature section with live mini demos in each tile and a sticky nav pill.',
     controls: [
@@ -1241,6 +1267,7 @@ export const COMPONENTS = [
     slug: 'bento-portfolio',
     name: 'Bento Portfolio',
     category: 'UI',
+    style: 'Bento',
     isNew: true,
     description: 'A link-in-bio bento: portrait, bio, project, now playing, map and socials.',
     controls: [
@@ -1256,6 +1283,7 @@ export const COMPONENTS = [
     slug: 'bento-analytics',
     name: 'Bento Analytics',
     category: 'UI',
+    style: 'Bento',
     isNew: true,
     description: 'An analytics bento with a date-range pill, expandable tiles and export.',
     controls: [
@@ -1270,6 +1298,7 @@ export const COMPONENTS = [
     slug: 'bento-home',
     name: 'Bento Home',
     category: 'UI',
+    style: 'Bento',
     isNew: true,
     description: 'An app home screen of pressable tiles with pinned items and a tab pill.',
     controls: [
@@ -1285,6 +1314,7 @@ export const COMPONENTS = [
     slug: 'bento-specs',
     name: 'Bento Specs',
     category: 'UI',
+    style: 'Bento',
     isNew: true,
     description: 'A product spec bento with animated numbers, model switcher and compare drawer.',
     controls: [

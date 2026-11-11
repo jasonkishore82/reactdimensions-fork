@@ -204,6 +204,26 @@
 .lib-cat a:hover { color: var(--ink); background: var(--glass); }
 .lib-cat a.active { color: var(--signal-ink); background: color-mix(in srgb, var(--signal) 12%, transparent); font-weight: 500; }
 .lib-none { margin: 24px 10px; color: var(--ink-3); font-size: 14px; }
+.lib-style + .lib-style { margin-top: 8px; }
+.lib-style h5 {
+  margin: 8px 0 4px 8px;
+  font: 600 11.5px/1 var(--sans);
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lib-style h5::after { content: ''; flex: 1; height: 1px; background: var(--line); margin-right: 8px; }
+.style-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 22px; }
+.style-chips button {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2);
+  font: 500 13px/1 var(--sans); cursor: pointer;
+}
+.style-chips button:hover { color: var(--ink); }
+.style-chips button[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.style-chips span { font: 500 11px/1 var(--mono); opacity: .7; }
 .lib-backdrop { display: none; }
 .badge {
   font: 600 9px/1 var(--mono);
