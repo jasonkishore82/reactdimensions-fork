@@ -3,8 +3,6 @@ import SpringButton from '../lib/SpringButton.jsx'
 import MagneticButton from '../lib/MagneticButton.jsx'
 import MeasureText from '../lib/MeasureText.jsx'
 import DecodeText from '../lib/DecodeText.jsx'
-import DimensionLine from '../lib/DimensionLine.jsx'
-import MaterialSphere from '../lib/MaterialSphere.jsx'
 import DraftingGrid from '../lib/DraftingGrid.jsx'
 import LightSweep from '../lib/LightSweep.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
@@ -29,7 +27,7 @@ const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx'
 // Files are named 'X.jsx' (in lib/ or src/) or 'pickup/X.jsx'.
 const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 
-export const CATEGORIES = ['Text', 'Interactions', '3D & Materials', 'Annotations', 'Backgrounds']
+export const CATEGORIES = ['Text', 'Interactions', '3D & Materials', 'Backgrounds']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -136,7 +134,20 @@ export const COMPONENTS = [
       { name: 'damping', type: 'range', min: 1, max: 30, step: 0.5, default: 7.5 },
       { name: 'gloss', type: 'range', min: 0, max: 1, step: 0.02, default: 0.94 },
       { name: 'iridescence', type: 'range', min: 0, max: 1, step: 0.05, default: 0.25 },
-      { name: 'color', type: 'color', default: '#141517' },
+      { name: 'color', type: 'color', default: '#34363b' },
+      { name: 'brand', type: 'text', default: 'DIMENSIONS' },
+      { name: 'tier', type: 'text', default: 'Studio Pass' },
+      { name: 'number', type: 'text', default: '8560 5398 0003 2026' },
+      { name: 'version', type: 'text', default: 'v1.0' },
+      { name: 'expiresTop', type: 'text', default: 'EXPIRES' },
+      { name: 'expiresBottom', type: 'text', default: 'END' },
+      { name: 'expiry', type: 'text', default: '00-00' },
+      { name: 'holder', type: 'text', default: 'FOUNDING MEMBER' },
+      { name: 'cvv', type: 'text', default: '123' },
+      { name: 'signatureNote', type: 'text', default: 'AUTHORIZED SIGNATURE — NOT VALID UNLESS SIGNED' },
+      { name: 'backLine1', type: 'text', default: 'Rendered in real time. No image assets were used to make this card.' },
+      { name: 'backLine2', type: 'text', default: '85.60 x 53.98 mm  /  clear-coat PBR  /  spring physics' },
+      { name: 'backName', type: 'text', default: 'react-dimensions' },
     ],
     preview: (p) => <ClearcoatCard {...p} height="100%" />,
     fill: true,
@@ -557,42 +568,6 @@ export const COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
-    slug: 'material-sphere',
-    name: 'Material Sphere',
-    category: '3D & Materials',
-    description: 'A pure-CSS shaded sphere in chrome, gold, copper and more. The highlight follows your cursor like a moving lamp.',
-    controls: [
-      { name: 'material', type: 'select', options: ['chrome', 'gold', 'copper', 'ink', 'signal'], default: 'chrome' },
-      { name: 'size', type: 'range', min: 60, max: 260, step: 10, default: 160, unit: 'px' },
-      { name: 'followLight', type: 'toggle', default: true },
-      { name: 'float', type: 'toggle', default: true },
-    ],
-    preview: (p) => <MaterialSphere {...p} />,
-    files: ['MaterialSphere.jsx'],
-    deps: [],
-  },
-  {
-    slug: 'dimension-line',
-    name: 'Dimension Line',
-    category: 'Annotations',
-    description: 'Wraps any element with a CAD-style dimension line and label that draws itself in.',
-    controls: [
-      { name: 'label', type: 'text', default: '320 mm' },
-      { name: 'position', type: 'select', options: ['top', 'bottom', 'left', 'right'], default: 'top' },
-      { name: 'offset', type: 'range', min: 6, max: 48, step: 2, default: 18, unit: 'px' },
-      { name: 'color', type: 'color', default: '#ff4d1a' },
-      { name: 'animate', type: 'toggle', default: true },
-    ],
-    replay: true,
-    preview: (p) => (
-      <DimensionLine {...p}>
-        <div className="demo-plate">Any element</div>
-      </DimensionLine>
-    ),
-    files: ['DimensionLine.jsx'],
-    deps: [],
-  },
-  {
     slug: 'drafting-grid',
     name: 'Drafting Grid',
     category: 'Backgrounds',
@@ -641,7 +616,7 @@ export const COMPONENTS = [
 ]
 
 // Components that take children, so usage shows them as wrappers.
-export const WRAPPERS = ['TiltCard', 'DimensionLine', 'DraftingGrid', 'LightSweep', 'SpringButton', 'MagneticButton']
+export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'SpringButton', 'MagneticButton']
 
 export const sourceFor = (c) => c.files.map((f) => ({ file: f, code: src(f) }))
 

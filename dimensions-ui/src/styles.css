@@ -26,32 +26,35 @@
   --sans: 'Hanken Grotesk', 'Helvetica Neue', sans-serif;
   --mono: 'IBM Plex Mono', 'Menlo', monospace;
 
-  --header-h: 60px;
+  --nav-h: 56px;
+  --nav-gap: 12px;
+  /* Space the floating pill takes at the top; sticky panels offset from this. */
+  --header-h: calc(var(--nav-h) + var(--nav-gap) + 4px);
   --gutter: clamp(16px, 4vw, 56px);
   --max: 1320px;
   --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 
 :root[data-theme='light'] {
-  --paper: #efece4;
-  --paper-2: #e6e2d7;
-  --paper-3: #ddd8ca;
-  --ink: #15171a;
-  --ink-2: #4a4d52;
-  --ink-3: #85878a;
-  --line: rgba(21, 23, 26, 0.14);
-  --line-strong: rgba(21, 23, 26, 0.32);
+  --paper: #ffffff;
+  --paper-2: #f7f7f8;
+  --paper-3: #efeff1;
+  --ink: #171717;
+  --ink-2: #525252;
+  --ink-3: #8a8a8a;
+  --line: rgba(0, 0, 0, 0.09);
+  --line-strong: rgba(0, 0, 0, 0.18);
   --signal-ink: #d93a0b;
-  --glass: rgba(255, 255, 255, 0.4);
-  --glass-2: rgba(255, 255, 255, 0.7);
-  --grid-a: rgba(21, 23, 26, 0.14);
-  --grid-b: rgba(21, 23, 26, 0.05);
-  --inv-bg: #15171a;
-  --inv-fg: #efece4;
-  --code-bg: #15171a;
+  --glass: #ffffff;
+  --glass-2: #f3f3f4;
+  --grid-a: rgba(0, 0, 0, 0.06);
+  --grid-b: rgba(0, 0, 0, 0.025);
+  --inv-bg: #171717;
+  --inv-fg: #ffffff;
+  --code-bg: #171717;
   --hero-glow: rgba(255, 255, 255, 0.75);
-  --panel: color-mix(in srgb, #efece4 82%, transparent);
-  --shadow: 0 18px 40px -24px rgba(21, 23, 26, 0.45);
+  --panel: color-mix(in srgb, #ffffff 86%, transparent);
+  --shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.18);
   color-scheme: light;
 }
 
@@ -95,6 +98,8 @@ a { color: inherit; }
   background: radial-gradient(ellipse 60% 100% at 50% -10%, rgba(255, 77, 26, 0.13), transparent 70%);
 }
 :root:not([data-theme='light']) .paper::after { display: none; }
+/* the light theme is plain white: no drafting grid or grain */
+:root[data-theme='light'] .paper { display: none; }
 .paper::after {
   content: '';
   position: absolute;
@@ -250,6 +255,19 @@ em {
   align-items: start;
 }
 .hero-copy { grid-area: copy; padding-top: 24px; }
+.hero-lander {
+  grid-template-areas: 'copy stage';
+  align-items: center;
+  min-height: calc(100svh - var(--header-h));
+  --lander-font: 'Noto Sans Meroitic', var(--sans);
+}
+.hero-lander .hero-copy { font-family: var(--lander-font); font-synthesis: none; }
+.hero-lander h1 {
+  font: 400 clamp(42px, 5.4vw, 84px)/1.04 var(--lander-font);
+  letter-spacing: -0.03em;
+}
+.hero-lander h1 em { font-family: var(--lander-font); font-style: normal; }
+.hero-lander .btn { font-family: var(--lander-font); font-weight: 400; }
 .eyebrow {
   display: flex;
   align-items: center;
@@ -684,25 +702,46 @@ h2 {
   .install { font-size: 13px; }
 }
 
-/* ---------- Header (60px, frosted, like a docs site) ---------- */
+/* ---------- Header (floating frosted pill) ---------- */
 .nav {
   position: sticky;
-  top: 0;
+  top: calc(var(--nav-gap) + env(safe-area-inset-top));
   z-index: 40;
-  height: calc(var(--header-h) + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) clamp(14px, 2.4vw, 28px) 0;
+  width: min(var(--max), calc(100% - 24px));
+  height: var(--nav-h);
+  margin: calc(var(--nav-gap) + env(safe-area-inset-top)) auto 0;
+  padding: 0 10px 0 22px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   background: color-mix(in srgb, var(--paper) 74%, transparent);
   backdrop-filter: blur(18px) saturate(1.3);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
-  border-bottom: 1px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  transition: top 0.25s var(--ease), width 0.25s var(--ease), border-radius 0.25s var(--ease), padding 0.25s var(--ease), background 0.25s, box-shadow 0.25s;
 }
+/* Once scrolled: a full-width panel stuck to the top. The margin stays, so the page doesn't shift. */
+.nav.scrolled {
+  top: 0;
+  width: 100%;
+  height: calc(var(--nav-h) + env(safe-area-inset-top));
+  margin-bottom: calc(-1 * env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) clamp(14px, 2.4vw, 28px) 0;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  border-width: 0 0 1px;
+  border-radius: 0;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) { .nav { transition: none; } }
+.nav .search-btn { border-radius: 999px; }
+.nav .icon-btn { border-radius: 50%; }
+.nav .btn-small { border-radius: 999px; }
 .nav .links { display: flex; gap: 4px; margin-left: 10px; }
 .nav .links a {
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 999px;
   letter-spacing: 0.06em;
   transition: background 0.2s, color 0.2s;
 }
@@ -750,7 +789,12 @@ h2 {
 .icon-btn:hover { border-color: var(--line-strong); background: var(--glass-2); color: var(--ink); }
 .icon-btn svg { width: 17px; height: 17px; }
 .menu-btn { display: none; }
+@media (max-width: 1180px) {
+  .search-btn { min-width: 130px; }
+  .nav .links { margin-left: 0; gap: 0; }
+}
 @media (max-width: 900px) {
+  .nav { padding-left: 16px; }
   .menu-btn.on-library { display: inline-grid; }
   .nav .links { display: none; }
   .search-btn { min-width: 0; }
@@ -760,6 +804,30 @@ h2 {
 @media (max-width: 640px) {
   .nav .btn-small, .nav .gh { display: none; }
 }
+
+/* ---------- General popup ---------- */
+.popup-back {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(5, 4, 8, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.popup {
+  width: min(380px, 100%);
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.popup h2 { margin: 0 0 8px; font: 600 20px/1.2 var(--sans); letter-spacing: -0.01em; }
+.popup p { margin: 0 0 20px; font-size: 15px; color: var(--ink-2); }
 
 /* ---------- Search dialog ---------- */
 .sd-back {
