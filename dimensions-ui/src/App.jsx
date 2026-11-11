@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Footer, Nav } from './Nav.jsx'
 import SearchDialog from './SearchDialog.jsx'
 import Landing from './Landing.jsx'
-import Library from './library/Library.jsx'
+import Library, { CategoryPage } from './library/Library.jsx'
 import { COMPONENTS } from './library/registry.jsx'
 
 export default function App() {
@@ -29,6 +29,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/library" element={<Navigate to={`/library/${COMPONENTS[0].slug}`} replace />} />
+        <Route path="/library/c/:cat" element={<CategoryPage />} />
         <Route path="/library/:slug" element={<Library />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
