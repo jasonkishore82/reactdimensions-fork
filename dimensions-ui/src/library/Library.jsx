@@ -298,7 +298,7 @@ function Sidebar({ active, open, onClose, favs, category }) {
             </svg>
             Browse all components
           </Link>
-          <div className="cat-picker" role="tablist" aria-label="Category" style={{ '--n': tabs.length, '--i': tabs.indexOf(cat) }}>
+          <div className="cat-picker" role="tablist" aria-label="Category" style={{ '--col': Math.max(0, tabs.indexOf(cat)) % 4, '--row': Math.floor(Math.max(0, tabs.indexOf(cat)) / 4) }}>
             <span className="pill-bg" aria-hidden="true" />
             {tabs.map((t) => (
               <button key={t} role="tab" aria-selected={cat === t} aria-label={t} title={t} onClick={() => { onClose(); navigate(`/library/c/${catSlug(t)}`) }}>
