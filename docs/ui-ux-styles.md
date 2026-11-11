@@ -320,6 +320,38 @@ grids don't stack well on their own.
 Only what's needed, with lots of space around it.
 Traits: generous whitespace, limited palette, strong type hierarchy.
 
+#### References
+
+Real examples and write-ups for the same use cases as the ideas below.
+
+- **Minimal reading app**
+  - [Readwise Reader design study: margins, ~65-character lines (Blake Crosley)](https://blakecrosley.com/guides/design/readwise-reader)
+  - [iA Writer, focus without stripping features (TapSmart)](https://www.tapsmart.com/features/classics-ia-writer/?noamp=mobile)
+  - [A Simpler Page, on screen reading typography (Craig Mod)](https://craigmod.com/essays/a_simpler_page/)
+- **Minimal to-do list**
+  - [Things 3: beauty and delight in a task manager (MacStories)](https://www.macstories.net/reviews/things-3-beauty-and-delight-in-a-task-manager/)
+  - [Design study: Things (Blake Crosley)](https://blakecrosley.com/blog/design-study-things)
+  - [Designing a simple to-do app, lessons from Clear (Medium)](https://medium.com/product-manager-journal/designing-a-simple-todo-app-b4d4ed9300a4)
+- **Minimal portfolio**
+  - [Minimalist portfolio websites (Really Good Designs)](https://reallygooddesigns.com/minimalist-portfolio-website/)
+  - [Best minimalist websites, incl. photographers (Pixpa)](https://pixpa.com/blog/best-minimalist-websites)
+  - [Simple minimal websites (SiteBuilderReport)](https://www.sitebuilderreport.com/inspiration/simple-minimal-websites)
+- **Minimal checkout**
+  - [The checkout UX guide: must-have features (Baymard)](https://baymard.com/blog/checkout-flow-ux-optimization)
+  - [Checkout form best practices (Baymard)](https://baymard.com/blog/checkout-form-best-practices)
+  - [Current state of checkout UX, common pitfalls (Baymard)](https://baymard.com/blog/current-state-of-checkout-ux)
+- **Minimal settings**
+  - [Settings patterns (Android design guidelines)](https://developer.android.com/design/ui/mobile/guides/patterns/settings)
+  - [How to design a toggle list (Cieden)](https://cieden.com/book/atoms/toggle-switch/how-to-design-a-toggle-list)
+  - [When to use toggle switches (Yoast)](https://yoast.com/developer-blog/when-to-use-toggle-switches/)
+
+Takeaways: minimal means fewer distractions, not fewer cues; keep enough
+orientation (where am I, what's next) so simple doesn't become lost; set
+reading text near 65 characters a line with generous margins; in
+checkout keep one clear forward action per step, guest checkout first,
+and as few fields as possible; group settings with headings and
+whitespace, and use toggles only for instant on/off choices.
+
 ### 6.1 Minimal reading app
 - **Look:** Off-white page, one serif typeface, wide margins, nothing on screen but the text.
 - **Buttons:** Text-only buttons in small caps; icons only for back and settings.

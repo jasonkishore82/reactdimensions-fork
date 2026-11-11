@@ -8,6 +8,11 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import MinSettings from '../lib/MinSettings.jsx'
+import MinCheckout from '../lib/MinCheckout.jsx'
+import MinPortfolio from '../lib/MinPortfolio.jsx'
+import MinTodo from '../lib/MinTodo.jsx'
+import MinReader from '../lib/MinReader.jsx'
 import MaxProfile from '../lib/MaxProfile.jsx'
 import MaxKids from '../lib/MaxKids.jsx'
 import MaxEditorial from '../lib/MaxEditorial.jsx'
@@ -68,7 +73,7 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
 
 // The UI section is grouped by visual style, in this order.
-export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Maximalism']
+export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -1411,6 +1416,83 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <MaxProfile {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['MaxProfile.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'min-reader',
+    name: 'Min Reader',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A calm reading view: one serif, a 65-character measure and a pill that appears on scroll up.',
+    controls: [
+      { name: 'title', type: 'text', default: 'The Quiet Hour' },
+      { name: 'author', type: 'text', default: 'June Halden' },
+    ],
+    fill: true,
+    preview: (p) => <MinReader {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinReader.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-todo',
+    name: 'Min To-do',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A single-column to-do list with one accent, inline add and a quiet progress line.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#2f6f4f' },
+    ],
+    fill: true,
+    preview: (p) => <MinTodo {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinTodo.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-portfolio',
+    name: 'Min Portfolio',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A monochrome portfolio with big images, thin captions and an index view.',
+    controls: [
+      { name: 'name', type: 'text', default: 'Ines Moreau' },
+      { name: 'role', type: 'text', default: 'Photographer, Lisbon' },
+    ],
+    fill: true,
+    preview: (p) => <MinPortfolio {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinPortfolio.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-checkout',
+    name: 'Min Checkout',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A one-step-per-screen guest checkout with inline errors and the total always in view.',
+    controls: [
+      { name: 'currency', type: 'select', options: ['€', '$', '£'], default: '€' },
+    ],
+    fill: true,
+    preview: (p) => <MinCheckout {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinCheckout.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-settings',
+    name: 'Min Settings',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'Plain grouped settings rows with instant toggles and a confirmed destructive action.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#111111' },
+    ],
+    fill: true,
+    preview: (p) => <MinSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinSettings.jsx'],
     deps: [],
   },
 ]
