@@ -362,6 +362,37 @@ Traits: generous whitespace, limited palette, strong type hierarchy.
 Loud, layered and full: more colour, pattern and type, on purpose.
 Traits: clashing colours, dense layouts, mixed fonts, big imagery.
 
+#### References
+
+Real examples and write-ups for the same use cases as the ideas below.
+
+- **Music festival site**
+  - [Bonnaroo site redesign, neon signage direction (UX Planet)](https://uxplanet.org/bonnaroo-music-arts-festival-site-redesign-7deac38e1617)
+  - [Nuits Sonores 2025 identity, grainy neon (It's Nice That)](https://www.itsnicethat.com/articles/dia-studio-nuits-sonores-graphic-design-project-181125)
+  - [Why festival line-up posters are getting hard to read (Wallpaper)](https://www.wallpaper.com/art/why-are-festival-line-up-poster-designs-getting-so-hard-to-read)
+- **Streetwear drop page**
+  - [Off-White tribute concept with countdown preloader (Contra)](https://contra.com/p/qqNvX2Le-off-white-a-tribute-to-virgil-abloh)
+  - [VOLTAGE streetwear store concept with drop countdown (Contra)](https://contra.com/p/UcYX3QgR-voltage-streetwear-store-design-concept)
+  - [Deadstock drop template with live inventory states (Framer)](https://www.framer.com/marketplace/templates/deadstock/)
+- **Maximal editorial magazine**
+  - [Most beautiful blog designs, incl. Girlboss palette (CareerFoundry)](https://careerfoundry.com/en/blog/ui-design/beautiful-blog-ui-design/)
+  - [Media and editorial website design (Tubik)](https://tubikstudio.com/blog/media-editorial-website-design/)
+- **Kids' learning app**
+  - [Why do children's websites have to be so chaotic? (Inktrap)](https://medium.com/inktrap/why-does-design-forchildrens-websites-have-to-be-so-chaotic-792cb210d5e5)
+  - [Designing a distraction-free learning app (Aufait UX)](https://www.aufaitux.com/case-study/ux-for-kids-learning-app/)
+- **Maximal creator profile**
+  - [O××OO× bio-link app, MySpace freedom made modern (Midnight Mice)](https://midnightmice.com/project/oxxoox/)
+  - [Personal website examples, incl. maximalist portfolios (Webflow)](https://webflow.com/blog/personal-website-examples)
+- **Background reading**
+  - [Maximalism in web design (Webflow)](https://webflow.com:443/blog/maximalism-web-design)
+  - [Maximalist websites, live examples (One Page Love)](https://onepagelove.com/tag/maximalist)
+  - [Graphic design trends 2025, incl. collage (Shopify)](https://www.shopify.com/blog/graphic-design-trends)
+
+Takeaways: loud is fine, unreadable is not; the content people came for
+(line-ups, prices, story text) must stay legible however busy the page
+gets; mix typefaces to build hierarchy rather than noise; for children,
+use colour freely but keep motion calm and touch targets big.
+
 ### 7.1 Music festival site
 - **Look:** Clashing neon colours, oversized display type, collaged artist photos and sticker shapes.
 - **Buttons:** Chunky buttons in contrasting colours with wobbly outlines; the hover swaps colours.

@@ -8,6 +8,11 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import MaxProfile from '../lib/MaxProfile.jsx'
+import MaxKids from '../lib/MaxKids.jsx'
+import MaxEditorial from '../lib/MaxEditorial.jsx'
+import MaxDrop from '../lib/MaxDrop.jsx'
+import MaxFestival from '../lib/MaxFestival.jsx'
 import BentoSpecs from '../lib/BentoSpecs.jsx'
 import BentoHome from '../lib/BentoHome.jsx'
 import BentoAnalytics from '../lib/BentoAnalytics.jsx'
@@ -63,7 +68,7 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
 
 // The UI section is grouped by visual style, in this order.
-export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento']
+export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Maximalism']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -1324,6 +1329,88 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <BentoSpecs {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['BentoSpecs.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-festival',
+    name: 'Max Festival',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A loud festival site: neon clash, collage, marquee nav and a readable line-up.',
+    controls: [
+      { name: 'name', type: 'text', default: 'LOUDER 26' },
+      { name: 'pink', type: 'color', default: '#ff2bd6' },
+      { name: 'lime', type: 'color', default: '#c6ff00' },
+      { name: 'blue', type: 'color', default: '#2a1bff' },
+    ],
+    fill: true,
+    preview: (p) => <MaxFestival {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxFestival.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'max-drop',
+    name: 'Max Drop',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A streetwear drop page with a countdown, loud size grid and a shaking cop button.',
+    controls: [
+      { name: 'product', type: 'text', default: 'NO SLEEP HOODIE' },
+      { name: 'price', type: 'range', min: 40, max: 400, step: 5, default: 140, unit: '$' },
+      { name: 'startsIn', type: 'range', min: 0, max: 60, step: 1, default: 12, unit: 's' },
+    ],
+    fill: true,
+    preview: (p) => <MaxDrop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxDrop.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'max-editorial',
+    name: 'Max Editorial',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A maximalist magazine page: mixed type, a pull quote over art, stamp buttons.',
+    controls: [
+      { name: 'masthead', type: 'text', default: 'RACKET' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <MaxEditorial {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxEditorial.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-kids',
+    name: 'Max Kids',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A bright counting game for kids with big answers, a buddy and a star trail.',
+    controls: [
+      { name: 'childName', type: 'text', default: 'Mia' },
+    ],
+    fill: true,
+    preview: (p) => <MaxKids {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxKids.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-profile',
+    name: 'Max Profile',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'An early-web style creator page with links, guestbook, top friends and a visitor counter.',
+    controls: [
+      { name: 'handle', type: 'text', default: 'pixiewav' },
+      { name: 'bg', type: 'color', default: '#160b2e' },
+    ],
+    fill: true,
+    preview: (p) => <MaxProfile {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxProfile.jsx', 'ui/onscreen.js'],
     deps: [],
   },
 ]
