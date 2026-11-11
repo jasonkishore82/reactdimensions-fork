@@ -2,7 +2,11 @@ import { useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { ContactShadows, Environment, Lightformer, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import Headphones from './Headphones.jsx'
+import Headphones, { LOWEST } from './Headphones.jsx'
+
+// The headset floats and bobs above the floor; the floor sits just under the
+// cups at their lowest (fully extended, bottom of the bob).
+const FLOOR_Y = -6 + LOWEST - 0.12 - 0.3
 
 const BG = '#e6e8ec'
 
@@ -26,7 +30,7 @@ function Rig() {
   useEffect(() => {
     const aspect = size.width / size.height
     const tan = Math.tan(THREE.MathUtils.degToRad(15))
-    const dist = Math.max((28 * 1.16) / 2 / tan, (33 / 2) / (tan * aspect)) * 1.16
+    const dist = Math.max((30 * 1.16) / 2 / tan, (33 / 2) / (tan * aspect)) * 1.16
     const az = 0.62
     camera.position.set(Math.sin(az) * dist, 3, Math.cos(az) * dist)
     camera.lookAt(0, 0, 0)
@@ -48,7 +52,7 @@ export default function HeadphonesScene({ autoRotate = false, ...props }) {
         <directionalLight position={[-14, 30, 24]} intensity={1.0} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0004} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={26} shadow-camera-bottom={-26} shadow-camera-near={5} shadow-camera-far={120} />
         <Studio />
         <Headphones {...props} />
-        <ContactShadows position={[0, -15.2, 0]} opacity={0.42} scale={50} blur={2.8} far={20} resolution={512} color="#202328" />
+        <ContactShadows position={[0, FLOOR_Y, 0]} opacity={0.42} scale={50} blur={2.8} far={22} resolution={512} color="#202328" />
         <Rig />
         <OrbitControls makeDefault enablePan={false} autoRotate={autoRotate} autoRotateSpeed={1.2} minDistance={22} maxDistance={110} minPolarAngle={0.4} maxPolarAngle={2.0} />
       </Canvas>

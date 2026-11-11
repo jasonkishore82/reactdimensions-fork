@@ -13,6 +13,9 @@ const T = 7.8
 const R = 11.2 // corner radius
 const BEVEL = 0.5
 const GLASS_FACE = T / 2 - 0.12 // z of the front / back glass faces
+const PLATE = 38 // camera plate size
+const PLATE_TOP = 1.7 // height of the plate above the back glass
+const LENS_TOP = 1.9 // height of a lens bezel above the plate
 export const PHONE_H = H
 
 function useTwoWay(prop, key, onChange) {
@@ -70,11 +73,36 @@ export default function Phone({
       g.translate(0, 0, -0.15)
       return g
     }
+    // Camera plate: a raised squircle with a soft rounded edge, like one piece of glass.
+    const plate = new THREE.ExtrudeGeometry(shapeOf(outline(PLATE - 1.2, PLATE - 1.2, 8.4, 3.0, 12)), {
+      depth: 0.5,
+      bevelEnabled: true,
+      bevelThickness: 0.6,
+      bevelSize: 0.6,
+      bevelSegments: 6,
+      curveSegments: 1,
+    })
+    plate.translate(0, 0, 0.6)
+    // Lens bezel, turned on a lathe: straight sides, then a chamfer down onto the glass.
+    const bezel = new THREE.LatheGeometry(
+      // listed from the base upwards so the faces point outwards
+      [
+        [6.95, 0],
+        [6.95, LENS_TOP - 0.9],
+        [6.85, LENS_TOP - 0.45],
+        [6.35, LENS_TOP],
+        [5.35, LENS_TOP],
+        [5.15, LENS_TOP - 0.18],
+      ].map(([x, y]) => new THREE.Vector2(x, y)),
+      56,
+    )
+    bezel.rotateX(Math.PI / 2)
     return {
       frame,
       front: glass(1.6),
       back: glass(1.6),
-      plate: new RoundedBoxGeometry(36.4, 36.4, 1.1, 4, 0.45).translate(0, 0, 0.55),
+      plate,
+      bezel,
       btn: (len) => new RoundedBoxGeometry(1.1, len, 1.7, 3, 0.4),
     }
   }, [])
@@ -84,6 +112,7 @@ export default function Phone({
       geo.front.dispose()
       geo.back.dispose()
       geo.plate.dispose()
+      geo.bezel.dispose()
     },
     [geo],
   )
@@ -92,18 +121,37 @@ export default function Phone({
   useEffect(() => () => islandGeo.dispose(), [islandGeo])
 
   // --- materials: colours ease, so swapping looks like a cross-fade ---
-  const frameMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: frameColor, metalness: 1, roughness: 0.32, anisotropy: 0.6, envMapIntensity: 1.25 }), [])
-  const backMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: backColor, metalness: 0.15, roughness: 0.5, clearcoat: 0.15, clearcoatRoughness: 0.4, envMapIntensity: 0.9 }), [])
-  const plateMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: backColor, metalness: 0.2, roughness: 0.4, clearcoat: 0.3, clearcoatRoughness: 0.3, envMapIntensity: 1 }), [])
-  const trimMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: cameraColor, metalness: 1, roughness: 0.22, envMapIntensity: 1.4 }), [])
+  const frameMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: frameColor, metalness: 1, roughness: 0.2, anisotropy: 0.5, envMapIntensity: 1.35 }), [])
+  // Frosted glass back with a faint grain, so light spreads across it instead of sitting flat.
+  const frost = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 256
+    const g = c.getContext('2d')
+    const img = g.createImageData(256, 256)
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = 150 + Math.random() * 60
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v
+      img.data[i + 3] = 255
+    }
+    g.putImageData(img, 0, 0)
+    const t = new THREE.CanvasTexture(c)
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.repeat.set(6, 12)
+    return t
+  }, [])
+  const backMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: backColor, metalness: 0.1, roughness: 0.55, roughnessMap: frost, clearcoat: 0.12, clearcoatRoughness: 0.5, sheen: 0.4, sheenRoughness: 0.6, sheenColor: '#ffffff', envMapIntensity: 1 }), [frost])
+  // The plate is the opposite finish to the back: glossy on a frosted phone.
+  const plateMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: backColor, metalness: 0.15, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.3 }), [])
+  const trimMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: cameraColor, metalness: 1, roughness: 0.16, envMapIntensity: 1.5 }), [])
   useEffect(
     () => () => {
       frameMat.dispose()
       backMat.dispose()
       plateMat.dispose()
       trimMat.dispose()
+      frost.dispose()
     },
-    [frameMat, backMat, plateMat, trimMat],
+    [frameMat, backMat, plateMat, trimMat, frost],
   )
   const tc = useMemo(() => [new THREE.Color(), new THREE.Color(), new THREE.Color()], [])
   const want = useRef({})
@@ -130,34 +178,38 @@ export default function Phone({
     const gloss = w.finish === 'gloss'
     backMat.roughness += ((gloss ? 0.06 : 0.55) - backMat.roughness) * e
     backMat.clearcoat += ((gloss ? 1 : 0.12) - backMat.clearcoat) * e
-    plateMat.roughness += ((gloss ? 0.08 : 0.45) - plateMat.roughness) * e
-    frameMat.roughness = 0.46 - w.shine * 0.34
+    backMat.sheen += ((gloss ? 0 : 0.4) - backMat.sheen) * e
+    // the plate takes the opposite finish to the back
+    plateMat.roughness += ((gloss ? 0.42 : 0.1) - plateMat.roughness) * e
+    plateMat.clearcoat += ((gloss ? 0.1 : 1) - plateMat.clearcoat) * e
+    frameMat.roughness = 0.4 - w.shine * 0.32
   })
 
   const black = <meshPhysicalMaterial color="#050506" roughness={0.18} clearcoat={1} clearcoatRoughness={0.06} />
   const dark = <meshStandardMaterial color="#060607" roughness={0.9} />
 
-  // lens: a metal ring, black glass and an inner element
+  // Lens: a turned metal bezel with a chamfered lip, then, sunk inside it, the
+  // stack of a real camera: a black baffle, rings of the barrel, and a coated
+  // front element that picks up coloured reflections.
+  const glassTop = LENS_TOP - 0.2
   const lens = (x, y) => (
-    <group key={`${x}${y}`} position={[x, y, 1.1]}>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.55]} material={trimMat} castShadow>
-        <cylinderGeometry args={[6.4, 6.6, 1.1, 40]} />
+    <group key={`${x}${y}`} position={[x, y, PLATE_TOP]}>
+      <mesh geometry={geo.bezel} material={trimMat} castShadow />
+      <mesh position={[0, 0, glassTop - 0.5]}>
+        <circleGeometry args={[5.2, 48]} />
+        <meshStandardMaterial color="#030304" roughness={0.85} />
       </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 1.12]}>
-        <cylinderGeometry args={[5.0, 5.0, 0.1, 40]} />
-        <meshPhysicalMaterial color="#05060a" roughness={0.05} clearcoat={1} clearcoatRoughness={0.02} iridescence={0.6} iridescenceIOR={1.5} iridescenceThicknessRange={[200, 500]} envMapIntensity={1.6} />
+      <mesh position={[0, 0, glassTop - 0.45]}>
+        <ringGeometry args={[3.55, 4.25, 48]} />
+        <meshStandardMaterial color="#1b1d22" roughness={0.35} metalness={0.9} />
       </mesh>
-      <mesh position={[0, 0, 1.2]}>
-        <ringGeometry args={[2.4, 3.1, 32]} />
-        <meshStandardMaterial color="#14161c" roughness={0.3} metalness={0.8} />
+      <mesh position={[0, 0, glassTop - 0.4]}>
+        <ringGeometry args={[2.55, 2.95, 40]} />
+        <meshStandardMaterial color="#2a2d35" roughness={0.25} metalness={0.9} />
       </mesh>
-      <mesh position={[0, 0, 1.21]}>
-        <circleGeometry args={[2.2, 28]} />
-        <meshPhysicalMaterial color="#0a0d18" roughness={0.04} clearcoat={1} envMapIntensity={1.8} />
-      </mesh>
-      <mesh position={[-1.1, 1.2, 1.24]}>
-        <circleGeometry args={[0.55, 12]} />
-        <meshBasicMaterial color="#8fb0ff" transparent opacity={0.55} />
+      <mesh position={[0, 0, glassTop - 0.35]}>
+        <circleGeometry args={[2.5, 40]} />
+        <meshPhysicalMaterial color="#04050a" roughness={0.06} metalness={0} iridescence={0.8} iridescenceIOR={1.7} iridescenceThicknessRange={[300, 600]} envMapIntensity={0.45} />
       </mesh>
     </group>
   )
@@ -229,23 +281,31 @@ export default function Phone({
           <mesh geometry={geo.back} material={backMat} position={[0, 0, GLASS_FACE - 0.15]} />
           <group position={[0, 0, GLASS_FACE]}>
             {/* camera plate, top left */}
-            <group position={[-(W / 2 - 3.4 - 18.2), H / 2 - 3.4 - 18.2, 0]}>
+            <group position={[-(W / 2 - 3.4 - PLATE / 2), H / 2 - 3.4 - PLATE / 2, 0]}>
               <mesh geometry={geo.plate} material={plateMat} castShadow />
-              {lens(-7.6, 7.8)}
-              {lens(-7.6, -7.8)}
-              {lens(7.2, 0.2)}
-              {/* flash, mic, depth sensor */}
-              <mesh position={[8.2, 12.2, 1.12]}>
-                <circleGeometry args={[2.1, 24]} />
-                <meshStandardMaterial color="#f6edd2" emissive="#f2e4b0" emissiveIntensity={0.25} roughness={0.35} />
+              {lens(-8.1, 8.3)}
+              {lens(-8.1, -8.3)}
+              {lens(7.6, 0)}
+              {/* flash: a frosted lens with a warm tint, in a thin metal ring */}
+              <group position={[9.4, 12.6, PLATE_TOP + 0.02]}>
+                <mesh>
+                  <ringGeometry args={[2.0, 2.45, 32]} />
+                  <meshStandardMaterial color="#c9c9cc" roughness={0.25} metalness={1} />
+                </mesh>
+                <mesh position={[0, 0, 0.01]}>
+                  <circleGeometry args={[2.0, 32]} />
+                  <meshPhysicalMaterial color="#f3ead2" roughness={0.55} transmission={0} sheen={0.6} sheenColor="#fff4d6" envMapIntensity={0.8} />
+                </mesh>
+              </group>
+              {/* depth sensor: a small dark glass dot */}
+              <mesh position={[9.4, -12.6, PLATE_TOP + 0.02]}>
+                <circleGeometry args={[1.7, 28]} />
+                <meshPhysicalMaterial color="#08080b" roughness={0.08} clearcoat={1} envMapIntensity={1.6} />
               </mesh>
-              <mesh position={[8.2, -12.2, 1.12]}>
-                <circleGeometry args={[2.1, 24]} />
-                <meshStandardMaterial color="#0a0a0c" roughness={0.2} metalness={0.6} />
-              </mesh>
-              <mesh position={[11.6, 6.8, 1.12]}>
-                <circleGeometry args={[0.7, 12]} />
-                <meshStandardMaterial color="#050505" roughness={0.6} />
+              {/* microphone hole */}
+              <mesh position={[13.6, 6.2, PLATE_TOP + 0.02]}>
+                <circleGeometry args={[0.5, 14]} />
+                <meshStandardMaterial color="#020202" roughness={0.9} />
               </mesh>
             </group>
           </group>

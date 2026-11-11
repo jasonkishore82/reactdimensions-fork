@@ -40,7 +40,7 @@ function Rig({ width, arm }) {
 export default function SunglassesScene({ autoRotate = true, ...props }) {
   const width = (props.lensWidth ?? 2) * 2 + (props.bridge ?? 0.45) + (props.thickness ?? 0.16) * 2
   return (
-    <div style={{ width: '100%', height: '100%', touchAction: 'none' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', touchAction: 'none' }}>
       <Canvas
         shadows
         dpr={[1, 1.75]}
@@ -75,6 +75,21 @@ export default function SunglassesScene({ autoRotate = true, ...props }) {
           maxPolarAngle={1.9}
         />
       </Canvas>
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 12,
+          textAlign: 'center',
+          pointerEvents: 'none',
+          font: '500 11px/1.4 ui-monospace, Menlo, monospace',
+          letterSpacing: '0.06em',
+          color: '#5a6068',
+        }}
+      >
+        Click the glasses to fold or open the arms
+      </div>
     </div>
   )
 }

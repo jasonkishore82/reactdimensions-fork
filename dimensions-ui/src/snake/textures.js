@@ -141,16 +141,24 @@ export function makeSnakeTextures({ back, belly, pattern, patternAmount = 0.55, 
   drawRows(bodyStart, rows - 1, cellH, cols, 0.62, 0.78)
   // The head has a few large plates instead of many small scales, which also
   // hides the pinching of the texture at the snout.
-  const headRowH = cellH * 1.7
-  drawRows(Math.ceil(SNOUT_PX / headRowH), Math.ceil(HEAD_PX / headRowH), headRowH, 11, 0.64, 0.74)
+  const headRowH = cellH * 2.3
+  drawRows(Math.ceil(SNOUT_PX / headRowH), Math.ceil(HEAD_PX / headRowH), headRowH, 9, 0.66, 0.76)
   // The very tip stays smooth: the texture pinches to a point there.
-  const tip = ctx.createLinearGradient(0, 0, 0, SNOUT_PX + 18)
-  tip.addColorStop(0, rgb(mix(cBack, [0, 0, 0], 0.15)))
-  tip.addColorStop(1, rgb(mix(cBack, [0, 0, 0], 0.15)) .replace('rgb', 'rgba').replace(')', ',0)'))
+  // A longer fade hides the fan the scales make as they converge on the tip.
+  const tipEnd = SNOUT_PX * 1.9
+  const tip = ctx.createLinearGradient(0, 0, 0, tipEnd)
+  const tipCol = rgb(mix(cBack, [0, 0, 0], 0.15))
+  tip.addColorStop(0, tipCol)
+  tip.addColorStop(0.55, tipCol)
+  tip.addColorStop(1, tipCol.replace('rgb', 'rgba').replace(')', ',0)'))
   ctx.fillStyle = tip
-  ctx.fillRect(0, 0, W, SNOUT_PX + 18)
-  bctx.fillStyle = '#808080'
-  bctx.fillRect(0, 0, W, SNOUT_PX * 0.7)
+  ctx.fillRect(0, 0, W, tipEnd)
+  const btip = bctx.createLinearGradient(0, 0, 0, tipEnd)
+  btip.addColorStop(0, '#808080')
+  btip.addColorStop(0.55, '#808080')
+  btip.addColorStop(1, 'rgba(128,128,128,0)')
+  bctx.fillStyle = btip
+  bctx.fillRect(0, 0, W, tipEnd)
 
   // Belly: wide plates across the underside, one per ~1.6 dorsal rows.
   const plateH = cellH * 1.7

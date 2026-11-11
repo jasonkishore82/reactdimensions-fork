@@ -24,6 +24,9 @@ import { createVinylAudio } from './audio.js'
 
 const ARM_Y = 0.56 // height of the tonearm above the plinth
 const REC_Y = 0.21 // top surface of the record
+const PLATTER_TOP = 0.16 // top of the aluminium platter (the mat sits on it)
+const LIFT_PITCH = 0.075 // how far the arm pitches up (radians) when lifted
+const REST_Z = 1.15 // where along the arm tube the rest holds it
 const RPM33 = (33.33 * Math.PI * 2) / 60
 const RPM45 = (45 * Math.PI * 2) / 60
 const KNOB_ANGLE = { 33: -1.1, 45: -2.0 }
@@ -111,6 +114,29 @@ function armGeometry(radius = 0.052) {
   return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5), 80, radius, 12)
 }
 
+// Where the arm rest goes: under the tube when the arm is parked and lifted.
+function restPlacement() {
+  const theta = thetaForRadius(PARK_R)
+  // arm-frame x of the tube at REST_Z (the path is near enough straight there)
+  let xA = 0
+  for (let i = 1; i < ARM_PATH.length; i++) {
+    const [x0, z0] = ARM_PATH[i - 1]
+    const [x1, z1] = ARM_PATH[i]
+    if (REST_Z >= z0 && REST_Z <= z1) {
+      xA = x0 + ((REST_Z - z0) / (z1 - z0)) * (x1 - x0)
+      break
+    }
+  }
+  const c = Math.cos(theta)
+  const s = Math.sin(theta)
+  return {
+    x: PIVOT.x + xA * c + REST_Z * s,
+    z: PIVOT.z - xA * s + REST_Z * c,
+    y: ARM_Y + Math.sin(LIFT_PITCH) * REST_Z, // the lifted arm rises towards its tip
+    theta,
+  }
+}
+
 export default function Turntable({
   playing: playingProp = true,
   speed: speedProp = '33',
@@ -149,6 +175,16 @@ export default function Turntable({
   const plinth = useMemo(plinthGeometry, [])
   const arm = useMemo(() => armGeometry(), [])
   const armHit = useMemo(() => armGeometry(0.2), [])
+  const rest = useMemo(restPlacement, [])
+  useEffect(
+    () => () => {
+      sheen.dispose()
+      plinth.dispose()
+      arm.dispose()
+      armHit.dispose()
+    },
+    [sheen, plinth, arm, armHit],
+  )
 
   // --- parts to animate ---
   const recRef = useRef()
@@ -390,7 +426,8 @@ export default function Turntable({
       raycaster.setFromCamera(pointer, camera)
       st.plane.constant = -ARM_Y
       if (raycaster.ray.intersectPlane(st.plane, st.hit)) {
-        thetaT = Math.min(Math.max(thetaTowards(st.hit.x, st.hit.z), thetaPark - 0.12), thetaMax)
+        // the rest's clip stops the arm swinging out past its parked position
+        thetaT = Math.min(Math.max(thetaTowards(st.hit.x, st.hit.z), thetaPark - 0.02), thetaMax)
         // Follow the hand directly, and lift while carrying it.
         st.theta += (thetaT - st.theta) * Math.min(1, dt * 18)
         st.thetaVel = 0
@@ -426,7 +463,7 @@ export default function Turntable({
     st.liftVel += ((liftT - st.lift) * 70 - st.liftVel * 11) * dt
     st.lift += st.liftVel * dt
     armYaw.current.rotation.y = st.theta
-    armPitch.current.rotation.x = -Math.min(Math.max(st.lift, 0), 1.15) * 0.075
+    armPitch.current.rotation.x = -Math.min(Math.max(st.lift, 0), 1.15) * LIFT_PITCH
 
     // ---- Knob and light ----
     const knobT = KNOB_ANGLE[sp] ?? KNOB_ANGLE[33]
@@ -480,9 +517,9 @@ export default function Turntable({
           <cylinderGeometry args={[REC_R - 0.02, REC_R - 0.02, 0.02, 96]} />
           <meshStandardMaterial color="#26262a" roughness={0.95} />
         </mesh>
-        {/* Spindle */}
-        <mesh position={[0, REC_Y + 0.07, 0]} castShadow>
-          <cylinderGeometry args={[0.05, 0.05, 0.16, 20]} />
+        {/* Spindle: from the platter top up through the record */}
+        <mesh position={[0, (PLATTER_TOP + REC_Y + 0.15) / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, REC_Y + 0.15 - PLATTER_TOP, 20]} />
           {chrome}
         </mesh>
         <mesh position={[0, REC_Y + 0.15, 0]}>
@@ -555,12 +592,25 @@ export default function Turntable({
           {chrome}
         </mesh>
       </group>
-      {/* Arm rest slot and lift lever */}
-      <mesh position={[3.52, 0.025, -0.7]} castShadow>
-        <boxGeometry args={[0.16, 0.05, 0.62]} />
-        {black}
-      </mesh>
-      <group position={[3.82, 0.1, -0.76]} rotation={[0, 0, -0.35]}>
+      {/* Arm rest: a post under the parked arm with a clip the tube sits in */}
+      <group position={[rest.x, 0, rest.z]} rotation={[0, rest.theta, 0]}>
+        <mesh position={[0, (rest.y - 0.08) / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.05, 0.07, rest.y - 0.08, 16]} />
+          {black}
+        </mesh>
+        <mesh position={[0, rest.y - 0.075, 0]} castShadow>
+          <boxGeometry args={[0.22, 0.03, 0.12]} />
+          {black}
+        </mesh>
+        {[-1, 1].map((sx) => (
+          <mesh key={sx} position={[sx * 0.095, rest.y, 0]} castShadow>
+            <boxGeometry args={[0.03, 0.15, 0.12]} />
+            {black}
+          </mesh>
+        ))}
+      </group>
+      {/* Lift lever, beside the rest */}
+      <group position={[rest.x + 0.32, 0.1, rest.z - 0.1]} rotation={[0, 0, -0.35]}>
         <mesh position={[0, 0.24, 0]} castShadow>
           <cylinderGeometry args={[0.022, 0.022, 0.5, 8]} />
           {black}
@@ -596,9 +646,9 @@ export default function Turntable({
               <boxGeometry args={[0.46, 0.04, 0.8]} />
               <meshPhysicalMaterial color="#2a2a2e" roughness={0.4} metalness={0.3} />
             </mesh>
-            {/* Counterweight */}
-            <mesh position={[0, 0, -0.45]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-              <cylinderGeometry args={[0.07, 0.07, 0.7, 14]} />
+            {/* Counterweight, on a stub that runs back out of the bearing housing */}
+            <mesh position={[0, 0, -0.4]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+              <cylinderGeometry args={[0.07, 0.07, 0.8, 14]} />
               {chrome}
             </mesh>
             <mesh position={[0, 0, -0.85]} rotation={[Math.PI / 2, 0, 0]} castShadow>
@@ -619,9 +669,14 @@ export default function Turntable({
                 <boxGeometry args={[0.27, 0.2, 0.36]} />
                 {black}
               </mesh>
-              <mesh position={[0, -0.32, 0.37]} castShadow>
-                <boxGeometry args={[0.1, 0.1, 0.14]} />
+              {/* stylus: the cantilever block, and a tip that just touches the record */}
+              <mesh position={[0, -0.29, 0.37]} castShadow>
+                <boxGeometry args={[0.1, 0.06, 0.14]} />
                 <meshPhysicalMaterial color="#c4161c" roughness={0.35} />
+              </mesh>
+              <mesh position={[0, -(ARM_Y - REC_Y) + 0.017, 0.4]} rotation={[Math.PI, 0, 0]}>
+                <coneGeometry args={[0.012, 0.03, 8]} />
+                {chrome}
               </mesh>
               <mesh position={[-0.07, -0.035, 0.18]}>
                 <sphereGeometry args={[0.022, 10, 8]} />

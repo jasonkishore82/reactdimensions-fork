@@ -159,6 +159,16 @@ export default function Pickup({
     mats.steel.color.set(color)
     mats.steel.roughness = roughness
   }, [mats, color, roughness])
+  useEffect(
+    () => () => {
+      Object.values(mats).forEach((m) => m.dispose())
+      for (const t of Object.values(tex)) {
+        if (t?.isTexture) t.dispose()
+        else if (t) Object.values(t).forEach((u) => u?.dispose?.())
+      }
+    },
+    [mats, tex],
+  )
 
   const geo = useMemo(() => {
     // Glass and roof panels, inset from the steel faces so a frame shows.
@@ -189,6 +199,7 @@ export default function Pickup({
       cover: new THREE.CylinderGeometry(0.33, 0.33, 0.03, 64),
     }
   }, [])
+  useEffect(() => () => Object.values(geo).forEach((g) => g.dispose()), [geo])
 
   // ---- Physics state ----
   const phys = useRef({
@@ -246,8 +257,9 @@ export default function Pickup({
       el.style.cursor = 'grab'
     }
     const dbl = () => {
-      // Kick the suspension: the body drops then rebounds.
-      p.syVel -= 1.6
+      // Kick the suspension: the body drops then rebounds. The kick is sized
+      // so the arches never come down onto the tyres (about 0.11 m of travel).
+      p.syVel -= 1.2
       p.tiltVel += 0.08
       p.lastInput = performance.now()
     }
@@ -268,7 +280,7 @@ export default function Pickup({
   useEffect(() => {
     if (!bounce) return
     const p = phys.current
-    p.syVel -= 1.8
+    p.syVel -= 1.2
     p.tiltVel += 0.1
     p.lastInput = performance.now()
   }, [bounce])
@@ -471,8 +483,9 @@ export default function Pickup({
             <mesh position={[-0.112, 0, 0]} rotation={[0, -Math.PI / 2, 0]} material={mats.mirror}>
               <planeGeometry args={[0.19, 0.09]} />
             </mesh>
-            <mesh position={[0.06, -0.02, -side * 0.08]} material={mats.plastic}>
-              <boxGeometry args={[0.06, 0.04, 0.08]} />
+            {/* stalk, reaching back into the sloped cabin side */}
+            <mesh position={[0.06, -0.02, -side * 0.12]} material={mats.plastic}>
+              <boxGeometry args={[0.06, 0.04, 0.18]} />
             </mesh>
           </group>
         ))}

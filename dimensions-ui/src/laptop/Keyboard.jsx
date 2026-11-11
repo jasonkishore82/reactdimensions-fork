@@ -18,6 +18,8 @@ const TOTAL_UNITS = 15
 export const KB_W = TOTAL_UNITS * PITCH
 const DEPTHS = ROWS.map((r) => (r.h ?? 1) * PITCH)
 export const KB_D = DEPTHS.reduce((a, b) => a + b, 0)
+// Keycaps stand this far above the deck (about 2 mm); the closed lid clears them.
+export const KEY_H = 0.04
 
 // Every key, positioned relative to the middle of the keyboard.
 export function layout() {
@@ -82,7 +84,7 @@ export default function Keyboard({ y, keyMat, legendColor = '#ffffff' }) {
   useLayoutEffect(() => {
     const m = new THREE.Matrix4()
     keys.forEach((k, i) => {
-      m.compose(new THREE.Vector3(k.x, 0.03, k.z), new THREE.Quaternion(), new THREE.Vector3(k.w, 0.06, k.d))
+      m.compose(new THREE.Vector3(k.x, KEY_H / 2, k.z), new THREE.Quaternion(), new THREE.Vector3(k.w, KEY_H, k.d))
       mesh.current.setMatrixAt(i, m)
     })
     mesh.current.instanceMatrix.needsUpdate = true
@@ -97,7 +99,7 @@ export default function Keyboard({ y, keyMat, legendColor = '#ffffff' }) {
         {keyMat}
       </instancedMesh>
       {/* legends: the sheet's colour is set from the parent so it can follow the key colour */}
-      <mesh position={[0, 0.0625, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+      <mesh position={[0, KEY_H + 0.0025, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
         <planeGeometry args={[KB_W, KB_D]} />
         <meshBasicMaterial map={legends} color={legendColor} transparent depthWrite={false} toneMapped={false} opacity={0.75} />
       </mesh>

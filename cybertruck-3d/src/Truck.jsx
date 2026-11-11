@@ -232,7 +232,7 @@ export default function Truck({ lightsOn = true, autoRotate = true, bounce = 0 }
     }
     const dbl = () => {
       // Kick the suspension: the body drops then rebounds.
-      p.syVel -= 1.6
+      p.syVel -= 1.2
       p.tiltVel += 0.08
       p.lastInput = performance.now()
     }
@@ -253,7 +253,7 @@ export default function Truck({ lightsOn = true, autoRotate = true, bounce = 0 }
   useEffect(() => {
     if (!bounce) return
     const p = phys.current
-    p.syVel -= 1.8
+    p.syVel -= 1.2
     p.tiltVel += 0.1
     p.lastInput = performance.now()
   }, [bounce])
@@ -456,8 +456,8 @@ export default function Truck({ lightsOn = true, autoRotate = true, bounce = 0 }
             <mesh position={[-0.112, 0, 0]} rotation={[0, -Math.PI / 2, 0]} material={mats.mirror}>
               <planeGeometry args={[0.19, 0.09]} />
             </mesh>
-            <mesh position={[0.06, -0.02, -side * 0.08]} material={mats.plastic}>
-              <boxGeometry args={[0.06, 0.04, 0.08]} />
+            <mesh position={[0.06, -0.02, -side * 0.12]} material={mats.plastic}>
+              <boxGeometry args={[0.06, 0.04, 0.18]} />
             </mesh>
           </group>
         ))}

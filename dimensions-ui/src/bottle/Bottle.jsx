@@ -14,7 +14,8 @@ void main() {
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  // same transform order as the glass itself, so both land on the same depth
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`
 const rimFrag = `
 uniform vec3 rimColor; uniform float strength; uniform float power;
@@ -26,6 +27,10 @@ void main() {
 }`
 
 const OPEN_ANGLE = 2.35 // how far the wire swings forward when opened
+const BAR_Y = 1.84 // height of the lever's top bar above the pivot
+// When open, the stopper hangs from the bar tilted this far out from the
+// glass, so it rests clear of the neck and shoulder instead of inside them.
+const HANG_ANGLE = -0.8
 
 function rng(seed) {
   return () => {
@@ -88,7 +93,7 @@ export default function Bottle({
         [-0.76, 1.05, 0],
         [-0.62, 1.5, 0],
         [-0.34, 1.78, 0],
-        [0, 1.84, 0],
+        [0, BAR_Y, 0],
         [0.34, 1.78, 0],
         [0.62, 1.5, 0],
         [0.76, 1.05, 0],
@@ -127,7 +132,9 @@ export default function Bottle({
     const r = rng(8)
     return Array.from({ length: maxBeads }, () => {
       const y = 0.45 + Math.pow(r(), 0.9) * 6.7
-      return { y, a: r() * Math.PI * 2, s: 0.018 + Math.pow(r(), 2.4) * 0.08, stretch: 1 + r() * 1.4 }
+      // no beads below about 0.035: smaller ones are under a pixel wide and
+      // their highlights flicker on and off as the bottle turns
+      return { y, a: r() * Math.PI * 2, s: 0.035 + Math.pow(r(), 2.4) * 0.07, stretch: 1 + r() * 1.4 }
     })
   }, [])
   const beadGeo = useMemo(() => new THREE.SphereGeometry(1, 14, 10), [])
@@ -151,8 +158,10 @@ export default function Bottle({
     beads.current.instanceMatrix.needsUpdate = true
   }, [droplets, beadData])
 
-  // The lever on a lightly damped spring
+  // The lever on a lightly damped spring. The stopper hangs from the lever's
+  // bar and turns against it as it opens, so it swings out and away.
   const leverRef = useRef()
+  const linkRef = useRef()
   const st = useRef({ a: openProp * OPEN_ANGLE, v: 0 })
   const want = useRef(open)
   want.current = open
@@ -162,6 +171,7 @@ export default function Bottle({
     s.v += ((want.current * OPEN_ANGLE - s.a) * 60 - s.v * 8) * dt
     s.a += s.v * dt
     leverRef.current.rotation.x = s.a
+    linkRef.current.rotation.x = -(s.a / OPEN_ANGLE) * (OPEN_ANGLE - HANG_ANGLE)
   })
 
   const tintColor = useMemo(() => new THREE.Color(tint), [tint])
@@ -174,6 +184,12 @@ export default function Bottle({
         transparent: true,
         depthWrite: false,
         side: THREE.DoubleSide,
+        // The outline sits exactly on the glass. Without a small nudge
+        // towards the camera the two fight over depth at the steep sides,
+        // and the outline flickers in and out as sparkly patches.
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
       }),
     [],
   )
@@ -216,7 +232,9 @@ export default function Bottle({
 
       {/* condensation beads */}
       <instancedMesh ref={beads} args={[beadGeo, undefined, maxBeads]}>
-        <meshPhysicalMaterial color="#ffffff" transparent opacity={0.4} roughness={0} clearcoat={1} clearcoatRoughness={0} envMapIntensity={2.2} depthWrite={false} />
+        {/* slightly soft reflections, so each bead shows a steady highlight
+            rather than a pinpoint that sparkles */}
+        <meshPhysicalMaterial color="#ffffff" transparent opacity={0.35} roughness={0.14} clearcoat={0.3} clearcoatRoughness={0.12} envMapIntensity={1.1} depthWrite={false} />
       </instancedMesh>
 
       {/* neck wire */}
@@ -230,8 +248,10 @@ export default function Bottle({
         {/* lever + stopper swing together about the pivots */}
         <group ref={leverRef}>
           <mesh geometry={tubes.lever}>{wireMat}</mesh>
-          {/* stopper, sitting on the lip: ceramic cap over a red rubber gasket */}
-          <group position={[0, LIP_Y - NECK_Y, 0]}>
+          {/* stopper, sitting on the lip: ceramic cap over a red rubber gasket.
+              It hangs from the bar, so it can turn outward when opened. */}
+          <group ref={linkRef} position={[0, BAR_Y, 0]}>
+          <group position={[0, LIP_Y - NECK_Y - BAR_Y, 0]}>
             <mesh position={[0, 0.02, 0]} castShadow>
               <cylinderGeometry args={[0.5, 0.5, 0.1, 40]} />
               <meshPhysicalMaterial color={gasket} roughness={0.55} clearcoat={0.2} />
@@ -254,6 +274,7 @@ export default function Bottle({
               <torusGeometry args={[0.07, 0.025, 8, 20]} />
               {wireMat}
             </mesh>
+          </group>
           </group>
         </group>
       </group>

@@ -47,6 +47,14 @@ export default function Smart({ caseColor, dialColor, accent, face, shine, time 
     return g
   }, [])
 
+  useEffect(
+    () => () => {
+      body.dispose()
+      screenGeo.dispose()
+    },
+    [body, screenGeo],
+  )
+
   const canvas = useMemo(() => {
     const c = document.createElement('canvas')
     c.width = 512
@@ -110,7 +118,13 @@ export default function Smart({ caseColor, dialColor, accent, face, shine, time 
       <RoundedBox args={[0.1, 0.5, 0.14]} radius={0.04} smoothness={3} position={[CASE_W / 2 + 0.0, -0.22, -0.02]} castShadow>
         {metal}
       </RoundedBox>
-      {/* the strap slots into the case, so there are no lugs */}
+      {/* strap connectors: the band's ends slot into these, which bridge the
+          case's rounded corners so the band never shows a gap */}
+      {[1, -1].map((s) => (
+        <RoundedBox key={s} args={[1.38, 0.3, 0.3]} radius={0.05} smoothness={3} position={[0, s * (CASE_H / 2 - 0.03), -0.07]} castShadow>
+          {metal}
+        </RoundedBox>
+      ))}
     </group>
   )
 }
