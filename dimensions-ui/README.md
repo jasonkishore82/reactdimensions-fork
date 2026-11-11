@@ -46,7 +46,7 @@ A component browser in the style of React Bits. Sidebar with search (press `/`),
 | --- | --- |
 | Text | Measure Text, Decode Text |
 | Interactions | Tilt Card, Spring Button, Magnetic Button |
-| UI | (coming soon) |
+| UI | Flat Dashboard, Flat Onboarding, Flat Utility, Flat Shop, Flat Docs |
 | 3D & Materials | Clear-coat Card (three.js), Pickup (three.js, optionally drivable), Snake (three.js, procedural), Turntable (three.js, playable), Vinyl Record (three.js), Sunglasses (three.js, parametric), Watch (three.js, analog and smart), Laptop (three.js), Glass Bottle (three.js), TV (three.js), Phone (three.js), Headphones (three.js) |
 | Backgrounds | Drafting Grid, Light Sweep, Cyclorama, Gradient Sweep, Soft Horizon |
 

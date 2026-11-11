@@ -8,6 +8,11 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import FlatDocs from '../lib/FlatDocs.jsx'
+import FlatShop from '../lib/FlatShop.jsx'
+import FlatUtility from '../lib/FlatUtility.jsx'
+import FlatOnboarding from '../lib/FlatOnboarding.jsx'
+import FlatDashboard from '../lib/FlatDashboard.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -785,6 +790,87 @@ export const COMPONENTS = [
       </SoftHorizon>
     ),
     files: ['SoftHorizon.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard',
+    name: 'Flat Dashboard',
+    category: 'UI',
+    isNew: true,
+    description: 'A flat colour-block analytics dashboard with a sidebar and tab pills.',
+    controls: [
+      { name: 'brand', type: 'color', default: '#2f6bff' },
+      { name: 'sidebar', type: 'color', default: '#16224a' },
+      { name: 'kpiColors', type: 'text', default: '#2f6bff, #12b886, #f59f00, #f03e3e' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-onboarding',
+    name: 'Flat Onboarding',
+    category: 'UI',
+    isNew: true,
+    description: 'Two-tone flat onboarding screens with a stretching progress pill.',
+    controls: [
+      { name: 'autoplay', type: 'toggle', default: false },
+      { name: 'interval', type: 'range', min: 1, max: 8, step: 0.5, default: 3, unit: 's' },
+      { name: 'buttonShape', type: 'select', options: ['pill', 'square'], default: 'pill' },
+    ],
+    fill: true,
+    preview: (p) => <FlatOnboarding {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatOnboarding.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-utility',
+    name: 'Flat Utility',
+    category: 'UI',
+    isNew: true,
+    description: 'An icon-first flat tool launcher with category chips and a tab bar.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#3b82f6' },
+      { name: 'tileRadius', type: 'range', min: 0, max: 32, step: 1, default: 14, unit: 'px' },
+      { name: 'showLabels', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatUtility {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatUtility.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-shop',
+    name: 'Flat Shop',
+    category: 'UI',
+    isNew: true,
+    description: 'A flat product catalogue with category pills, filters and add-to-bag.',
+    controls: [
+      { name: 'buttonColor', type: 'color', default: '#111111' },
+      { name: 'radius', type: 'range', min: 0, max: 20, step: 1, default: 4, unit: 'px' },
+      { name: 'showFilters', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatShop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatShop.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-docs',
+    name: 'Flat Docs',
+    category: 'UI',
+    isNew: true,
+    description: 'A flat documentation page with a framework switcher and accent sidebar.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#2563eb' },
+      { name: 'codeTheme', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'showSidebar', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatDocs {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDocs.jsx'],
     deps: [],
   },
 ]
