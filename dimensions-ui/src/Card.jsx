@@ -44,27 +44,37 @@ const DRAG_SPEED = 0.009
 // stiffness / damping: the spring that settles the card after a drag.
 // iridescence: strength of the rainbow sheen on the clear-coat.
 // gloss: 0 = satin, 1 = mirror-like clear-coat.
-export default function Card({ stiffness = 55, damping = 7.5, iridescence = 0.25, gloss = 0.94, color = '#141517' }) {
+// Any other props are the printed text: see DEFAULT_TEXT in textures.js.
+export default function Card({ stiffness = 55, damping = 7.5, iridescence = 0.25, gloss = 0.94, color = '#34363b', ...copy }) {
   const group = useRef()
   const { gl, viewport } = useThree()
   const [hovered, setHovered] = useState(false)
 
-  const [front, setFront] = useState(() => createFaceTextures('front'))
-  const [back, setBack] = useState(() => createFaceTextures('back'))
+  const [front, setFront] = useState(() => createFaceTextures('front', copy, color))
+  const [back, setBack] = useState(() => createFaceTextures('back', copy, color))
   const chip = useMemo(() => createChipTextures(), [])
 
-  // Redraw the printed text once the web font has loaded.
+  // Redraw the printed faces once the web font has loaded and whenever the text or colour changes.
+  // The short delay stops a redraw on every keystroke.
+  const copyKey = JSON.stringify({ ...copy, color })
   useEffect(() => {
     let alive = true
-    Promise.all([document.fonts?.load("500 64px 'IBM Plex Mono'"), document.fonts?.load("600 64px 'IBM Plex Mono'")]).then(() => {
-      if (!alive) return
-      setFront(createFaceTextures('front'))
-      setBack(createFaceTextures('back'))
-    })
+    const id = setTimeout(() => {
+      Promise.all([document.fonts?.load("500 64px 'IBM Plex Mono'"), document.fonts?.load("600 64px 'IBM Plex Mono'")]).then(() => {
+        if (!alive) return
+        setFront(createFaceTextures('front', copy, color))
+        setBack(createFaceTextures('back', copy, color))
+      })
+    }, 120)
     return () => {
       alive = false
+      clearTimeout(id)
     }
-  }, [])
+  }, [copyKey])
+
+  // Free the GPU memory of textures that have been replaced.
+  useEffect(() => () => Object.values(front).forEach((t) => t.dispose()), [front])
+  useEffect(() => () => Object.values(back).forEach((t) => t.dispose()), [back])
 
   const geo = useMemo(() => {
     const inner = W - BEVEL * 2
@@ -200,7 +210,7 @@ export default function Card({ stiffness = 55, damping = 7.5, iridescence = 0.25
     iridescence,
     iridescenceIOR: 1.6,
     iridescenceThicknessRange: [200, 500],
-    envMapIntensity: 1.1,
+    envMapIntensity: 1.7,
   })
 
   return (

@@ -11,9 +11,26 @@ const FONT = "'IBM Plex Mono', 'Menlo', monospace"
 //  - orm:   roughness (G) + metalness (B) so printed text reads as foil
 //  - bump:  white ink on black, so the text is slightly raised and catches light
 const INKS = {
-  color: { bg: '#1c1d1f', ink: '#f2f2f2', dim: '#cfcfcf' },
+  color: { bg: '#34363b', ink: '#f2f2f2', dim: '#cfcfcf' },
   orm: { bg: 'rgb(0,120,30)', ink: 'rgb(0,70,235)', dim: 'rgb(0,70,235)' },
   bump: { bg: '#000', ink: '#fff', dim: '#bbb' },
+}
+
+// Everything printed on the card. Each key is also a prop on the card component.
+export const DEFAULT_TEXT = {
+  brand: 'DIMENSIONS',
+  tier: 'Studio Pass',
+  number: '8560 5398 0003 2026',
+  version: 'v1.0',
+  expiresTop: 'EXPIRES',
+  expiresBottom: 'END',
+  expiry: '00-00',
+  holder: 'FOUNDING MEMBER',
+  cvv: '123',
+  signatureNote: 'AUTHORIZED SIGNATURE — NOT VALID UNLESS SIGNED',
+  backLine1: 'Rendered in real time. No image assets were used to make this card.',
+  backLine2: '85.60 x 53.98 mm  /  clear-coat PBR  /  spring physics',
+  backName: 'react-dimensions',
 }
 
 function makeCanvas() {
@@ -23,18 +40,20 @@ function makeCanvas() {
   return c
 }
 
-function text(ctx, str, x, y, size, { align = 'left', weight = 500, spacing = 0, fill } = {}) {
+// maxWidth squeezes long custom text so it stays in its slot on the card.
+function text(ctx, str, x, y, size, { align = 'left', weight = 500, spacing = 0, fill, maxWidth } = {}) {
   ctx.font = `${weight} ${size}px ${FONT}`
   ctx.textAlign = align
   ctx.textBaseline = 'middle'
   ctx.fillStyle = fill
   if ('letterSpacing' in ctx) ctx.letterSpacing = `${spacing}px`
-  ctx.fillText(str, x, y)
+  if (maxWidth) ctx.fillText(str, x, y, maxWidth)
+  else ctx.fillText(str, x, y)
   if ('letterSpacing' in ctx) ctx.letterSpacing = '0px'
 }
 
 // Proportions measured from the reference image.
-function drawFront(ctx, ink) {
+function drawFront(ctx, ink, copy) {
   const W = TEX_W
   const H = TEX_H
   ctx.fillStyle = ink.bg
@@ -54,8 +73,8 @@ function drawFront(ctx, ink) {
   ctx.closePath()
   ctx.fill()
 
-  text(ctx, 'DIMENSIONS', left + ls * 1.55, ly, H * 0.072, { weight: 600, spacing: 4, fill: ink.ink })
-  text(ctx, 'Studio Pass', W * 0.877, ly, H * 0.07, { align: 'right', weight: 500, spacing: 4, fill: ink.ink })
+  text(ctx, copy.brand, left + ls * 1.55, ly, H * 0.072, { weight: 600, spacing: 4, fill: ink.ink, maxWidth: W * 0.33 })
+  text(ctx, copy.tier, W * 0.877, ly, H * 0.07, { align: 'right', weight: 500, spacing: 4, fill: ink.ink, maxWidth: W * 0.35 })
 
   // Contactless symbol
   const cx = W * 0.825
@@ -70,31 +89,44 @@ function drawFront(ctx, ink) {
   })
 
   // Card number
-  // Spread the four groups evenly between the left margin and right margin.
-  const groups = ['8560', '5398', '0003', '2026']
+  // Spread the groups evenly between the left margin and right margin,
+  // shrinking the type if a long number wouldn't otherwise fit.
+  const groups = copy.number.trim().split(/\s+/).filter(Boolean)
   const numRight = W * 0.877
-  const numSize = H * 0.095
-  ctx.font = `500 ${numSize}px ${FONT}`
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '8px'
-  const widths = groups.map((g) => ctx.measureText(g).width)
-  const gap = (numRight - left - widths.reduce((a, b) => a + b, 0)) / 3
+  const avail = numRight - left
+  const minGap = W * 0.02
+  const measure = (size) => {
+    ctx.font = `500 ${size}px ${FONT}`
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '8px'
+    return groups.map((g) => ctx.measureText(g).width)
+  }
+  const gaps = Math.max(groups.length - 1, 1)
+  const sum = (list) => list.reduce((a, b) => a + b, 0)
+  let numSize = H * 0.095
+  let widths = measure(numSize)
+  const needed = sum(widths) + minGap * gaps
+  if (needed > avail) {
+    numSize *= avail / needed
+    widths = measure(numSize)
+  }
+  const gap = Math.max((avail - sum(widths)) / gaps, 0)
   let gx = left
   groups.forEach((g, i) => {
     text(ctx, g, gx, H * 0.606, numSize, { weight: 500, spacing: 8, fill: ink.ink })
     gx += widths[i] + gap
   })
 
-  text(ctx, 'v1.0', left, H * 0.72, H * 0.055, { weight: 500, spacing: 4, fill: ink.dim })
+  text(ctx, copy.version, left, H * 0.72, H * 0.055, { weight: 500, spacing: 4, fill: ink.dim, maxWidth: W * 0.4 })
 
   // Expiry
-  text(ctx, 'EXPIRES', W * 0.69, H * 0.755, H * 0.022, { align: 'right', weight: 600, fill: ink.dim })
-  text(ctx, 'END', W * 0.69, H * 0.785, H * 0.022, { align: 'right', weight: 600, fill: ink.dim })
-  text(ctx, '00-00', W * 0.877, H * 0.77, H * 0.07, { align: 'right', weight: 500, spacing: 6, fill: ink.ink })
+  text(ctx, copy.expiresTop, W * 0.69, H * 0.755, H * 0.022, { align: 'right', weight: 600, fill: ink.dim, maxWidth: W * 0.2 })
+  text(ctx, copy.expiresBottom, W * 0.69, H * 0.785, H * 0.022, { align: 'right', weight: 600, fill: ink.dim, maxWidth: W * 0.2 })
+  text(ctx, copy.expiry, W * 0.877, H * 0.77, H * 0.07, { align: 'right', weight: 500, spacing: 6, fill: ink.ink, maxWidth: W * 0.17 })
 
-  text(ctx, 'FOUNDING MEMBER', left, H * 0.915, H * 0.065, { weight: 500, spacing: 6, fill: ink.ink })
+  text(ctx, copy.holder, left, H * 0.915, H * 0.065, { weight: 500, spacing: 6, fill: ink.ink, maxWidth: W * 0.76 })
 }
 
-function drawBack(ctx, ink, layer) {
+function drawBack(ctx, ink, layer, copy) {
   const W = TEX_W
   const H = TEX_H
   ctx.fillStyle = ink.bg
@@ -133,20 +165,22 @@ function drawBack(ctx, ink, layer) {
   // CVV box
   ctx.fillStyle = layer === 'color' ? '#ffffff' : layer === 'orm' ? 'rgb(0,200,0)' : '#111'
   ctx.fillRect(sx + sw + W * 0.02, sy, W * 0.13, sh)
-  text(ctx, '123', sx + sw + W * 0.085, sy + sh / 2, H * 0.06, {
+  text(ctx, copy.cvv, sx + sw + W * 0.085, sy + sh / 2, H * 0.06, {
     align: 'center',
     weight: 600,
     fill: layer === 'color' ? '#1c1d1f' : ink.bg,
+    maxWidth: W * 0.11,
   })
 
   const small = H * 0.032
-  text(ctx, 'AUTHORIZED SIGNATURE — NOT VALID UNLESS SIGNED', sx, H * 0.6, small, { weight: 500, spacing: 2, fill: ink.dim })
-  text(ctx, 'Rendered in real time. No image assets were used to make this card.', sx, H * 0.7, small, { weight: 400, fill: ink.dim })
-  text(ctx, '85.60 x 53.98 mm  /  clear-coat PBR  /  spring physics', sx, H * 0.75, small, { weight: 400, fill: ink.dim })
-  text(ctx, 'react-dimensions', sx, H * 0.85, H * 0.04, { weight: 500, spacing: 2, fill: ink.ink })
+  const wide = W * 0.86
+  text(ctx, copy.signatureNote, sx, H * 0.6, small, { weight: 500, spacing: 2, fill: ink.dim, maxWidth: wide })
+  text(ctx, copy.backLine1, sx, H * 0.7, small, { weight: 400, fill: ink.dim, maxWidth: wide })
+  text(ctx, copy.backLine2, sx, H * 0.75, small, { weight: 400, fill: ink.dim, maxWidth: wide })
+  text(ctx, copy.backName, sx, H * 0.85, H * 0.04, { weight: 500, spacing: 2, fill: ink.ink, maxWidth: W * 0.5 })
 
   // Small bank mark bottom-right
-  text(ctx, 'DIMENSIONS', W * 0.93, H * 0.88, H * 0.05, { align: 'right', weight: 600, spacing: 4, fill: ink.ink })
+  text(ctx, copy.brand, W * 0.93, H * 0.88, H * 0.05, { align: 'right', weight: 600, spacing: 4, fill: ink.ink, maxWidth: W * 0.3 })
 }
 
 function drawChip(ctx, layer) {
@@ -243,13 +277,22 @@ function toTexture(canvas, srgb) {
   return t
 }
 
-export function createFaceTextures(side) {
+// The printed colours for a card colour: dark ink on light cards, light ink on dark ones.
+function colorInk(color) {
+  const { r, g, b } = new THREE.Color(color) // linear values
+  const light = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.2
+  return { bg: color, ink: light ? '#17181a' : '#f2f2f2', dim: light ? '#3c3e42' : '#cfcfcf' }
+}
+
+export function createFaceTextures(side, custom = {}, color) {
+  const copy = { ...DEFAULT_TEXT, ...custom }
   const out = {}
   for (const layer of ['color', 'orm', 'bump']) {
     const c = makeCanvas()
     const ctx = c.getContext('2d')
-    if (side === 'front') drawFront(ctx, INKS[layer])
-    else drawBack(ctx, INKS[layer], layer)
+    const ink = layer === 'color' && color ? colorInk(color) : INKS[layer]
+    if (side === 'front') drawFront(ctx, ink, copy)
+    else drawBack(ctx, ink, layer, copy)
     out[layer] = toTexture(c, layer === 'color')
   }
   return out
