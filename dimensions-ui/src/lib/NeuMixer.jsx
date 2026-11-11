@@ -5,9 +5,16 @@ import { useEffect, useRef, useState } from 'react'
 // and mute / solo keys that stay pressed in and light up. A recessed
 // segmented control switches between the faders and a row of EQ knobs.
 
-const NEU = {
-  light: { base: '#e6ebf2', hi: '#ffffff', lo: '#b6c0ce', ink: '#243044', muted: '#56627a' },
-  dark: { base: '#2a2e37', hi: '#363b47', lo: '#1b1e25', ink: '#e8ebf1', muted: '#a3abb9' },
+// Works out the soft highlight, shadow and text colours from one surface
+// colour, so any surface keeps the pressed/raised look and readable text.
+function soften(surface) {
+  const h = surface.replace('#', '')
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16)
+  const light = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255 > 0.5
+  const mix = (c, pct) => `color-mix(in srgb, ${surface}, ${c} ${pct}%)`
+  return light
+    ? { base: surface, hi: mix('white', 70), lo: mix('#1b2433', 24), ink: mix('#0d1320', 84), muted: mix('#0d1320', 62) }
+    : { base: surface, hi: mix('white', 9), lo: mix('black', 40), ink: mix('white', 90), muted: mix('white', 64) }
 }
 
 const CHANNELS = ['Vocals', 'Guitar', 'Bass', 'Drums', 'Keys', 'Master']
@@ -66,8 +73,8 @@ function Knob({ value, onChange, label }) {
   )
 }
 
-export default function NeuMixer({ mode = 'light', accent = '#ff7a45', style }) {
-  const t = NEU[mode] ?? NEU.light
+export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', style }) {
+  const t = soften(surface)
   const [levels, setLevels] = useState([72, 58, 64, 80, 45, 76])
   const [mute, setMute] = useState([false, false, false, false, true, false])
   const [solo, setSolo] = useState([false, false, false, false, false, false])

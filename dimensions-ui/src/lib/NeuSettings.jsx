@@ -6,10 +6,18 @@ import { useEffect, useState } from 'react'
 // The Appearance control really switches this panel between light and dark,
 // and Save stays pressed in until something changes.
 
-const NEU = {
-  light: { base: '#e6ebf2', hi: '#ffffff', lo: '#b6c0ce', ink: '#243044', muted: '#56627a' },
-  dark: { base: '#2a2e37', hi: '#363b47', lo: '#1b1e25', ink: '#e8ebf1', muted: '#a3abb9' },
+// Works out the soft highlight, shadow and text colours from one surface
+// colour, so any surface keeps the pressed/raised look and readable text.
+function soften(surface) {
+  const h = surface.replace('#', '')
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16)
+  const light = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255 > 0.5
+  const mix = (c, pct) => `color-mix(in srgb, ${surface}, ${c} ${pct}%)`
+  return light
+    ? { base: surface, hi: mix('white', 70), lo: mix('#1b2433', 24), ink: mix('#0d1320', 84), muted: mix('#0d1320', 62) }
+    : { base: surface, hi: mix('white', 9), lo: mix('black', 40), ink: mix('white', 90), muted: mix('white', 64) }
 }
+const THEMES = { light: '#e6ebf2', dark: '#2a2e37' }
 
 const SECTIONS = [
   ['General', 'M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4'],
@@ -25,20 +33,20 @@ const ROWS = {
   Devices: [['sync', 'Sync across devices', 'Keep settings the same everywhere'], ['wifiOnly', 'Sync on Wi-Fi only', 'Save mobile data']],
 }
 
-const DEFAULTS = { autoUpdate: true, sounds: false, analytics: false, location: true, faceUnlock: true, push: true, email: false, quiet: true, sync: true, wifiOnly: true, textSize: 100, theme: 'light' }
+const DEFAULTS = { autoUpdate: true, sounds: false, analytics: false, location: true, faceUnlock: true, push: true, email: false, quiet: true, sync: true, wifiOnly: true, textSize: 100, theme: 'custom' }
 
 const Icon = ({ d, size = 18 }) => (
   <svg viewBox="0 0 20 20" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: 'none' }}><path d={d} /></svg>
 )
 
-export default function NeuSettings({ mode = 'light', accent = '#ff7a45', style }) {
-  const [saved, setSaved] = useState({ ...DEFAULTS, theme: mode })
-  const [draft, setDraft] = useState({ ...DEFAULTS, theme: mode })
+export default function NeuSettings({ surface = '#e6ebf2', accent = '#ff7a45', style }) {
+  const [saved, setSaved] = useState(DEFAULTS)
+  const [draft, setDraft] = useState(DEFAULTS)
   const [section, setSection] = useState(0)
   const [flash, setFlash] = useState(false)
-  // follow the library's mode control when it changes
-  useEffect(() => { setDraft((d) => ({ ...d, theme: mode })); setSaved((d) => ({ ...d, theme: mode })) }, [mode])
-  const t = NEU[draft.theme] ?? NEU.light
+  // a new surface from the library switches the panel back to it
+  useEffect(() => { setDraft((d) => ({ ...d, theme: 'custom' })); setSaved((d) => ({ ...d, theme: 'custom' })) }, [surface])
+  const t = soften(THEMES[draft.theme] ?? surface)
   const dirty = JSON.stringify(saved) !== JSON.stringify(draft)
   const name = SECTIONS[section][0]
   const set = (k, v) => setDraft({ ...draft, [k]: v })
@@ -109,10 +117,10 @@ export default function NeuSettings({ mode = 'light', accent = '#ff7a45', style 
           {section === 0 && (
             <section className="ns-card ns-up">
               <div className="ns-row">
-                <span><b>Appearance</b><small>Light, dark, or match the system</small></span>
+                <span><b>Appearance</b><small>Light, dark, or your own surface colour</small></span>
                 <div className="ns-seg ns-in" role="radiogroup" aria-label="Appearance">
-                  <i className="ns-up" style={{ transform: `translateX(${['light', 'dark', 'auto'].indexOf(draft.theme) * 100}%)` }} />
-                  {['light', 'dark', 'auto'].map((m) => (
+                  <i className="ns-up" style={{ transform: `translateX(${['light', 'dark', 'custom'].indexOf(draft.theme) * 100}%)` }} />
+                  {['light', 'dark', 'custom'].map((m) => (
                     <button key={m} role="radio" aria-checked={draft.theme === m} onClick={() => set('theme', m)}>{m[0].toUpperCase() + m.slice(1)}</button>
                   ))}
                 </div>
