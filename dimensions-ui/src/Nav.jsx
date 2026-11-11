@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { createPortal } from 'react-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export function Logo() {
   return (
@@ -22,7 +23,7 @@ function useTheme() {
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
     document.documentElement.dataset.theme = next
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#0d0c11' : '#efece4')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#0d0c11' : '#ffffff')
     try {
       localStorage.setItem(THEME_KEY, next)
     } catch {}
@@ -62,12 +63,41 @@ const Icon = {
 }
 export { Icon }
 
+function Popup({ onClose }) {
+  useEffect(() => {
+    const on = (e) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', on)
+    return () => window.removeEventListener('keydown', on)
+  }, [onClose])
+  // Portalled to the body: the header's backdrop-filter would otherwise trap a fixed overlay inside the pill.
+  return createPortal(
+    <div className="popup-back" onClick={onClose}>
+      <div className="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" onClick={(e) => e.stopPropagation()}>
+        <h2 id="popup-title">Coming soon</h2>
+        <p>The source code isn't public yet. Check back soon.</p>
+        <button className="btn btn-small" onClick={onClose} autoFocus>
+          Got it
+        </button>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
 export function Nav({ onSearch }) {
   const { pathname } = useLocation()
   const [theme, toggleTheme] = useTheme()
   const onLibrary = pathname.startsWith('/library')
+  const [popup, setPopup] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 12)
+    on()
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [])
   return (
-    <header className="nav">
+    <header className={`nav${scrolled ? ' scrolled' : ''}`}>
       <button
         className={`icon-btn menu-btn${onLibrary ? ' on-library' : ''}`}
         aria-label="Browse components"
@@ -76,12 +106,6 @@ export function Nav({ onSearch }) {
         {Icon.menu}
       </button>
       <Logo />
-      <nav className="links">
-        <NavLink to="/library">Library</NavLink>
-        <Link to="/#primitives">Primitives</Link>
-        <Link to="/#models">Models</Link>
-        <Link to="/#code">Code</Link>
-      </nav>
       <div className="nav-spacer" />
       <button className="search-btn" onClick={onSearch} aria-label="Search components">
         {Icon.search}
@@ -91,12 +115,13 @@ export function Nav({ onSearch }) {
       <button className="icon-btn" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
         {theme === 'dark' ? Icon.sun : Icon.moon}
       </button>
-      <a className="icon-btn gh" href="https://github.com/jasonkishore82/3D_Models" target="_blank" rel="noreferrer" aria-label="GitHub">
+      <button className="icon-btn gh" onClick={() => setPopup(true)} aria-label="GitHub">
         {Icon.github}
-      </a>
-      <Link className="btn btn-small" to="/#access">
-        Early access
+      </button>
+      <Link className="btn btn-small" to="/library">
+        Library
       </Link>
+      {popup && <Popup onClose={() => setPopup(false)} />}
     </header>
   )
 }

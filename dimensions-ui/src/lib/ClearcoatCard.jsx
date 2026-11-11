@@ -10,14 +10,15 @@ export default function ClearcoatCard({
   damping = 7.5,
   iridescence = 0.25,
   gloss = 0.94,
-  color = '#141517',
+  color = '#34363b',
   height = 420,
   style,
+  ...text // brand, tier, number, version, expiry, holder, cvv and the other printed lines
 }) {
   return (
     <div style={{ width: '100%', height, touchAction: 'pan-y', ...style }}>
       <Suspense fallback={null}>
-        <Scene stiffness={stiffness} damping={damping} iridescence={iridescence} gloss={gloss} color={color} />
+        <Scene stiffness={stiffness} damping={damping} iridescence={iridescence} gloss={gloss} color={color} {...text} />
       </Suspense>
     </div>
   )

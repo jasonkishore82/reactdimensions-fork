@@ -219,6 +219,7 @@
 .lib-stage.fill .lib-stage-inner { padding: 0; display: block; }
 /* demo content inside the stage keeps the light-theme ink, whichever theme the page is in */
 .lib-stage { color: #15171a; --ink: #15171a; --ink-2: #4a4d52; --ink-3: #85878a; --paper: #efece4; --paper-2: #e6e2d7; --line: rgba(21, 23, 26, 0.14); --line-strong: rgba(21, 23, 26, 0.32); --signal-ink: #d93a0b; }
+:root[data-theme='light'] .lib-stage { --stage-bg: #f7f7f8; --dim-bg: #f7f7f8; --paper: #ffffff; --paper-2: #f7f7f8; }
 
 /* sections under the stage */
 .lib-section { margin-top: 38px; scroll-margin-top: 84px; }
