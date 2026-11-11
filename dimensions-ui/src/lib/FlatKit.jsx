@@ -159,10 +159,10 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
         .fk-mail { padding: 8px; gap: 4px; }
         .fk-mail button { display: flex; align-items: center; gap: 10px; padding: 7px 10px !important; border-radius: var(--r); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink) !important; text-align: left; }
         .fk-mail button i { width: 22px; height: 22px; border-radius: 4px; display: grid; place-items: center; background: var(--line); color: var(--alt); flex: none; }
-        .fk-mail button em { margin-left: auto; font-style: normal; font-weight: 800; letter-spacing: 0; background: var(--accent); color: #fff; border-radius: 999px; padding: 1px 7px; font-size: 10px; }
+        .fk-mail button .fk-count { margin-left: auto; font-style: normal; font-weight: 800; letter-spacing: 0; background: var(--accent); color: #fff; border-radius: 999px; padding: 1px 7px; font-size: 10px; }
         .fk-mail button[aria-current='true'] { background: var(--accent) !important; color: #fff !important; }
         .fk-mail button[aria-current='true'] i { background: color-mix(in srgb, #fff 25%, transparent); color: #fff; }
-        .fk-mail button[aria-current='true'] em { background: #fff; color: var(--accent); }
+        .fk-mail button[aria-current='true'] .fk-count { background: #fff; color: var(--accent); }
 
         /* controls */
         .fk-ctl { justify-content: space-between; }
@@ -284,7 +284,7 @@ export default function FlatKit({ theme = 'warm', radius = 6, style }) {
             <button key={label} aria-current={i === mail} onClick={() => setMail(i)}>
               <i><Icon d={I[icon]} size={13} /></i>
               {label}
-              {count > 0 && <em>{count}</em>}
+              {count > 0 && <span className="fk-count">{count}</span>}
             </button>
           ))}
         </div>

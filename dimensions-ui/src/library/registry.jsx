@@ -8,6 +8,11 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import GlassDesktop from '../lib/GlassDesktop.jsx'
+import GlassFinance from '../lib/GlassFinance.jsx'
+import GlassLogin from '../lib/GlassLogin.jsx'
+import GlassWeather from '../lib/GlassWeather.jsx'
+import GlassPlayer from '../lib/GlassPlayer.jsx'
 import FlatKit from '../lib/FlatKit.jsx'
 import FlatDocs from '../lib/FlatDocs.jsx'
 import FlatShop from '../lib/FlatShop.jsx'
@@ -887,6 +892,86 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <FlatKit {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['FlatKit.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-player',
+    name: 'Glass Player',
+    category: 'UI',
+    isNew: true,
+    description: 'A frosted music player over its own blurred album art, with a glass queue.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 18, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.16 },
+      { name: 'autoplay', type: 'toggle', default: false },
+    ],
+    fill: true,
+    preview: (p) => <GlassPlayer {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassPlayer.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-weather',
+    name: 'Glass Weather',
+    category: 'UI',
+    isNew: true,
+    description: 'Frosted weather cards over a live sky: sun, snow, rain or stars.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 16, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.18 },
+      { name: 'unit', type: 'select', options: ['C', 'F'], default: 'C' },
+    ],
+    fill: true,
+    preview: (p) => <GlassWeather {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassWeather.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-login',
+    name: 'Glass Login',
+    category: 'UI',
+    isNew: true,
+    description: 'A frosted sign-in card over a drifting Swiss-style poster.',
+    controls: [
+      { name: 'poster', type: 'select', options: ['vermillion', 'ultramarine', 'mint'], default: 'vermillion' },
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 22, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.18 },
+    ],
+    fill: true,
+    preview: (p) => <GlassLogin {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassLogin.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-finance',
+    name: 'Glass Finance',
+    category: 'UI',
+    isNew: true,
+    description: 'A dark glass banking app lit by amber and teal light leaks.',
+    controls: [
+      { name: 'glowA', type: 'color', default: '#ffb547' },
+      { name: 'glowB', type: 'color', default: '#2dd4bf' },
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 20, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.02, max: 0.3, step: 0.02, default: 0.08 },
+    ],
+    fill: true,
+    preview: (p) => <GlassFinance {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassFinance.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-desktop',
+    name: 'Glass Desktop',
+    category: 'UI',
+    isNew: true,
+    description: 'Frosted desktop widgets over a dusk landscape, with a dock and notifications.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 18, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.16 },
+    ],
+    fill: true,
+    preview: (p) => <GlassDesktop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassDesktop.jsx'],
     deps: [],
   },
 ]
