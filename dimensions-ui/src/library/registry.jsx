@@ -19,9 +19,10 @@ import PhoneModel from '../lib/PhoneModel.jsx'
 import HeadphonesModel from '../lib/HeadphonesModel.jsx'
 import IpadModel from '../lib/IpadModel.jsx'
 import TabletModel from '../lib/TabletModel.jsx'
+import CradleModel from '../lib/CradleModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -624,6 +625,40 @@ export const COMPONENTS = [
     preview: (p, set) => <TabletModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['TabletModel.jsx', 'tablet/TabletScene.jsx', 'tablet/Tablet.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'newtons-cradle',
+    name: "Newton's Cradle",
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Chrome balls on strings with real pendulum physics: lift an end ball, let go, and the swing passes through the row.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Chrome', values: { ballColor: '#d9dce0', frameColor: '#1b1c1f', stringColor: '#9aa0a8' } },
+          { name: 'Brass', values: { ballColor: '#d8b25a', frameColor: '#2a1d12', stringColor: '#b89a5a' } },
+          { name: 'Copper', values: { ballColor: '#c9764a', frameColor: '#1d1f24', stringColor: '#a8683f' } },
+          { name: 'Gunmetal', values: { ballColor: '#6d7076', frameColor: '#d6d8dc', stringColor: '#7d838c' } },
+          { name: 'Rose', values: { ballColor: '#e8b4b8', frameColor: '#3a2a2c', stringColor: '#c89aa0' } },
+          { name: 'Ink', values: { ballColor: '#2a2d33', frameColor: '#e9e6df', stringColor: '#55595f' } },
+        ],
+      },
+      { name: 'balls', type: 'range', min: 3, max: 8, step: 1, default: 5 },
+      { name: 'stringLength', type: 'range', min: 2.4, max: 4.6, step: 0.1, default: 3.4 },
+      { name: 'damping', type: 'range', min: 0, max: 1, step: 0.05, default: 0.15 },
+      { name: 'ballColor', type: 'color', default: '#d9dce0' },
+      { name: 'frameColor', type: 'color', default: '#1b1c1f' },
+      { name: 'stringColor', type: 'color', default: '#9aa0a8' },
+      { name: 'frameFinish', type: 'select', options: ['polished', 'satin', 'matte'], default: 'polished' },
+      { name: 'shine', type: 'range', min: 0, max: 1, step: 0.05, default: 0.8 },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <CradleModel {...p} height="100%" />,
+    fill: true,
+    files: ['CradleModel.jsx', 'cradle/CradleScene.jsx', 'cradle/Cradle.jsx'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
