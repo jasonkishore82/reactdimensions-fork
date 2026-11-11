@@ -130,7 +130,6 @@ export function Footer() {
   return (
     <footer className="footer">
       <Logo />
-      <span>Drawn in real time. No image assets were harmed.</span>
       <span>© {new Date().getFullYear()} React Dimensions</span>
     </footer>
   )
