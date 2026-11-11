@@ -7,6 +7,7 @@ import DraftingGrid from '../lib/DraftingGrid.jsx'
 import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
+import SoftHorizon from '../lib/SoftHorizon.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -760,10 +761,36 @@ export const COMPONENTS = [
     files: ['GradientSweep.jsx'],
     deps: [],
   },
+  {
+    slug: 'soft-horizon',
+    name: 'Soft Horizon',
+    category: 'Backgrounds',
+    isNew: true,
+    description: 'A wall and floor that meet at a soft, blurred band of light.',
+    controls: [
+      { name: 'wall', type: 'color', default: '#1b1d22' },
+      { name: 'floor', type: 'color', default: '#2a2c31' },
+      { name: 'band', type: 'color', default: '#f3efe6' },
+      { name: 'horizon', type: 'range', min: 30, max: 85, step: 1, default: 60, unit: '%' },
+      { name: 'softness', type: 'range', min: 4, max: 120, step: 2, default: 40, unit: 'px' },
+      { name: 'glow', type: 'range', min: 0, max: 1, step: 0.05, default: 0.35 },
+      { name: 'spread', type: 'range', min: 20, max: 140, step: 5, default: 70, unit: '%' },
+    ],
+    fill: true,
+    preview: (p) => (
+      <SoftHorizon {...p} style={{ position: 'absolute', inset: 0 }}>
+        <div className="demo-center">
+          <span className="demo-bg-title light">Horizon</span>
+        </div>
+      </SoftHorizon>
+    ),
+    files: ['SoftHorizon.jsx'],
+    deps: [],
+  },
 ]
 
 // Components that take children, so usage shows them as wrappers.
-export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'GradientSweep', 'SpringButton', 'MagneticButton']
+export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'GradientSweep', 'SoftHorizon', 'SpringButton', 'MagneticButton']
 
 export const sourceFor = (c) => c.files.map((f) => ({ file: f, code: src(f) }))
 

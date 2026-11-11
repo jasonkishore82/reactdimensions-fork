@@ -48,7 +48,7 @@ A component browser in the style of React Bits. Sidebar with search (press `/`),
 | Interactions | Tilt Card, Spring Button, Magnetic Button |
 | UI | (coming soon) |
 | 3D & Materials | Clear-coat Card (three.js), Pickup (three.js, optionally drivable), Snake (three.js, procedural), Turntable (three.js, playable), Vinyl Record (three.js), Sunglasses (three.js, parametric), Watch (three.js, analog and smart), Laptop (three.js), Glass Bottle (three.js), TV (three.js), Phone (three.js), Headphones (three.js) |
-| Backgrounds | Drafting Grid, Light Sweep, Cyclorama, Gradient Sweep |
+| Backgrounds | Drafting Grid, Light Sweep, Cyclorama, Gradient Sweep, Soft Horizon |
 
 The **Snake** is built entirely in code (no model file): a tube along a spring-driven spine, with an overlapping-scale texture drawn on a canvas from your colours. Colour presets set several colours at once and every colour stays editable. In *rear* mode the head follows the pointer; in *slither* mode it crawls after it along the floor with a travelling body wave.
 
