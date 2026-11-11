@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; }
+body {
+  background: radial-gradient(ellipse at 50% 40%, #dfe6eb 0%, #c9d4db 60%, #b8c4cc 100%);
+  font-family: 'Saira', system-ui, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+}
+.hint {
+  position: fixed;
+  left: 0; right: 0; bottom: 24px;
+  text-align: center;
+  color: #4a5862;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  user-select: none;
+}
