@@ -10,6 +10,7 @@ const CAT_ICON = {
   All: <path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4zM11 11h5v5h-5z" />,
   Text: <path d="M4 5.5V4h12v1.5M10 4v12M7.5 16h5" />,
   Interactions: <path d="m5 3.5 9 5.2-3.9 1.2 2.4 4.1-1.8 1-2.4-4.1-2.7 2.9z" />,
+  UI: <path d="M3 4.5h14v11H3zM3 7.5h14M6 11.5h4M13 11.5h1" />,
   '3D & Materials': <path d="M10 2.5 16.5 6v8L10 17.5 3.5 14V6zM10 10 3.5 6M10 10l6.5-4M10 10v7.5" />,
   Backgrounds: <path d="M3.500 3.500h13v13h-13zM3.500 8h13M3.500 12h13M8 3.500v13M12 3.500v13" />,
 }
