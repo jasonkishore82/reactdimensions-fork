@@ -8,6 +8,11 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import NeuSettings from '../lib/NeuSettings.jsx'
+import NeuMixer from '../lib/NeuMixer.jsx'
+import NeuFitness from '../lib/NeuFitness.jsx'
+import NeuCalc from '../lib/NeuCalc.jsx'
+import NeuHome from '../lib/NeuHome.jsx'
 import GlassDashboard from '../lib/GlassDashboard.jsx'
 import GlassDesktop from '../lib/GlassDesktop.jsx'
 import GlassFinance from '../lib/GlassFinance.jsx'
@@ -989,6 +994,83 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <GlassDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['GlassDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-home',
+    name: 'Neu Home Remote',
+    category: 'UI',
+    isNew: true,
+    description: 'A soft smart-home remote: rooms, a draggable thermostat dial and device keys.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuHome {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuHome.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-calc',
+    name: 'Neu Calculator',
+    category: 'UI',
+    isNew: true,
+    description: 'A working soft-UI calculator with scientific mode, history and keyboard input.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+      { name: 'showHistory', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <NeuCalc {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuCalc.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-fitness',
+    name: 'Neu Fitness',
+    category: 'UI',
+    isNew: true,
+    description: 'A soft activity tracker with a progress ring, workout timer and week view.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+      { name: 'goal', type: 'range', min: 4000, max: 15000, step: 500, default: 10000 },
+    ],
+    fill: true,
+    preview: (p) => <NeuFitness {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuFitness.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-mixer',
+    name: 'Neu Mixer',
+    category: 'UI',
+    isNew: true,
+    description: 'A soft audio mixer with draggable faders, live meters, mute/solo and EQ knobs.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuMixer {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuMixer.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-settings',
+    name: 'Neu Settings',
+    category: 'UI',
+    isNew: true,
+    description: 'A soft settings panel with real toggles, a live light/dark switch and save state.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuSettings.jsx'],
     deps: [],
   },
 ]
