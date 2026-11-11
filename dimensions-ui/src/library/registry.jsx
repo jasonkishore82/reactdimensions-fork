@@ -8,6 +8,7 @@ import LightSweep from '../lib/LightSweep.jsx'
 import Cyclorama from '../lib/Cyclorama.jsx'
 import GradientSweep from '../lib/GradientSweep.jsx'
 import SoftHorizon from '../lib/SoftHorizon.jsx'
+import MinDashboard from '../lib/MinDashboard.jsx'
 import MinSettings from '../lib/MinSettings.jsx'
 import MinCheckout from '../lib/MinCheckout.jsx'
 import MinPortfolio from '../lib/MinPortfolio.jsx'
@@ -1493,6 +1494,22 @@ export const COMPONENTS = [
     fill: true,
     preview: (p) => <MinSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['MinSettings.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-dashboard',
+    name: 'Min Dashboard',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A quiet greyscale sales dashboard: KPIs, channel gauge, revenue vs target, heatmap.',
+    controls: [
+      { name: 'brand', type: 'text', default: 'Tally' },
+      { name: 'user', type: 'text', default: 'Sam Rivera' },
+    ],
+    fill: true,
+    preview: (p) => <MinDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinDashboard.jsx'],
     deps: [],
   },
 ]
