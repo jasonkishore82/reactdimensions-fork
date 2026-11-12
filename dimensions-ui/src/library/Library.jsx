@@ -400,7 +400,7 @@ function Sidebar({ active, open, onClose, favs, category }) {
           </div>
           <div className="lib-filter">
             {Icon.search}
-            <input ref={search} placeholder={`Filter ${COMPONENTS.length} components…`} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Filter components" />
+            <input ref={search} placeholder={cat === 'All' ? `Filter ${COMPONENTS.length} components…` : `Filter ${COMPONENTS.filter((x) => x.category === cat).length} in ${cat}…`} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Filter components" />
           </div>
         </div>
         <nav className={`lib-list${edge.top ? ' at-top' : ''}${edge.bottom ? ' at-bottom' : ''}`} ref={scroller} onScroll={measure}>

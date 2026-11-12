@@ -9,7 +9,7 @@
   --side-w: 256px;
   max-width: 1680px;
   margin: 0 auto;
-  padding: 16px clamp(14px, 2vw, 28px) 80px;
+  padding: 16px clamp(14px, 2vw, 28px) 28px;
   display: grid;
   grid-template-columns: var(--side-w) minmax(0, 1fr) 190px;
   gap: clamp(20px, 3vw, 44px);
