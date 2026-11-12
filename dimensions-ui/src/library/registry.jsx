@@ -5,6 +5,53 @@ import MeasureText from '../lib/MeasureText.jsx'
 import DecodeText from '../lib/DecodeText.jsx'
 import DraftingGrid from '../lib/DraftingGrid.jsx'
 import LightSweep from '../lib/LightSweep.jsx'
+import Cyclorama from '../lib/Cyclorama.jsx'
+import GradientSweep from '../lib/GradientSweep.jsx'
+import SoftHorizon from '../lib/SoftHorizon.jsx'
+import SkeuConsole from '../lib/SkeuConsole.jsx'
+import SkeuCalendar from '../lib/SkeuCalendar.jsx'
+import SkeuHifi from '../lib/SkeuHifi.jsx'
+import SkeuCamera from '../lib/SkeuCamera.jsx'
+import SkeuJournal from '../lib/SkeuJournal.jsx'
+import SkeuDelay from '../lib/SkeuDelay.jsx'
+import MinDashboard from '../lib/MinDashboard.jsx'
+import MinSettings from '../lib/MinSettings.jsx'
+import MinCheckout from '../lib/MinCheckout.jsx'
+import MinPortfolio from '../lib/MinPortfolio.jsx'
+import MinTodo from '../lib/MinTodo.jsx'
+import MinReader from '../lib/MinReader.jsx'
+import MaxProfile from '../lib/MaxProfile.jsx'
+import MaxKids from '../lib/MaxKids.jsx'
+import MaxEditorial from '../lib/MaxEditorial.jsx'
+import MaxDrop from '../lib/MaxDrop.jsx'
+import MaxFestival from '../lib/MaxFestival.jsx'
+import BentoSpecs from '../lib/BentoSpecs.jsx'
+import BentoHome from '../lib/BentoHome.jsx'
+import BentoAnalytics from '../lib/BentoAnalytics.jsx'
+import BentoPortfolio from '../lib/BentoPortfolio.jsx'
+import BentoFeatures from '../lib/BentoFeatures.jsx'
+import LiquidHero from '../lib/LiquidHero.jsx'
+import LiquidMedia from '../lib/LiquidMedia.jsx'
+import LiquidControl from '../lib/LiquidControl.jsx'
+import LiquidLens from '../lib/LiquidLens.jsx'
+import LiquidTabBar from '../lib/LiquidTabBar.jsx'
+import NeuSettings from '../lib/NeuSettings.jsx'
+import NeuMixer from '../lib/NeuMixer.jsx'
+import NeuFitness from '../lib/NeuFitness.jsx'
+import NeuCalc from '../lib/NeuCalc.jsx'
+import NeuHome from '../lib/NeuHome.jsx'
+import GlassDashboard from '../lib/GlassDashboard.jsx'
+import GlassDesktop from '../lib/GlassDesktop.jsx'
+import GlassFinance from '../lib/GlassFinance.jsx'
+import GlassLogin from '../lib/GlassLogin.jsx'
+import GlassWeather from '../lib/GlassWeather.jsx'
+import GlassPlayer from '../lib/GlassPlayer.jsx'
+import FlatKit from '../lib/FlatKit.jsx'
+import FlatDocs from '../lib/FlatDocs.jsx'
+import FlatShop from '../lib/FlatShop.jsx'
+import FlatUtility from '../lib/FlatUtility.jsx'
+import FlatOnboarding from '../lib/FlatOnboarding.jsx'
+import FlatDashboard from '../lib/FlatDashboard.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -20,9 +67,11 @@ import HeadphonesModel from '../lib/HeadphonesModel.jsx'
 import IpadModel from '../lib/IpadModel.jsx'
 import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
+import KeyboardModel from '../lib/KeyboardModel.jsx'
+import TypewriterModel from '../lib/TypewriterModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -30,7 +79,10 @@ const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx'
 // Files are named 'X.jsx' (in lib/ or src/) or 'pickup/X.jsx'.
 const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 
-export const CATEGORIES = ['Text', 'Interactions', '3D & Materials', 'Backgrounds']
+export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
+
+// The UI section is grouped by visual style, in this order.
+export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism', 'Skeuomorphism']
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -662,6 +714,75 @@ export const COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'mechanical-keyboard',
+    name: 'Mechanical Keyboard',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Type on your real keyboard and the matching keycap travels down. Sculpted rows, wire-stabilised space bar, switch sounds and RGB.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cream', values: { keycapColor: '#efe9dc', modColor: '#b9b2a3', accentColor: '#d9643a', legendColor: '#2b2b2b', caseColor: '#d8d3c8' } },
+          { name: 'Carbon', values: { keycapColor: '#34363b', modColor: '#1f2023', accentColor: '#e8833a', legendColor: '#ececec', caseColor: '#18191b' } },
+          { name: 'Mint', values: { keycapColor: '#e9f4ee', modColor: '#9ccfb8', accentColor: '#2f7d5b', legendColor: '#22433a', caseColor: '#f2f2ef' } },
+          { name: 'Ocean', values: { keycapColor: '#dbe6ef', modColor: '#93afc8', accentColor: '#e07a5f', legendColor: '#14283b', caseColor: '#2c4a6b' } },
+          { name: 'Sunset', values: { keycapColor: '#f7e3c8', modColor: '#eaa66d', accentColor: '#c8423a', legendColor: '#3a2418', caseColor: '#5a2e22' } },
+          { name: 'Retro', values: { keycapColor: '#e6e0d2', modColor: '#a8a296', accentColor: '#b5452f', legendColor: '#24221f', caseColor: '#cfc8b8' } },
+        ],
+      },
+      { name: 'layout', type: 'select', options: ['60%', 'TKL', 'Full'], default: 'TKL' },
+      { name: 'switchType', type: 'select', options: ['tactile', 'linear', 'clicky'], default: 'tactile' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'keycapColor', type: 'color', default: '#efe9dc' },
+      { name: 'modColor', type: 'color', default: '#b9b2a3' },
+      { name: 'accentColor', type: 'color', default: '#d9643a' },
+      { name: 'legendColor', type: 'color', default: '#2b2b2b' },
+      { name: 'caseColor', type: 'color', default: '#d8d3c8' },
+      { name: 'rgb', type: 'toggle', default: true },
+      { name: 'rgbEffect', type: 'select', options: ['wave', 'breathe', 'reactive', 'static'], default: 'wave' },
+      { name: 'rgbColor', type: 'color', default: '#7c5cff' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <KeyboardModel {...p} height="100%" />,
+    fill: true,
+    files: ['KeyboardModel.jsx', 'keyboard/KeyboardScene.jsx', 'keyboard/Keyboard.jsx', 'keyboard/layout.js', 'keyboard/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'typewriter',
+    name: 'Typewriter',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Type and a typebar swings up to strike the platen, ink lands on the paper and the carriage steps along. Bell, lever and line feed included.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Racing green', values: { bodyColor: '#1f3d33', keyColor: '#1b1b1b', legendColor: '#f4efe2' } },
+          { name: 'Cherry', values: { bodyColor: '#8e1f22', keyColor: '#1b1b1b', legendColor: '#f4efe2' } },
+          { name: 'Sky', values: { bodyColor: '#7fb3c8', keyColor: '#f2ede2', legendColor: '#23303a' } },
+          { name: 'Ivory', values: { bodyColor: '#e6dcc6', keyColor: '#3b2f25', legendColor: '#f4efe2' } },
+          { name: 'Matte black', values: { bodyColor: '#1c1c1e', keyColor: '#2b2b2e', legendColor: '#e9e5dc' } },
+        ],
+      },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'bodyColor', type: 'color', default: '#1f3d33' },
+      { name: 'keyColor', type: 'color', default: '#1b1b1b' },
+      { name: 'legendColor', type: 'color', default: '#f4efe2' },
+      { name: 'paperColor', type: 'color', default: '#f8f4ea' },
+      { name: 'inkColor', type: 'color', default: '#1d1b26' },
+      { name: 'ribbonColor', type: 'color', default: '#1a1a1a' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <TypewriterModel {...p} height="100%" />,
+    fill: true,
+    files: ['TypewriterModel.jsx', 'typewriter/TypewriterScene.jsx', 'typewriter/Typewriter.jsx', 'typewriter/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'drafting-grid',
     name: 'Drafting Grid',
     category: 'Backgrounds',
@@ -707,10 +828,861 @@ export const COMPONENTS = [
     files: ['LightSweep.jsx'],
     deps: [],
   },
+  {
+    slug: 'cyclorama',
+    name: 'Cyclorama',
+    category: 'Backgrounds',
+    isNew: true,
+    description: 'A seamless curved studio backdrop in a single tinted colour.',
+    controls: [
+      { name: 'tint', type: 'color', default: '#d9d4ca' },
+      { name: 'horizon', type: 'range', min: 30, max: 85, step: 1, default: 62, unit: '%' },
+      { name: 'curve', type: 'range', min: 2, max: 40, step: 1, default: 18, unit: '%' },
+      { name: 'light', type: 'range', min: 0, max: 1, step: 0.05, default: 0.45 },
+      { name: 'vignette', type: 'range', min: 0, max: 0.8, step: 0.05, default: 0.35 },
+      { name: 'shadow', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => (
+      <Cyclorama {...p} style={{ position: 'absolute', inset: 0 }}>
+        <div className="demo-center">
+          <span className="demo-bg-title">Studio sweep</span>
+        </div>
+      </Cyclorama>
+    ),
+    files: ['Cyclorama.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'gradient-sweep',
+    name: 'Gradient Sweep',
+    category: 'Backgrounds',
+    isNew: true,
+    description: "A studio sweep that shifts hue to match the product's main colour.",
+    controls: [
+      { name: 'color', type: 'color', default: '#ff4d1a' },
+      { name: 'base', type: 'color', default: '#121316' },
+      { name: 'shift', type: 'range', min: 0, max: 180, step: 5, default: 40, unit: '°' },
+      { name: 'strength', type: 'range', min: 0.1, max: 1, step: 0.05, default: 0.55 },
+      { name: 'drift', type: 'range', min: 0, max: 120, step: 5, default: 0, unit: '°' },
+      { name: 'speed', type: 'range', min: 2, max: 20, step: 1, default: 8, unit: 's' },
+      { name: 'transition', type: 'range', min: 0, max: 3, step: 0.1, default: 0.9, unit: 's' },
+    ],
+    fill: true,
+    preview: (p) => (
+      <GradientSweep {...p} style={{ position: 'absolute', inset: 0 }}>
+        <div className="demo-center">
+          <span className="demo-bg-title light">Colour matched</span>
+        </div>
+      </GradientSweep>
+    ),
+    files: ['GradientSweep.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'soft-horizon',
+    name: 'Soft Horizon',
+    category: 'Backgrounds',
+    isNew: true,
+    description: 'A wall and floor that meet at a soft, blurred band of light.',
+    controls: [
+      { name: 'wall', type: 'color', default: '#1b1d22' },
+      { name: 'floor', type: 'color', default: '#2a2c31' },
+      { name: 'band', type: 'color', default: '#f3efe6' },
+      { name: 'horizon', type: 'range', min: 30, max: 85, step: 1, default: 60, unit: '%' },
+      { name: 'softness', type: 'range', min: 4, max: 120, step: 2, default: 40, unit: 'px' },
+      { name: 'glow', type: 'range', min: 0, max: 1, step: 0.05, default: 0.35 },
+      { name: 'spread', type: 'range', min: 20, max: 140, step: 5, default: 70, unit: '%' },
+    ],
+    fill: true,
+    preview: (p) => (
+      <SoftHorizon {...p} style={{ position: 'absolute', inset: 0 }}>
+        <div className="demo-center">
+          <span className="demo-bg-title light">Horizon</span>
+        </div>
+      </SoftHorizon>
+    ),
+    files: ['SoftHorizon.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard',
+    name: 'Flat Dashboard',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A flat colour-block analytics dashboard with a sidebar and tab pills.',
+    controls: [
+      { name: 'brand', type: 'color', default: '#2563eb' },
+      { name: 'sidebar', type: 'color', default: '#16224a' },
+      { name: 'kpiColors', type: 'text', default: '#2563eb, #0d7a55, #b45309, #c92a2a' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-onboarding',
+    name: 'Flat Onboarding',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'Two-tone flat onboarding screens with a stretching progress pill.',
+    controls: [
+      { name: 'autoplay', type: 'toggle', default: false },
+      { name: 'interval', type: 'range', min: 1, max: 8, step: 0.5, default: 3, unit: 's' },
+      { name: 'buttonShape', type: 'select', options: ['pill', 'square'], default: 'pill' },
+    ],
+    fill: true,
+    preview: (p) => <FlatOnboarding {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatOnboarding.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-utility',
+    name: 'Flat Utility',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'An icon-first flat tool launcher with category chips and a tab bar.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#3b82f6' },
+      { name: 'tileRadius', type: 'range', min: 0, max: 32, step: 1, default: 14, unit: 'px' },
+      { name: 'showLabels', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatUtility {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatUtility.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-shop',
+    name: 'Flat Shop',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A flat product catalogue with category pills, filters and add-to-bag.',
+    controls: [
+      { name: 'buttonColor', type: 'color', default: '#111111' },
+      { name: 'radius', type: 'range', min: 0, max: 20, step: 1, default: 4, unit: 'px' },
+      { name: 'showFilters', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatShop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatShop.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-docs',
+    name: 'Flat Docs',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A flat documentation page with a framework switcher and accent sidebar.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#2563eb' },
+      { name: 'codeTheme', type: 'select', options: ['light', 'dark'], default: 'light' },
+      { name: 'showSidebar', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <FlatDocs {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDocs.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-kit',
+    name: 'Flat UI Kit',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A board of flat widgets: profile, calendar, player, controls and more.',
+    controls: [
+      { name: 'theme', type: 'select', options: ['warm', 'coral'], default: 'warm' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatKit {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatKit.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-player',
+    name: 'Glass Player',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'A frosted music player over its own blurred album art, with a glass queue.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 18, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.16 },
+      { name: 'autoplay', type: 'toggle', default: false },
+    ],
+    fill: true,
+    preview: (p) => <GlassPlayer {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassPlayer.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glass-weather',
+    name: 'Glass Weather',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'Frosted weather cards over a live sky: sun, snow, rain or stars.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 16, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.18 },
+      { name: 'unit', type: 'select', options: ['C', 'F'], default: 'C' },
+    ],
+    fill: true,
+    preview: (p) => <GlassWeather {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassWeather.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'glass-login',
+    name: 'Glass Login',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'A frosted sign-in card over a drifting Swiss-style poster.',
+    controls: [
+      { name: 'poster', type: 'select', options: ['vermillion', 'ultramarine', 'mint'], default: 'vermillion' },
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 22, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.18 },
+    ],
+    fill: true,
+    preview: (p) => <GlassLogin {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassLogin.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'glass-finance',
+    name: 'Glass Finance',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'A dark glass banking app lit by amber and teal light leaks.',
+    controls: [
+      { name: 'glowA', type: 'color', default: '#ffb547' },
+      { name: 'glowB', type: 'color', default: '#2dd4bf' },
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 20, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.02, max: 0.3, step: 0.02, default: 0.08 },
+    ],
+    fill: true,
+    preview: (p) => <GlassFinance {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassFinance.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'glass-desktop',
+    name: 'Glass Desktop',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'Frosted desktop widgets over a dusk landscape, with a dock and notifications.',
+    controls: [
+      { name: 'blur', type: 'range', min: 4, max: 40, step: 1, default: 18, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0.04, max: 0.4, step: 0.02, default: 0.16 },
+    ],
+    fill: true,
+    preview: (p) => <GlassDesktop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassDesktop.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'glass-dashboard',
+    name: 'Glass Dashboard',
+    category: 'UI',
+    style: 'Glassmorphism',
+    isNew: true,
+    description: 'A dark glass finance dashboard floating in a warm, dim room.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#ff6a2b' },
+      { name: 'blur', type: 'range', min: 6, max: 48, step: 1, default: 26, unit: 'px' },
+      { name: 'frost', type: 'range', min: 0, max: 0.3, step: 0.02, default: 0.06 },
+    ],
+    fill: true,
+    preview: (p) => <GlassDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['GlassDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neu-home',
+    name: 'Neu Home Remote',
+    category: 'UI',
+    style: 'Neumorphism',
+    isNew: true,
+    description: 'A soft smart-home remote: rooms, a draggable thermostat dial and device keys.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cloud', values: { surface: '#e6ebf2', accent: '#ff7a45' } },
+          { name: 'Charcoal', values: { surface: '#2a2e37', accent: '#ff7a45' } },
+          { name: 'Sand', values: { surface: '#ece3d6', accent: '#d9643a' } },
+          { name: 'Mint', values: { surface: '#dcefe6', accent: '#1f9d6b' } },
+          { name: 'Lilac', values: { surface: '#e7e3f3', accent: '#7b5cd6' } },
+          { name: 'Navy', values: { surface: '#1f2a44', accent: '#ffb347' } },
+        ],
+      },
+      { name: 'surface', type: 'color', default: '#e6ebf2' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuHome {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuHome.jsx', 'ui/color.js'],
+    deps: [],
+  },
+  {
+    slug: 'neu-calc',
+    name: 'Neu Calculator',
+    category: 'UI',
+    style: 'Neumorphism',
+    isNew: true,
+    description: 'A working soft-UI calculator with scientific mode, history and keyboard input.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cloud', values: { surface: '#e6ebf2', accent: '#ff7a45' } },
+          { name: 'Charcoal', values: { surface: '#2a2e37', accent: '#ff7a45' } },
+          { name: 'Sand', values: { surface: '#ece3d6', accent: '#d9643a' } },
+          { name: 'Mint', values: { surface: '#dcefe6', accent: '#1f9d6b' } },
+          { name: 'Lilac', values: { surface: '#e7e3f3', accent: '#7b5cd6' } },
+          { name: 'Navy', values: { surface: '#1f2a44', accent: '#ffb347' } },
+        ],
+      },
+      { name: 'surface', type: 'color', default: '#e6ebf2' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+      { name: 'showHistory', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <NeuCalc {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuCalc.jsx', 'ui/color.js'],
+    deps: [],
+  },
+  {
+    slug: 'neu-fitness',
+    name: 'Neu Fitness',
+    category: 'UI',
+    style: 'Neumorphism',
+    isNew: true,
+    description: 'A soft activity tracker with a progress ring, workout timer and week view.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cloud', values: { surface: '#e6ebf2', accent: '#ff7a45' } },
+          { name: 'Charcoal', values: { surface: '#2a2e37', accent: '#ff7a45' } },
+          { name: 'Sand', values: { surface: '#ece3d6', accent: '#d9643a' } },
+          { name: 'Mint', values: { surface: '#dcefe6', accent: '#1f9d6b' } },
+          { name: 'Lilac', values: { surface: '#e7e3f3', accent: '#7b5cd6' } },
+          { name: 'Navy', values: { surface: '#1f2a44', accent: '#ffb347' } },
+        ],
+      },
+      { name: 'surface', type: 'color', default: '#e6ebf2' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+      { name: 'goal', type: 'range', min: 4000, max: 15000, step: 500, default: 10000 },
+    ],
+    fill: true,
+    preview: (p) => <NeuFitness {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuFitness.jsx', 'ui/color.js'],
+    deps: [],
+  },
+  {
+    slug: 'neu-mixer',
+    name: 'Neu Mixer',
+    category: 'UI',
+    style: 'Neumorphism',
+    isNew: true,
+    description: 'A soft audio mixer with draggable faders, live meters, mute/solo and EQ knobs.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cloud', values: { surface: '#e6ebf2', accent: '#ff7a45' } },
+          { name: 'Charcoal', values: { surface: '#2a2e37', accent: '#ff7a45' } },
+          { name: 'Sand', values: { surface: '#ece3d6', accent: '#d9643a' } },
+          { name: 'Mint', values: { surface: '#dcefe6', accent: '#1f9d6b' } },
+          { name: 'Lilac', values: { surface: '#e7e3f3', accent: '#7b5cd6' } },
+          { name: 'Navy', values: { surface: '#1f2a44', accent: '#ffb347' } },
+        ],
+      },
+      { name: 'surface', type: 'color', default: '#e6ebf2' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuMixer {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuMixer.jsx', 'ui/color.js', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'neu-settings',
+    name: 'Neu Settings',
+    category: 'UI',
+    style: 'Neumorphism',
+    isNew: true,
+    description: 'A soft settings panel with real toggles, a live light/dark switch and save state.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cloud', values: { surface: '#e6ebf2', accent: '#ff7a45' } },
+          { name: 'Charcoal', values: { surface: '#2a2e37', accent: '#ff7a45' } },
+          { name: 'Sand', values: { surface: '#ece3d6', accent: '#d9643a' } },
+          { name: 'Mint', values: { surface: '#dcefe6', accent: '#1f9d6b' } },
+          { name: 'Lilac', values: { surface: '#e7e3f3', accent: '#7b5cd6' } },
+          { name: 'Navy', values: { surface: '#1f2a44', accent: '#ffb347' } },
+        ],
+      },
+      { name: 'surface', type: 'color', default: '#e6ebf2' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <NeuSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['NeuSettings.jsx', 'ui/color.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-tab-bar',
+    name: 'Liquid Tab Bar',
+    category: 'UI',
+    style: 'Liquid glass',
+    isNew: true,
+    description: 'A thick-glass tab bar that bends the feed beneath it, with a stretching droplet.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+      { name: 'tint', type: 'range', min: 0, max: 0.6, step: 0.02, default: 0.3 },
+    ],
+    fill: true,
+    preview: (p) => <LiquidTabBar {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidTabBar.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-lens',
+    name: 'Liquid Lens',
+    category: 'UI',
+    style: 'Liquid glass',
+    isNew: true,
+    description: 'A product viewer with a draggable glass lens, glass colour beads and a thick glass spec panel.',
+    controls: [
+      { name: 'zoom', type: 'range', min: 1.1, max: 3, step: 0.1, default: 1.8, unit: '×' },
+      { name: 'strength', type: 'range', min: 0, max: 180, step: 5, default: 90 },
+      { name: 'lensSize', type: 'range', min: 90, max: 240, step: 10, default: 150, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <LiquidLens {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidLens.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-control',
+    name: 'Liquid Control Centre',
+    category: 'UI',
+    style: 'Liquid glass',
+    isNew: true,
+    description: 'Glass control tiles that bend the wallpaper, with rippling toggles and glass-tube sliders.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+      { name: 'accent', type: 'color', default: '#2f80ff' },
+    ],
+    fill: true,
+    preview: (p) => <LiquidControl {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidControl.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-media',
+    name: 'Liquid Media Controls',
+    category: 'UI',
+    style: 'Liquid glass',
+    isNew: true,
+    description: 'Glass bubble video controls with a droplet scrubber over a living scene.',
+    controls: [
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 70 },
+      { name: 'autoHide', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <LiquidMedia {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidMedia.jsx', 'liquid/lens.js'],
+    deps: [],
+  },
+  {
+    slug: 'liquid-hero',
+    name: 'Liquid Hero',
+    category: 'UI',
+    style: 'Liquid glass',
+    isNew: true,
+    description: 'A landing hero where a drifting glass orb bends a giant headline.',
+    controls: [
+      { name: 'headline', type: 'text', default: 'Bend the light.' },
+      { name: 'accent', type: 'color', default: '#e0401f' },
+      { name: 'orbSize', type: 'range', min: 140, max: 400, step: 10, default: 260, unit: 'px' },
+      { name: 'zoom', type: 'range', min: 1.1, max: 2.5, step: 0.05, default: 1.45, unit: '×' },
+      { name: 'strength', type: 'range', min: 0, max: 140, step: 5, default: 60 },
+    ],
+    fill: true,
+    preview: (p) => <LiquidHero {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LiquidHero.jsx', 'liquid/lens.js', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'bento-features',
+    name: 'Bento Features',
+    category: 'UI',
+    style: 'Bento',
+    isNew: true,
+    description: 'A bento feature section with live mini demos in each tile and a sticky nav pill.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#c6f432' },
+      { name: 'dark', type: 'toggle', default: true },
+    ],
+    fill: true,
+    preview: (p) => <BentoFeatures {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoFeatures.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'bento-portfolio',
+    name: 'Bento Portfolio',
+    category: 'UI',
+    style: 'Bento',
+    isNew: true,
+    description: 'A link-in-bio bento: portrait, bio, project, now playing, map and socials.',
+    controls: [
+      { name: 'name', type: 'text', default: 'Lena Ortiz' },
+      { name: 'accent', type: 'color', default: '#ff7a45' },
+    ],
+    fill: true,
+    preview: (p) => <BentoPortfolio {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoPortfolio.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'bento-analytics',
+    name: 'Bento Analytics',
+    category: 'UI',
+    style: 'Bento',
+    isNew: true,
+    description: 'An analytics bento with a date-range pill, expandable tiles and export.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#3b5bfd' },
+    ],
+    fill: true,
+    preview: (p) => <BentoAnalytics {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoAnalytics.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'bento-home',
+    name: 'Bento Home',
+    category: 'UI',
+    style: 'Bento',
+    isNew: true,
+    description: 'An app home screen of pressable tiles with pinned items and a tab pill.',
+    controls: [
+      { name: 'greeting', type: 'text', default: 'Good morning, Sam' },
+      { name: 'accent', type: 'color', default: '#7048e8' },
+    ],
+    fill: true,
+    preview: (p) => <BentoHome {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoHome.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bento-specs',
+    name: 'Bento Specs',
+    category: 'UI',
+    style: 'Bento',
+    isNew: true,
+    description: 'A product spec bento with animated numbers, model switcher and compare drawer.',
+    controls: [
+      { name: 'product', type: 'text', default: 'Nova' },
+      { name: 'accent', type: 'color', default: '#ff9f43' },
+    ],
+    fill: true,
+    preview: (p) => <BentoSpecs {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['BentoSpecs.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-festival',
+    name: 'Max Festival',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A loud festival site: neon clash, collage, marquee nav and a readable line-up.',
+    controls: [
+      { name: 'name', type: 'text', default: 'LOUDER 26' },
+      { name: 'pink', type: 'color', default: '#ff2bd6' },
+      { name: 'lime', type: 'color', default: '#c6ff00' },
+      { name: 'blue', type: 'color', default: '#2a1bff' },
+    ],
+    fill: true,
+    preview: (p) => <MaxFestival {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxFestival.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'max-drop',
+    name: 'Max Drop',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A streetwear drop page with a countdown, loud size grid and a shaking cop button.',
+    controls: [
+      { name: 'product', type: 'text', default: 'NO SLEEP HOODIE' },
+      { name: 'price', type: 'range', min: 40, max: 400, step: 5, default: 140, unit: '$' },
+      { name: 'startsIn', type: 'range', min: 0, max: 60, step: 1, default: 12, unit: 's' },
+    ],
+    fill: true,
+    preview: (p) => <MaxDrop {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxDrop.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'max-editorial',
+    name: 'Max Editorial',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A maximalist magazine page: mixed type, a pull quote over art, stamp buttons.',
+    controls: [
+      { name: 'masthead', type: 'text', default: 'RACKET' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <MaxEditorial {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxEditorial.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-kids',
+    name: 'Max Kids',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'A bright counting game for kids with big answers, a buddy and a star trail.',
+    controls: [
+      { name: 'childName', type: 'text', default: 'Mia' },
+    ],
+    fill: true,
+    preview: (p) => <MaxKids {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxKids.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'max-profile',
+    name: 'Max Profile',
+    category: 'UI',
+    style: 'Maximalism',
+    isNew: true,
+    description: 'An early-web style creator page with links, guestbook, top friends and a visitor counter.',
+    controls: [
+      { name: 'handle', type: 'text', default: 'pixiewav' },
+      { name: 'bg', type: 'color', default: '#160b2e' },
+    ],
+    fill: true,
+    preview: (p) => <MaxProfile {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MaxProfile.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'min-reader',
+    name: 'Min Reader',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A calm reading view: one serif, a 65-character measure and a pill that appears on scroll up.',
+    controls: [
+      { name: 'title', type: 'text', default: 'The Quiet Hour' },
+      { name: 'author', type: 'text', default: 'June Halden' },
+    ],
+    fill: true,
+    preview: (p) => <MinReader {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinReader.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-todo',
+    name: 'Min To-do',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A single-column to-do list with one accent, inline add and a quiet progress line.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#2f6f4f' },
+    ],
+    fill: true,
+    preview: (p) => <MinTodo {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinTodo.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-portfolio',
+    name: 'Min Portfolio',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A monochrome portfolio with big images, thin captions and an index view.',
+    controls: [
+      { name: 'name', type: 'text', default: 'Ines Moreau' },
+      { name: 'role', type: 'text', default: 'Photographer, Lisbon' },
+    ],
+    fill: true,
+    preview: (p) => <MinPortfolio {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinPortfolio.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-checkout',
+    name: 'Min Checkout',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A one-step-per-screen guest checkout with inline errors and the total always in view.',
+    controls: [
+      { name: 'currency', type: 'select', options: ['€', '$', '£'], default: '€' },
+    ],
+    fill: true,
+    preview: (p) => <MinCheckout {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinCheckout.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-settings',
+    name: 'Min Settings',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'Plain grouped settings rows with instant toggles and a confirmed destructive action.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#111111' },
+    ],
+    fill: true,
+    preview: (p) => <MinSettings {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinSettings.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'min-dashboard',
+    name: 'Min Dashboard',
+    category: 'UI',
+    style: 'Minimalism',
+    isNew: true,
+    description: 'A quiet greyscale sales dashboard: KPIs, channel gauge, revenue vs target, heatmap.',
+    controls: [
+      { name: 'brand', type: 'text', default: 'Tally' },
+      { name: 'user', type: 'text', default: 'Sam Rivera' },
+    ],
+    fill: true,
+    preview: (p) => <MinDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['MinDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-delay',
+    name: 'Skeu Delay',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A stereo delay plugin with glossy knobs, physical faders and raised keys, in light, dark or split.',
+    controls: [
+      { name: 'theme', type: 'select', options: ['split', 'light', 'dark'], default: 'split' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuDelay {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuDelay.jsx', 'ui/dial.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-journal',
+    name: 'Skeu Journal',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A stitched leather journal with a brass clasp, lined pages you can write on, a ribbon, section tabs and an index-card drawer.',
+    controls: [
+      { name: 'owner', type: 'text', default: 'June' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuJournal {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuJournal.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-camera',
+    name: 'Skeu Camera',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'An analogue camera with knurled ISO and shutter dials that change the viewfinder exposure, a mode switch, a chrome shutter and a film strip.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuCamera {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuCamera.jsx', 'ui/dial.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-hifi',
+    name: 'Skeu Hi-Fi',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A walnut hi-fi with a spinning record and swinging tonearm, glowing VU meters, chrome knobs, source push-buttons and a record crate.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuHifi {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuHifi.jsx', 'ui/dial.js', 'ui/onscreen.js'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-calendar',
+    name: 'Skeu Calendar',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'A tear-off desk calendar with ring-binder Day/Week/Month tabs, a DONE rubber stamp and a corkboard of sticky notes.',
+    controls: [
+
+    ],
+    fill: true,
+    preview: (p) => <SkeuCalendar {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuCalendar.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'skeu-console',
+    name: 'Skeu Console',
+    category: 'UI',
+    style: 'Skeuomorphism',
+    isNew: true,
+    description: 'An original retro handheld with a CRT menu, d-pad and A/B buttons that press down (keyboard too) and cartridges that slide in from a shelf.',
+    controls: [
+      { name: 'shell', type: 'color', default: '#8fcfc0' },
+    ],
+    fill: true,
+    preview: (p) => <SkeuConsole {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['SkeuConsole.jsx', 'ui/onscreen.js'],
+    deps: [],
+  },
 ]
 
 // Components that take children, so usage shows them as wrappers.
-export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'SpringButton', 'MagneticButton']
+export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'GradientSweep', 'SoftHorizon', 'SpringButton', 'MagneticButton']
 
 export const sourceFor = (c) => c.files.map((f) => ({ file: f, code: src(f) }))
 
