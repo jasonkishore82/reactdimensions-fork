@@ -52,6 +52,10 @@ import FlatShop from '../lib/FlatShop.jsx'
 import FlatUtility from '../lib/FlatUtility.jsx'
 import FlatOnboarding from '../lib/FlatOnboarding.jsx'
 import FlatDashboard from '../lib/FlatDashboard.jsx'
+import FlatDashboardCards from '../lib/FlatDashboardCards.jsx'
+import FlatDashboardPanels from '../lib/FlatDashboardPanels.jsx'
+import FlatDashboardWidgets from '../lib/FlatDashboardWidgets.jsx'
+import FlatDashboardProfiles from '../lib/FlatDashboardProfiles.jsx'
 import ClearcoatCard from '../lib/ClearcoatCard.jsx'
 import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
@@ -74,6 +78,9 @@ import TypewriterModel from '../lib/TypewriterModel.jsx'
 import LighterModel from '../lib/LighterModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
 import LorryModel from '../lib/LorryModel.jsx'
+import ClockModel from '../lib/ClockModel.jsx'
+import LampModel from '../lib/LampModel.jsx'
+import TapeModel from '../lib/TapeModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -96,7 +103,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -985,6 +992,101 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'alarm-clock',
+    name: 'Alarm Clock',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A twin-bell alarm clock on the live time. Drag the hands to set it; at the alarm the hammer beats the bells and the clock dances on its feet.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Red', values: { caseColor: '#c8312a', dialColor: '#f3eee2', bellFinish: 'chrome' } },
+          { name: 'Brass', values: { caseColor: '#b58a3c', dialColor: '#f6efdf', bellFinish: 'brass' } },
+          { name: 'Mint', values: { caseColor: '#8fcab4', dialColor: '#fbfaf5', bellFinish: 'chrome' } },
+          { name: 'Black', values: { caseColor: '#1d1e21', dialColor: '#ece6d8', bellFinish: 'black' } },
+          { name: 'Sky', values: { caseColor: '#4b86c8', dialColor: '#f4f1ea', bellFinish: 'chrome' } },
+        ],
+      },
+      { name: 'alarm', type: 'text', default: '07:00', maxLength: 5 },
+      { name: 'alarmOn', type: 'toggle', default: true },
+      { name: 'dialStyle', type: 'select', options: ['classic', 'roman', 'minimal'], default: 'classic' },
+      { name: 'caseColor', type: 'color', default: '#c8312a' },
+      { name: 'dialColor', type: 'color', default: '#f3eee2' },
+      { name: 'bellFinish', type: 'select', options: ['chrome', 'brass', 'black'], default: 'chrome' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (dragging the gold hand sets the alarm).
+    preview: (p, set) => <ClockModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['ClockModel.jsx', 'clock/ClockScene.jsx', 'clock/Clock.jsx', 'clock/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'desk-lamp',
+    name: 'Desk Lamp',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A balanced-arm lamp with a real spotlight. Drag the arms to pose it, the springs stretch as the joints open, and the light falls on the desk.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Petrol', values: { bodyColor: '#1f5f74', lightColor: '#ffd9a3' } },
+          { name: 'Red', values: { bodyColor: '#b8332a', lightColor: '#ffd39a' } },
+          { name: 'Black', values: { bodyColor: '#1b1c1f', lightColor: '#fff1dc' } },
+          { name: 'Cream', values: { bodyColor: '#e8e0cf', lightColor: '#ffe2b8' } },
+          { name: 'Daylight', values: { bodyColor: '#c9ccd2', lightColor: '#eef4ff' } },
+        ],
+      },
+      { name: 'on', type: 'toggle', default: true },
+      { name: 'brightness', type: 'range', min: 0, max: 1, step: 0.05, default: 0.8 },
+      { name: 'armLength', type: 'range', min: 0.8, max: 1.2, step: 0.05, default: 1 },
+      { name: 'bodyColor', type: 'color', default: '#1f5f74' },
+      { name: 'lightColor', type: 'color', default: '#ffd9a3' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking the switch turns it on and off).
+    preview: (p, set) => <LampModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['LampModel.jsx', 'lamp/LampScene.jsx', 'lamp/Lamp.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'tape-measure',
+    name: 'Tape Measure',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Drag the hook to draw the cupped steel blade straight out. Let go and it reels back in until the hook thunks home, unless the lock is on.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Yellow', values: { caseColor: '#f5b800', bladeColor: '#f2d33a' } },
+          { name: 'Orange', values: { caseColor: '#ff6a13', bladeColor: '#f2d33a' } },
+          { name: 'Black', values: { caseColor: '#1f2023', bladeColor: '#f4f2ea' } },
+          { name: 'Steel', values: { caseColor: '#b9bec5', bladeColor: '#f2d33a' } },
+          { name: 'Red', values: { caseColor: '#c8312a', bladeColor: '#f4f2ea' } },
+        ],
+      },
+      { name: 'locked', type: 'toggle', default: true },
+      { name: 'units', type: 'select', options: ['metric', 'imperial'], default: 'metric' },
+      { name: 'caseColor', type: 'color', default: '#f5b800' },
+      { name: 'bladeColor', type: 'color', default: '#f2d33a' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking the lock on the case toggles it).
+    preview: (p, set) => <TapeModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['TapeModel.jsx', 'tape/TapeScene.jsx', 'tape/Tape.jsx', 'tape/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'drafting-grid',
     name: 'Drafting Grid',
     category: 'Backgrounds',
@@ -1113,16 +1215,91 @@ const ALL_COMPONENTS = [
     category: 'UI',
     style: 'Flat',
     isNew: true,
-    description: 'A flat colour-block analytics dashboard with a sidebar and tab pills.',
+    description: 'A flat commerce dashboard with a light sidebar, paired-bar sales chart, stat chips and an activity rail.',
     controls: [
-      { name: 'brand', type: 'color', default: '#2563eb' },
-      { name: 'sidebar', type: 'color', default: '#16224a' },
-      { name: 'kpiColors', type: 'text', default: '#2563eb, #0d7a55, #b45309, #c92a2a' },
-      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+      { name: 'brand', type: 'color', default: '#3b72f0' },
+      { name: 'sidebar', type: 'color', default: '#f4f6fa' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 8, unit: 'px' },
     ],
     fill: true,
     preview: (p) => <FlatDashboard {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['FlatDashboard.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard-cards',
+    name: 'Flat Card Dashboard',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A colourful flat card-grid dashboard with an icon rail, line chart, donut and calendar.',
+    controls: [
+      { name: 'coral', type: 'color', default: '#ff8068' },
+      { name: 'teal', type: 'color', default: '#0fcfa0' },
+      { name: 'yellow', type: 'color', default: '#ffd27a' },
+      { name: 'rail', type: 'color', default: '#2f6577' },
+      { name: 'radius', type: 'range', min: 0, max: 24, step: 1, default: 14, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboardCards {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboardCards.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard-panels',
+    name: 'Flat Panel Dashboard',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A full-size flat admin dashboard: top tabs, colour KPI tiles, gauges, bar and area charts, and a calendar rail.',
+    controls: [
+      { name: 'orange', type: 'color', default: '#f5a04a' },
+      { name: 'blue', type: 'color', default: '#5aa9d6' },
+      { name: 'green', type: 'color', default: '#4cb98a' },
+      { name: 'purple', type: 'color', default: '#8a58b0' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboardPanels {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboardPanels.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard-widgets',
+    name: 'Flat Widget Dashboard',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A full-size flat widget grid: line, area and dot charts, donuts, grouped bars and a step timeline.',
+    controls: [
+      { name: 'teal', type: 'color', default: '#1fb5a5' },
+      { name: 'purple', type: 'color', default: '#922b7e' },
+      { name: 'orange', type: 'color', default: '#f4a623' },
+      { name: 'grey', type: 'color', default: '#7c7f86' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboardWidgets {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboardWidgets.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'flat-dashboard-profiles',
+    name: 'Flat Profile Dashboard',
+    category: 'UI',
+    style: 'Flat',
+    isNew: true,
+    description: 'A full-size flat dashboard with chart widgets and a paging column of rated profile cards.',
+    controls: [
+      { name: 'blue', type: 'color', default: '#1aa3e0' },
+      { name: 'lime', type: 'color', default: '#9ccc3a' },
+      { name: 'pink', type: 'color', default: '#e8458b' },
+      { name: 'purple', type: 'color', default: '#8e5bb5' },
+      { name: 'radius', type: 'range', min: 0, max: 16, step: 1, default: 6, unit: 'px' },
+    ],
+    fill: true,
+    preview: (p) => <FlatDashboardProfiles {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['FlatDashboardProfiles.jsx'],
     deps: [],
   },
   {

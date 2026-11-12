@@ -20,6 +20,9 @@ dispose of its geometry, materials and textures.
 | ✓ | 1. Mechanical keyboard |
 | ✓ | 2. Lighter |
 | ✓ | 3. Pocket knife |
+| ✓ | 4. Tape measure |
+| ✓ | 8. Analog alarm clock |
+| ✓ | 9. Desk lamp |
 | ✓ | 68. Newton's cradle |
 | ✓ | Typewriter (extra, not one of the 100) |
 
@@ -49,7 +52,7 @@ headphones, tablet bot and tablet.
 - **Controls:** number of tools, scale colour, steel finish, blade shape.
 - **Detail:** tools pivot on a shared rivet and nest in separate liners, so they never pass through each other when closed.
 
-### 4. Tape measure
+### 4. Tape measure ✓
 - **Interaction:** drag the hook out to pull the blade; release and it reels back, or press the lock to hold it.
 - **Sound:** a fast ratchet buzz on retraction and a thunk when the hook hits the case.
 - **Controls:** case colour, blade colour, units (metric or imperial), lock on or off.
@@ -73,13 +76,13 @@ headphones, tablet bot and tablet.
 - **Controls:** barrel colour, trim (gold, silver, black), nib size, ink colour.
 - **Detail:** a two-tone nib with a slit and breather hole, and a clip that flexes slightly as the cap slides on.
 
-### 8. Analog alarm clock
+### 8. Analog alarm clock ✓
 - **Interaction:** drag the hands to set a time; set the alarm hand and it rings when the time comes; tap the top to stop it.
 - **Sound:** a ticking second hand and a hammer ringing between two bells.
 - **Controls:** case colour, dial style, live time, alarm time, bell finish.
 - **Detail:** the hammer swings between the bells and the whole clock judders across the surface while ringing.
 
-### 9. Desk lamp
+### 9. Desk lamp ✓
 - **Interaction:** drag the head and the arm segments to pose it; click the switch to turn it on.
 - **Sound:** a click on the switch.
 - **Controls:** body colour, light colour and brightness, arm length.
