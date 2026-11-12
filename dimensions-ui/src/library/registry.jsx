@@ -115,6 +115,7 @@ import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
+import LadderModel from '../lib/LadderModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -137,7 +138,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../ladder/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1820,6 +1821,40 @@ const ALL_COMPONENTS = [
     preview: (p) => <DiceModel {...p} height="100%" />,
     fill: true,
     files: ['DiceModel.jsx', 'dice/DiceScene.jsx', 'dice/Dice.jsx', 'dice/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'ladder',
+    name: 'Ladder',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A wooden ladder against a wall on real friction physics: lean it too far and it slides down and crashes. Hang the paint can higher and it slips sooner.',
+    controls: [
+      { name: 'floorFriction', type: 'range', min: 0.05, max: 1, step: 0.05, default: 0.4 },
+      { name: 'wallFriction', type: 'range', min: 0, max: 1, step: 0.05, default: 0.25 },
+      { name: 'load', type: 'range', min: 0, max: 2, step: 0.1, default: 0.6 },
+      { name: 'rung', type: 'range', min: 0, max: 6, step: 1, default: 5 },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Pine', values: { woodColor: '#c88a43', canColor: '#2f6db5', wallColor: '#e6e4df', floorColor: '#d3cfc6' } },
+          { name: 'Oak', values: { woodColor: '#9c6a36', canColor: '#c8432b', wallColor: '#ece6da', floorColor: '#bfae92' } },
+          { name: 'Ash', values: { woodColor: '#e0c49a', canColor: '#2d2d30', wallColor: '#f2f1ee', floorColor: '#dcdad4' } },
+          { name: 'Walnut', values: { woodColor: '#6b4428', canColor: '#e2b33c', wallColor: '#2c2c2f', floorColor: '#3a3936' } },
+        ],
+      },
+      { name: 'woodColor', type: 'color', default: '#c88a43' },
+      { name: 'canColor', type: 'color', default: '#2f6db5' },
+      { name: 'wallColor', type: 'color', default: '#e6e4df' },
+      { name: 'floorColor', type: 'color', default: '#d3cfc6' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking a rung moves the can).
+    preview: (p, set) => <LadderModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['LadderModel.jsx', 'ladder/LadderScene.jsx', 'ladder/Ladder.jsx', 'ladder/physics.js', 'ladder/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
