@@ -6,6 +6,44 @@ open or fold, drag to orbit, drag to spin, double-tap to bounce and keyboard
 driving; these build out from there. Each should respect reduced-motion
 settings and work with touch as well as a mouse.
 
+## Status
+
+Ideas 1 to 30 are built; each is a component in the library (slug in
+brackets). 31 to 50 are still open.
+
+| Built | Idea | Component |
+| --- | --- | --- |
+| ✓ | 1. Peek | Peek Card (`peek-card`) |
+| ✓ | 2. Hover scrub | Hover Scrub (`hover-scrub`) |
+| ✓ | 3. Cursor trail | Cursor Trail (`cursor-trail`) |
+| ✓ | 4. Custom cursor | Morph Cursor (`morph-cursor`) |
+| ✓ | 5. Tilt-to-reveal | Tilt Reveal (`tilt-reveal`) |
+| ✓ | 6. Proximity glow | Proximity Glow (`proximity-glow`) |
+| ✓ | 7. Long-hover tooltip | Long-hover Preview (`long-hover-preview`) |
+| ✓ | 8. Edge hover nav | Edge Peek Nav (`edge-peek-nav`) |
+| ✓ | 9. Inertia and snap | Inertia Snap (`inertia-snap`) |
+| ✓ | 10. Throwable cards | Throw Cards (`throw-cards`) |
+| ✓ | 11. Drag to reorder | Drag Reorder (`drag-reorder`) |
+| ✓ | 12. Pull-to-refresh | Pull Refresh (`pull-refresh`) |
+| ✓ | 13. Over-scroll slider | Rubber Slider (`rubber-slider`) |
+| ✓ | 14. Drag the 3D model | Drag Model (`drag-model`) |
+| ✓ | 15. Rope | Rope Sway (`rope-sway`) |
+| ✓ | 16. Following drawer | Follow Drawer (`follow-drawer`) |
+| ✓ | 17. Hold to confirm | Hold Button (`hold-button`) |
+| ✓ | 18. Tap ripple | Tap Ripple (`tap-ripple`) |
+| ✓ | 19. Tap to cycle presets | Preset Cycle (`preset-cycle`) |
+| ✓ | 20. Double-tap to like | Double-tap Like (`double-tap-like`) |
+| ✓ | 21. Tap to isolate a part | Isolate Part (`isolate-part`) |
+| ✓ | 22. Long-press wobble edit | Wobble Edit (`wobble-edit`) |
+| ✓ | 23. Hold to preview | Hold Preview (`hold-preview`) |
+| ✓ | 24. Hotspot annotations | Hotspot Notes (`hotspot-notes`) |
+| ✓ | 25. Scroll-linked assembly | Scroll Assembly (`scroll-assembly`) |
+| ✓ | 26. Scroll to rotate | Scroll Rotate (`scroll-rotate`) |
+| ✓ | 27. Horizontal scroll gallery | Scroll Gallery (`scroll-gallery`) |
+| ✓ | 28. Scroll velocity skew | Scroll Skew (`scroll-skew`) |
+| ✓ | 29. Snapping sections | Snap Rail (`snap-rail`) |
+| ✓ | 30. Scroll-to-explode | Scroll Explode (`scroll-explode`) |
+
 ## Pointer and hover
 
 1. Peek: hovering a card lifts it and shows its back edge
