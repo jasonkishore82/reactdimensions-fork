@@ -89,11 +89,105 @@ function turning(steer) {
   return { R, wheels: [yaw(TRACK), yaw(-TRACK)], gamma }
 }
 
+// how far in from the wheel centre the spindle reaches; the axle beam ends there
+const HUB_IN = 0.3
+const AXLE_END = TRACK - HUB_IN
+const AXLE_R = 0.065
+const AXLE_TOP = WHEEL_Y + AXLE_R
+
+// An axle beam between a pair of wheels' spindles, with leaf springs clamped
+// on by U-bolts at z = ±springZ, rising to the frame at frameY. Front: kingpin
+// bosses at the beam ends that the steered wheels turn about. Drive: the
+// differential housing in the middle.
+function Axle({ x, springZ, frameY, railZ, springLen = 1.2, front = false, drive = false }) {
+  const springY = AXLE_TOP + 0.03
+  const dark = { color: '#26292d', metalness: 0.6, roughness: 0.55 }
+  return (
+    <group position={[x, 0, 0]}>
+      <mesh position-y={WHEEL_Y} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[AXLE_R, AXLE_R, 2 * AXLE_END, 16]} />
+        <meshStandardMaterial {...dark} />
+      </mesh>
+      {front &&
+        [-1, 1].map((s) => (
+          <mesh key={s} position={[0, WHEEL_Y, s * AXLE_END]}>
+            <cylinderGeometry args={[0.07, 0.07, 0.26, 14]} />
+            <meshStandardMaterial {...dark} />
+          </mesh>
+        ))}
+      {drive && (
+        <>
+          <mesh position-y={WHEEL_Y} scale={[1, 1, 1.15]} castShadow>
+            <sphereGeometry args={[0.2, 20, 14]} />
+            <meshStandardMaterial {...dark} />
+          </mesh>
+          {/* the pinion nose, pointing forward to the prop shaft */}
+          <mesh position={[0.22, WHEEL_Y, 0]} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.07, 0.1, 0.16, 14]} />
+            <meshStandardMaterial {...dark} />
+          </mesh>
+        </>
+      )}
+      {[-1, 1].map((s) => (
+        <group key={s} position-z={s * springZ}>
+          {/* leaf spring pack: three leaves, longest on top */}
+          {[0, 1, 2].map((i) => (
+            <mesh key={i} position-y={springY + 0.035 - i * 0.025}>
+              <boxGeometry args={[springLen * (1 - i * 0.22), 0.022, 0.08]} />
+              <meshStandardMaterial {...dark} />
+            </mesh>
+          ))}
+          {/* U-bolts round the axle and a clamp plate */}
+          <mesh position-y={springY + 0.06}>
+            <boxGeometry args={[0.2, 0.03, 0.12]} />
+            <meshStandardMaterial {...dark} />
+          </mesh>
+          {[-0.07, 0.07].map((dx) => (
+            <mesh key={dx} position={[dx, (WHEEL_Y - AXLE_R + springY + 0.06) / 2, 0]}>
+              <boxGeometry args={[0.025, springY + 0.06 - (WHEEL_Y - AXLE_R), 0.1]} />
+              <meshStandardMaterial color="#5c6168" metalness={0.8} roughness={0.4} />
+            </mesh>
+          ))}
+          {/* hangers from the frame down to the spring eyes */}
+          {[-1, 1].map((e) => (
+            <group key={e} position-x={(e * springLen) / 2}>
+              <mesh position-y={(springY + 0.04 + frameY) / 2}>
+                <boxGeometry args={[0.1, frameY - springY - 0.04 + 0.02, 0.1]} />
+                <meshStandardMaterial {...dark} />
+              </mesh>
+              {/* outboard springs: a bracket back in to the side of the rail */}
+              {railZ != null && (
+                <mesh position={[0, frameY - 0.03, (s * (railZ - springZ + 0.05)) / 2]}>
+                  <boxGeometry args={[0.1, 0.06, springZ + 0.05 - railZ]} />
+                  <meshStandardMaterial {...dark} />
+                </mesh>
+              )}
+              <mesh position-y={springY + 0.035} rotation-x={Math.PI / 2}>
+                <cylinderGeometry args={[0.035, 0.035, 0.12, 10]} />
+                <meshStandardMaterial color="#5c6168" metalness={0.8} roughness={0.4} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      ))}
+    </group>
+  )
+}
+
 function Wheel({ x, z, spin, steer }) {
   const side = z > 0 ? 1 : -1
   return (
     <group position={[x, WHEEL_Y, z]}>
       <group ref={steer}>
+        {/* brake drum behind the wheel, and the stub spindle into the axle end */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -side * 0.17]}>
+          <cylinderGeometry args={[0.28, 0.28, 0.08, 28]} />
+          <meshStandardMaterial color="#3b3f45" metalness={0.6} roughness={0.55} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -side * (HUB_IN + 0.21) / 2]}>
+          <cylinderGeometry args={[0.06, 0.06, HUB_IN - 0.21, 14]} />
+          <meshStandardMaterial color="#5c6168" metalness={0.8} roughness={0.4} />
+        </mesh>
         <group ref={(g) => g && !spin.current.includes(g) && spin.current.push(g)}>
           <mesh castShadow>
             <torusGeometry args={[0.42, 0.14, 14, 32]} />
@@ -476,6 +570,11 @@ export default function Lorry({
             <meshStandardMaterial map={plateTex} emissiveMap={plateTex} emissive="#ffffff" emissiveIntensity={0.35} roughness={0.4} />
           </mesh>
 
+          {/* axles on leaf springs, just outboard of the chassis rails on brackets */}
+          <Axle x={FRONT_AXLE} springZ={0.72} frameY={0.86} railZ={0.63} front />
+          {DRIVE_AXLES.map((x) => (
+            <Axle key={x} x={x} springZ={0.72} frameY={0.86} railZ={0.63} springLen={0.95} drive />
+          ))}
           {/* wheels: the front pair steer */}
           <Wheel x={FRONT_AXLE} z={TRACK} spin={spin} steer={steerR} />
           <Wheel x={FRONT_AXLE} z={-TRACK} spin={spin} steer={steerL} />
@@ -619,6 +718,10 @@ export default function Lorry({
             <planeGeometry args={[0.9, 0.225]} />
             <meshStandardMaterial map={plateTex} emissiveMap={plateTex} emissive="#ffffff" emissiveIntensity={0.25} />
           </mesh>
+          {/* axles on leaf springs, hung from the main beams */}
+          {TRAILER_AXLES.map((x) => (
+            <Axle key={x} x={x} springZ={0.45} frameY={FIFTH_TOP} springLen={1.1} />
+          ))}
           {TRAILER_AXLES.flatMap((x) => [<Wheel key={`${x}a`} x={x} z={TRACK} spin={spin} />, <Wheel key={`${x}b`} x={x} z={-TRACK} spin={spin} />])}
         </group>
       </group>

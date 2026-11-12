@@ -1,6 +1,7 @@
 import TiltCard from '../lib/TiltCard.jsx'
 import SpringButton from '../lib/SpringButton.jsx'
 import MagneticButton from '../lib/MagneticButton.jsx'
+import HandwritingText from '../lib/HandwritingText.jsx'
 import MeasureText from '../lib/MeasureText.jsx'
 import DecodeText from '../lib/DecodeText.jsx'
 import DraftingGrid from '../lib/DraftingGrid.jsx'
@@ -81,6 +82,8 @@ import LorryModel from '../lib/LorryModel.jsx'
 import ClockModel from '../lib/ClockModel.jsx'
 import LampModel from '../lib/LampModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
+import ButterflyModel from '../lib/ButterflyModel.jsx'
+import OceanModel from '../lib/OceanModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -103,7 +106,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -115,7 +118,7 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 // files stay as they are; take a category out of this list to show it again.
 export const HIDDEN_CATEGORIES = ['Icons & Emojis']
 
-const ALL_CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
+const ALL_CATEGORIES = ['Text', 'Animation', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
 export const CATEGORIES = ALL_CATEGORIES.filter((c) => !HIDDEN_CATEGORIES.includes(c))
 
 // The UI section is grouped by visual style, in this order.
@@ -194,7 +197,7 @@ const ALL_COMPONENTS = [
   {
     slug: 'tilt-card',
     name: 'Tilt Card',
-    category: 'Interactions',
+    category: 'Animation',
     description: 'A card that tilts toward the pointer with moving glare.',
     controls: [
       { name: 'maxTilt', type: 'range', min: 2, max: 30, step: 1, default: 14, unit: '°' },
@@ -221,7 +224,7 @@ const ALL_COMPONENTS = [
   {
     slug: 'spring-button',
     name: 'Spring Button',
-    category: 'Interactions',
+    category: 'Animation',
     isNew: true,
     description: 'A button that presses in and springs back.',
     controls: [
@@ -237,7 +240,7 @@ const ALL_COMPONENTS = [
   {
     slug: 'magnetic-button',
     name: 'Magnetic Button',
-    category: 'Interactions',
+    category: 'Animation',
     description: 'A button that pulls toward the cursor when it gets close.',
     controls: [
       { name: 'strength', type: 'range', min: 0.1, max: 1, step: 0.05, default: 0.4 },
@@ -247,6 +250,28 @@ const ALL_COMPONENTS = [
     ],
     preview: (p) => <MagneticButton {...p}>Come closer</MagneticButton>,
     files: ['MagneticButton.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'handwriting-text',
+    name: 'Handwriting Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Cursive text written stroke by stroke, letter by letter, as if by hand.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Hello there' },
+      { name: 'speed', type: 'range', min: 20, max: 300, step: 5, default: 70 },
+      { name: 'frameRate', type: 'range', min: 0, max: 60, step: 1, default: 30, unit: 'fps' },
+      { name: 'wordPause', type: 'range', min: 0, max: 1, step: 0.05, default: 0.25, unit: 's' },
+      { name: 'slant', type: 'range', min: 0, max: 25, step: 1, default: 10, unit: '°' },
+      { name: 'color', type: 'color', default: '#1d2b4f' },
+      { name: 'strokeWidth', type: 'range', min: 0.6, max: 4, step: 0.1, default: 1.3 },
+      { name: 'loop', type: 'toggle', default: false },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <HandwritingText {...p} />,
+    files: ['HandwritingText.jsx'],
     deps: [],
   },
   {
@@ -1029,7 +1054,7 @@ const ALL_COMPONENTS = [
     name: 'Desk Lamp',
     category: '3D & Materials',
     isNew: true,
-    description: 'A balanced-arm lamp with a real spotlight. Drag the arms to pose it, the springs stretch as the joints open, and the light falls on the desk.',
+    description: 'A balanced-arm lamp, plugged into a power strip, with a real spotlight. Drag the arms to pose it: the joints swing and settle with weight, the springs stretch, and the shade stops at the desk, the base and its own arm instead of passing through.',
     controls: [
       {
         name: 'palette',
@@ -1084,6 +1109,72 @@ const ALL_COMPONENTS = [
     preview: (p, set) => <TapeModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['TapeModel.jsx', 'tape/TapeScene.jsx', 'tape/Tape.jsx', 'tape/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'butterfly',
+    name: 'Butterfly',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A butterfly basking on a coneflower. Click it to take off and it flutters round, following the pointer; click the flower and it settles back down.',
+    controls: [
+      { name: 'species', type: 'select', options: ['monarch', 'morpho', 'swallowtail', 'peacock', 'cabbage white', 'glasswing'], default: 'monarch' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Coneflower', values: { petalColor: '#d9568c', centerColor: '#ffffff' } },
+          { name: 'Daisy', values: { petalColor: '#f7f5ee', centerColor: '#ffd23a' } },
+          { name: 'Sunflower', values: { petalColor: '#f5b51f', centerColor: '#8a6a50' } },
+          { name: 'Lavender', values: { petalColor: '#9b7fd6', centerColor: '#ffe9a8' } },
+        ],
+      },
+      { name: 'flying', type: 'toggle', default: false },
+      { name: 'follow', type: 'toggle', default: true },
+      { name: 'speed', type: 'range', min: 0.5, max: 1.6, step: 0.1, default: 1 },
+      { name: 'petalColor', type: 'color', default: '#d9568c' },
+      { name: 'centerColor', type: 'color', default: '#ffffff' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking the butterfly toggles flying).
+    preview: (p, set) => <ButterflyModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['ButterflyModel.jsx', 'butterfly/ButterflyScene.jsx', 'butterfly/Butterfly.jsx', 'butterfly/wings.js', 'butterfly/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'ocean',
+    name: 'Ocean',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'An open sea of Gerstner waves under a physical sky, with reflections, light through the crests and whitecaps. A buoy rides the waves; click the water to send it there.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Dawn', values: { elevation: 6, azimuth: -140, exposure: 0.5, deepColor: '#0b2c3d', scatterColor: '#1f8f7f' } },
+          { name: 'Noon', values: { elevation: 55, azimuth: -140, exposure: 0.35, deepColor: '#08324a', scatterColor: '#2aa59a' } },
+          { name: 'Sunset', values: { elevation: 2, azimuth: 20, exposure: 0.6, deepColor: '#10202e', scatterColor: '#1c6f72' } },
+          { name: 'Tropical', values: { elevation: 40, azimuth: -60, exposure: 0.4, deepColor: '#035a6e', scatterColor: '#3fd6c0' } },
+        ],
+      },
+      { name: 'elevation', type: 'range', min: 0, max: 90, step: 0.5, default: 6, unit: '°' },
+      { name: 'azimuth', type: 'range', min: -180, max: 180, step: 1, default: -140, unit: '°' },
+      { name: 'exposure', type: 'range', min: 0.1, max: 1.5, step: 0.01, default: 0.5 },
+      { name: 'chop', type: 'range', min: 0.1, max: 1.15, step: 0.01, default: 1 },
+      { name: 'speed', type: 'range', min: 0, max: 3, step: 0.05, default: 1 },
+      { name: 'foam', type: 'range', min: 0.3, max: 1.2, step: 0.01, default: 0.8 },
+      { name: 'deepColor', type: 'color', default: '#0b2c3d' },
+      { name: 'scatterColor', type: 'color', default: '#1f8f7f' },
+      { name: 'buoy', type: 'toggle', default: true },
+      { name: 'buoyColor', type: 'color', default: '#d0342c' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <OceanModel {...p} height="100%" />,
+    fill: true,
+    files: ['OceanModel.jsx', 'ocean/OceanScene.jsx', 'ocean/Ocean.jsx', 'ocean/oceanShader.js', 'ocean/waves.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
