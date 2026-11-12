@@ -114,6 +114,7 @@ import LampModel from '../lib/LampModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
+import DiceModel from '../lib/DiceModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -136,7 +137,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1788,6 +1789,37 @@ const ALL_COMPONENTS = [
     preview: (p) => <OceanModel {...p} height="100%" />,
     fill: true,
     files: ['OceanModel.jsx', 'ocean/OceanScene.jsx', 'ocean/Ocean.jsx', 'ocean/oceanShader.js', 'ocean/waves.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'dice',
+    name: 'Dice',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Roll a pair of dice into the tray: they tumble, bounce off the rim and each other, settle flat and add up. Drag one to fling it, click one to flip it.',
+    controls: [
+      { name: 'count', type: 'range', min: 1, max: 6, step: 1, default: 2 },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Studio', values: { dieColor: '#f5f5f3', pipColor: '#0b0b0c', feltColor: '#cfcfcf', rimColor: '#b9b9b9', background: '#cdcdcd' } },
+          { name: 'Casino', values: { dieColor: '#c8102e', pipColor: '#f7f3ea', feltColor: '#1f5c3f', rimColor: '#6b3f22', background: '#20372c' } },
+          { name: 'Ivory', values: { dieColor: '#efe6d2', pipColor: '#7a1c16', feltColor: '#2b2b30', rimColor: '#1c1c20', background: '#1a1a1d' } },
+          { name: 'Ink', values: { dieColor: '#17181b', pipColor: '#f2f2f0', feltColor: '#d9d4cb', rimColor: '#c4beb2', background: '#e4e0d8' } },
+        ],
+      },
+      { name: 'dieColor', type: 'color', default: '#f5f5f3' },
+      { name: 'pipColor', type: 'color', default: '#0b0b0c' },
+      { name: 'feltColor', type: 'color', default: '#cfcfcf' },
+      { name: 'rimColor', type: 'color', default: '#b9b9b9' },
+      { name: 'background', type: 'color', default: '#cdcdcd' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <DiceModel {...p} height="100%" />,
+    fill: true,
+    files: ['DiceModel.jsx', 'dice/DiceScene.jsx', 'dice/Dice.jsx', 'dice/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
