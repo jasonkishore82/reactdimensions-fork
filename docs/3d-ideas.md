@@ -27,6 +27,7 @@ dispose of its geometry, materials and textures.
 | ✓ | Typewriter (extra, not one of the 100) |
 | ✓ | Dice (extra: rigid-body physics, no physics library) |
 | ✓ | Ladder (extra: friction statics against a wall, checked against the textbook slip angle) |
+| ✓ | Shirt (extra: cloth simulation, buttons as constraints, oxford, poplin, linen and denim) |
 
 Already in the library but not on this list: clear-coat card, pickup, snake,
 turntable, vinyl record, sunglasses, watch, laptop, glass bottle, TV, phone,

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
+import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, OBJECT_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
 import { highlight } from './highlight.js'
 import { markdownFor, openPromptFor, promptFor, sourceText, typesFor } from './ai.js'
 import { Icon } from '../Nav.jsx'
@@ -42,7 +42,7 @@ function CopyChip({ code }) {
 }
 
 // Categories whose pages are split into sections.
-const SECTIONS = { UI: UI_STYLES, 'Icons & Emojis': ICON_STYLES }
+const SECTIONS = { UI: UI_STYLES, '3D & Materials': OBJECT_STYLES, 'Icons & Emojis': ICON_STYLES }
 
 const COMING_SOON = ['Phone UI', 'Icons & Emojis']
 
@@ -517,9 +517,9 @@ export function CategoryPage() {
   const name = cat === 'all' ? 'All' : CATEGORIES.find((c) => catSlug(c) === cat)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('az')
-  // A sectioned category (styles, or icons and emojis) always shows one section
-  // at a time, starting with the first; there is no combined "all styles" view.
-  const firstStyle = SECTIONS[name]?.[0] ?? 'All'
+  // A sectioned category (styles, or icons and emojis) opens on "All
+  // components", with a chip per section to narrow it down.
+  const firstStyle = 'All'
   const [style, setStyle] = useState(firstStyle)
   const [drawer, setDrawer] = useState(false)
   const [favs] = useFavs()
@@ -561,6 +561,9 @@ export function CategoryPage() {
         </header>
         {SECTIONS[name] && (
           <div className="style-chips" role="group" aria-label="Filter by style">
+            <button aria-pressed={style === 'All'} onClick={() => setStyle('All')}>
+              All components<span>{COMPONENTS.filter((c) => c.category === name).length}</span>
+            </button>
             {SECTIONS[name].map((st) => {
               const n = COMPONENTS.filter((c) => c.category === name && c.style === st).length
               return (
