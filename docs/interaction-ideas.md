@@ -8,8 +8,8 @@ settings and work with touch as well as a mouse.
 
 ## Status
 
-Ideas 1 to 30 are built; each is a component in the library (slug in
-brackets). 31 to 50 are still open.
+Ideas 1 to 32 are built; each is a component in the library (slug in
+brackets). 33 to 50 are still open.
 
 | Built | Idea | Component |
 | --- | --- | --- |
@@ -43,6 +43,8 @@ brackets). 31 to 50 are still open.
 | ✓ | 28. Scroll velocity skew | Scroll Skew (`scroll-skew`) |
 | ✓ | 29. Snapping sections | Snap Rail (`snap-rail`) |
 | ✓ | 30. Scroll-to-explode | Scroll Explode (`scroll-explode`) |
+| ✓ | 31. Sticky product shot that changes colour | Sticky Color (`sticky-color`) |
+| ✓ | 32. Reading progress as a 3D ring | Reading Ring (`reading-ring`) |
 
 ## Pointer and hover
 
