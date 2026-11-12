@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
 import { highlight } from './highlight.js'
-import { markdownFor, promptFor, sourceText, typesFor } from './ai.js'
+import { markdownFor, openPromptFor, promptFor, sourceText, typesFor } from './ai.js'
 import { Icon } from '../Nav.jsx'
 import './library.css'
 
@@ -267,6 +267,13 @@ function AiMenu({ comp, props }) {
     setOpen(false)
     setTimeout(() => setDone(''), 1800)
   }
+  // Open an assistant with a short prompt that links to this page, the
+  // component's registry JSON and llms.txt (the assistant fetches the source).
+  const openIn = (base) => {
+    const q = openPromptFor(comp, props, window.location.origin)
+    window.open(base + encodeURIComponent(q), '_blank', 'noopener,noreferrer')
+    setOpen(false)
+  }
   return (
     <div className="ai-menu" ref={box}>
       <button className="tool-btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -276,7 +283,7 @@ function AiMenu({ comp, props }) {
         <div className="ai-pop" role="menu">
           <button role="menuitem" onClick={() => copy('Prompt copied', promptFor(comp, props))}>
             <strong>Copy as prompt</strong>
-            <small>Description, props, usage and source, ready to paste into an assistant</small>
+            <small>Usage, props table, full source and integration steps, ready to paste into an assistant</small>
           </button>
           <button role="menuitem" onClick={() => copy('Markdown copied', markdownFor(comp, props))}>
             <strong>Copy as Markdown</strong>
@@ -285,6 +292,20 @@ function AiMenu({ comp, props }) {
           <button role="menuitem" onClick={() => copy('Source copied', sourceText(comp))}>
             <strong>Copy source only</strong>
             <small>{comp.files.length} file{comp.files.length > 1 ? 's' : ''}, with file names as comments</small>
+          </button>
+          <div className="ai-sep" role="separator" />
+          <button role="menuitem" className="ai-open" onClick={() => openIn('https://chatgpt.com/?q=')}>
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden="true">
+              <path d="M10 2.8l6.2 3.6v7.2L10 17.2l-6.2-3.6V6.4z" />
+              <path d="M10 2.8v7.2l6.2 3.6M10 10l-6.2 3.6M3.8 6.4L10 10" />
+            </svg>
+            <strong>Open in ChatGPT</strong>
+          </button>
+          <button role="menuitem" className="ai-open" onClick={() => openIn('https://claude.ai/new?q=')}>
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+              <path d="M10 2.5v15M2.5 10h15M4.7 4.7l10.6 10.6M15.3 4.7L4.7 15.3M6.2 3.4l7.6 13.2M13.8 3.4L6.2 16.6" />
+            </svg>
+            <strong>Open in Claude</strong>
           </button>
         </div>
       )}
