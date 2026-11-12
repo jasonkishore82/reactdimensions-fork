@@ -115,7 +115,9 @@ import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
+import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import LadderModel from '../lib/LadderModel.jsx'
+import ShirtModel from '../lib/ShirtModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -138,7 +140,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../ladder/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -149,6 +151,9 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 // Categories kept in the code but not shown on the site. Their components and
 // files stay as they are; take a category out of this list to show it again.
 export const HIDDEN_CATEGORIES = ['Icons & Emojis']
+// Individual components kept in the code but left out of the site (the
+// sidebar, the section pages, search and the generated registry files).
+export const HIDDEN_COMPONENTS = ['shirt']
 
 const ALL_CATEGORIES = ['Text', 'Animation', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
 export const CATEGORIES = ALL_CATEGORIES.filter((c) => !HIDDEN_CATEGORIES.includes(c))
@@ -157,6 +162,9 @@ export const CATEGORIES = ALL_CATEGORIES.filter((c) => !HIDDEN_CATEGORIES.includ
 export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism', 'Skeuomorphism']
 
 export const ICON_STYLES = ['Icons', 'Emojis']
+
+// sections of the 3D & Materials category, in the order they are shown
+export const OBJECT_STYLES = ['Tech & gadgets', 'Everyday objects', 'Physics & play', 'Vehicles', 'Nature & world', 'Interactive 3D']
 
 // Basic outline icons share one set of controls; each file is standalone.
 const icon = (Comp, file, slug, name, description) => ({
@@ -671,6 +679,7 @@ const ALL_COMPONENTS = [
     slug: 'scroll-rotate',
     name: 'Scroll Rotate',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'Scroll through the section and the bottle turns a full circle, easing to a stop, with an angle readout and progress rail.',
     controls: [
@@ -758,6 +767,7 @@ const ALL_COMPONENTS = [
     slug: 'scroll-explode',
     name: 'Scroll Explode',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'Scroll down and the phone comes apart into labelled layers without any part touching another; scroll back up and it snaps together again.',
     controls: [
@@ -779,6 +789,7 @@ const ALL_COMPONENTS = [
     slug: 'drag-model',
     name: 'Drag Model',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'Pick up a little radio and carry it across the floor: it lifts while held, leans with its speed, drops with a small bounce, and its soft shadow spreads as it rises.',
     controls: [
@@ -797,6 +808,7 @@ const ALL_COMPONENTS = [
     slug: 'rope-sway',
     name: 'Rope Sway',
     category: '3D & Materials',
+    style: 'Physics & play',
     isNew: true,
     description: 'A cable hangs from a hook with a plug on its end; drag the plug anywhere and the whole cable follows, then swings and settles when you let go, never stretching past its length.',
     controls: [
@@ -816,6 +828,7 @@ const ALL_COMPONENTS = [
     slug: 'isolate-part',
     name: 'Isolate Part',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'Tap any part of an exploded camera to isolate it: the rest fade to grey ghosts, the view eases in to frame it and a label names it; tap away or press Escape to restore.',
     controls: [
@@ -834,6 +847,7 @@ const ALL_COMPONENTS = [
     slug: 'hotspot-notes',
     name: 'Hotspot Notes',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'A smart speaker with pulsing hotspots: click one to open a note card beside it as the camera turns to face it, and hotspots hidden behind the speaker fade away.',
     controls: [
@@ -853,6 +867,7 @@ const ALL_COMPONENTS = [
     slug: 'scroll-assembly',
     name: 'Scroll Assembly',
     category: '3D & Materials',
+    style: 'Interactive 3D',
     isNew: true,
     description: 'Scroll inside the box and a little robot builds itself, each part flying in from a scattered pose one after another, with captions and a progress rail for each stage.',
     controls: [
@@ -893,6 +908,7 @@ const ALL_COMPONENTS = [
     slug: 'clearcoat-card',
     name: 'Clear-coat Card',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A glossy 3D card you can drag, flip and customize.',
     controls: [
@@ -924,6 +940,7 @@ const ALL_COMPONENTS = [
     slug: 'pickup',
     name: 'Pickup',
     category: '3D & Materials',
+    style: 'Vehicles',
     isNew: true,
     description: 'An angular electric pickup you can orbit and drive.',
     controls: [
@@ -942,6 +959,7 @@ const ALL_COMPONENTS = [
     slug: 'snake',
     name: 'Snake',
     category: '3D & Materials',
+    style: 'Nature & world',
     isNew: true,
     description: 'A coiled 3D snake whose head follows the pointer.',
     controls: [
@@ -979,6 +997,7 @@ const ALL_COMPONENTS = [
     slug: 'turntable',
     name: 'Turntable',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A record player you can power on, cue and scratch.',
     controls: [
@@ -1025,6 +1044,7 @@ const ALL_COMPONENTS = [
     slug: 'vinyl-record',
     name: 'Vinyl Record',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A spinning vinyl record with a printed label and sleeve.',
     controls: [
@@ -1061,6 +1081,7 @@ const ALL_COMPONENTS = [
     slug: 'sunglasses',
     name: 'Sunglasses',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'Parametric sunglasses with six frame shapes and tinted lenses.',
     controls: [
@@ -1105,6 +1126,7 @@ const ALL_COMPONENTS = [
     slug: 'watch',
     name: 'Watch',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'An analog or smart watch with swappable straps.',
     controls: [
@@ -1145,6 +1167,7 @@ const ALL_COMPONENTS = [
     slug: 'laptop',
     name: 'Laptop',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A thin aluminium laptop with a lid that opens and closes.',
     controls: [
@@ -1180,6 +1203,7 @@ const ALL_COMPONENTS = [
     slug: 'glass-bottle',
     name: 'Glass Bottle',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A swing-top glass bottle with real refraction.',
     controls: [
@@ -1216,6 +1240,7 @@ const ALL_COMPONENTS = [
     slug: 'book',
     name: 'Book',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A hardback book with your own title, logo, colours and pages that bend as they turn.',
     controls: [
@@ -1261,6 +1286,7 @@ const ALL_COMPONENTS = [
     slug: 'tv',
     name: 'TV',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A TV you can resize from 32 to 100 inches at true scale.',
     controls: [
@@ -1300,6 +1326,7 @@ const ALL_COMPONENTS = [
     slug: 'phone',
     name: 'Phone',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A modern smartphone at real size that flips on click.',
     controls: [
@@ -1337,6 +1364,7 @@ const ALL_COMPONENTS = [
     slug: 'headphones',
     name: 'Headphones',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'Over-ear headphones with cups that slide and fold.',
     controls: [
@@ -1376,6 +1404,7 @@ const ALL_COMPONENTS = [
     slug: 'ipad-bot',
     name: 'Tablet Bot',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A tablet on a rolling stand whose screen is a face: eyes that follow you, six moods and a talking mouth.',
     controls: [
@@ -1408,6 +1437,7 @@ const ALL_COMPONENTS = [
     slug: 'tablet',
     name: 'Tablet',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'A slim aluminium tablet with a live home screen, in landscape or portrait, that flips over to show its back.',
     controls: [
@@ -1442,6 +1472,7 @@ const ALL_COMPONENTS = [
     slug: 'newtons-cradle',
     name: "Newton's Cradle",
     category: '3D & Materials',
+    style: 'Physics & play',
     isNew: true,
     description: 'Chrome balls on strings with real pendulum physics: lift an end ball, let go, and the swing passes through the row.',
     controls: [
@@ -1476,6 +1507,7 @@ const ALL_COMPONENTS = [
     slug: 'mechanical-keyboard',
     name: 'Mechanical Keyboard',
     category: '3D & Materials',
+    style: 'Tech & gadgets',
     isNew: true,
     description: 'Type on your real keyboard and the matching keycap travels down. Sculpted rows, wire-stabilised space bar, switch sounds and RGB.',
     controls: [
@@ -1513,6 +1545,7 @@ const ALL_COMPONENTS = [
     slug: 'typewriter',
     name: 'Typewriter',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'Type and a typebar swings up to strike the platen, ink lands on the paper and the carriage steps along. Bell, lever and line feed included.',
     controls: [
@@ -1545,6 +1578,7 @@ const ALL_COMPONENTS = [
     slug: 'lighter',
     name: 'Lighter',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A flip-top lighter: the lid snaps open on its hinge, the flint wheel throws sparks, and the flame flickers and leans in the wind.',
     controls: [
@@ -1567,6 +1601,7 @@ const ALL_COMPONENTS = [
     slug: 'pocket-knife',
     name: 'Pocket Knife',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A multi-tool with a blade, small blade, bottle opener and saw on two rivets. Drag a tool to fold it out; it snaps to closed, half open or open.',
     controls: [
@@ -1598,6 +1633,7 @@ const ALL_COMPONENTS = [
     slug: 'lorry',
     name: 'Lorry',
     category: '3D & Materials',
+    style: 'Vehicles',
     isNew: true,
     description: 'An articulated lorry whose trailer pivots on its kingpin as it steers. Drive it round the yard, open the rear doors, switch on the lights.',
     controls: [
@@ -1635,6 +1671,7 @@ const ALL_COMPONENTS = [
     slug: 'alarm-clock',
     name: 'Alarm Clock',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A twin-bell alarm clock on the live time. Drag the hands to set it; at the alarm the hammer beats the bells and the clock dances on its feet.',
     controls: [
@@ -1668,6 +1705,7 @@ const ALL_COMPONENTS = [
     slug: 'desk-lamp',
     name: 'Desk Lamp',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'A balanced-arm lamp, plugged into a power strip, with a real spotlight. Drag the arms to pose it: the joints swing and settle with weight, the springs stretch, and the shade stops at the desk, the base and its own arm instead of passing through.',
     controls: [
@@ -1699,6 +1737,7 @@ const ALL_COMPONENTS = [
     slug: 'tape-measure',
     name: 'Tape Measure',
     category: '3D & Materials',
+    style: 'Everyday objects',
     isNew: true,
     description: 'Drag the hook to draw the cupped steel blade straight out. Let go and it reels back in until the hook thunks home, unless the lock is on.',
     controls: [
@@ -1730,6 +1769,7 @@ const ALL_COMPONENTS = [
     slug: 'butterfly',
     name: 'Butterfly',
     category: '3D & Materials',
+    style: 'Nature & world',
     isNew: true,
     description: 'A butterfly basking on a coneflower. Click it to take off and it flutters round, following the pointer; click the flower and it settles back down.',
     controls: [
@@ -1762,6 +1802,7 @@ const ALL_COMPONENTS = [
     slug: 'ocean',
     name: 'Ocean',
     category: '3D & Materials',
+    style: 'Nature & world',
     isNew: true,
     description: 'An open sea of Gerstner waves under a physical sky, with reflections, light through the crests and whitecaps. A buoy rides the waves; click the water to send it there.',
     controls: [
@@ -1796,6 +1837,7 @@ const ALL_COMPONENTS = [
     slug: 'dice',
     name: 'Dice',
     category: '3D & Materials',
+    style: 'Physics & play',
     isNew: true,
     description: 'Roll a pair of dice into the tray: they tumble, bounce off the rim and each other, settle flat and add up. Drag one to fling it, click one to flip it.',
     controls: [
@@ -1824,9 +1866,46 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'puzzle-cube',
+    name: 'Puzzle Cube',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A playable twisty puzzle cube, 2×2 to 5×5. Drag a face to turn its layer: it follows the pointer, carries its momentum and springs into place with a click. Scramble, solve against the clock, or let Solve undo every move.',
+    controls: [
+      { name: 'size', type: 'select', options: ['2', '3', '4', '5'], default: '3' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Classic', values: { upColor: '#ffffff', downColor: '#f2d500', frontColor: '#12a83c', backColor: '#1446d6', rightColor: '#d81620', leftColor: '#f08a10', bodyColor: '#111111', background: '#e4e4e4' } },
+          { name: 'Stickerless', values: { upColor: '#f4f4f4', downColor: '#ffe14d', frontColor: '#2fd16a', backColor: '#2f7bff', rightColor: '#ff3b4a', leftColor: '#ff9a2e', bodyColor: '#e9e9e9', background: '#d9d9d9' } },
+          { name: 'Pastel', values: { upColor: '#fbf7ef', downColor: '#f7e39a', frontColor: '#a8dcb4', backColor: '#a9c4f2', rightColor: '#f2a7a7', leftColor: '#f6c79a', bodyColor: '#2b2b30', background: '#efe9df' } },
+          { name: 'Neon', values: { upColor: '#f5f5f5', downColor: '#e8ff3a', frontColor: '#2bff88', backColor: '#2ad4ff', rightColor: '#ff2d6f', leftColor: '#ff9d1c', bodyColor: '#0c0c10', background: '#17171c' } },
+        ],
+      },
+      { name: 'speed', type: 'range', min: 0.5, max: 2, step: 0.1, default: 1 },
+      { name: 'upColor', type: 'color', default: '#ffffff' },
+      { name: 'downColor', type: 'color', default: '#f2d500' },
+      { name: 'frontColor', type: 'color', default: '#12a83c' },
+      { name: 'backColor', type: 'color', default: '#1446d6' },
+      { name: 'rightColor', type: 'color', default: '#d81620' },
+      { name: 'leftColor', type: 'color', default: '#f08a10' },
+      { name: 'bodyColor', type: 'color', default: '#111111' },
+      { name: 'background', type: 'color', default: '#e4e4e4' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <PuzzleCubeModel {...p} height="100%" />,
+    fill: true,
+    files: ['PuzzleCubeModel.jsx', 'cube/CubeScene.jsx', 'cube/Cube.jsx', 'cube/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'ladder',
     name: 'Ladder',
     category: '3D & Materials',
+    style: 'Physics & play',
     isNew: true,
     description: 'A wooden ladder against a wall on real friction physics: lean it too far and it slides down and crashes. Hang the paint can higher and it slips sooner.',
     controls: [
@@ -1855,6 +1934,39 @@ const ALL_COMPONENTS = [
     preview: (p, set) => <LadderModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['LadderModel.jsx', 'ladder/LadderScene.jsx', 'ladder/Ladder.jsx', 'ladder/physics.js', 'ladder/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'shirt',
+    name: 'Shirt',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A button-up shirt simulated as real cloth: undo a button and that part of the front falls open, do it up and it pulls closed. Drag the fabric to pull it.',
+    controls: [
+      { name: 'buttoned', type: 'toggle', default: true },
+      { name: 'fabric', type: 'select', options: ['oxford', 'poplin', 'linen', 'denim'], default: 'oxford' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Sky', values: { color: '#9ec5ea', stitchColor: '#c9def3', buttonColor: '#b4d2f0' } },
+          { name: 'White', values: { color: '#f3f3f1', stitchColor: '#ffffff', buttonColor: '#fbfaf6' } },
+          { name: 'Pink', values: { color: '#efc3cc', stitchColor: '#f7dde2', buttonColor: '#f5d6dc' } },
+          { name: 'Indigo', values: { color: '#3a4f7a', stitchColor: '#c9a35c', buttonColor: '#d9d4c8' } },
+        ],
+      },
+      { name: 'memory', type: 'range', min: 0, max: 2, step: 0.1, default: 1 },
+      { name: 'wind', type: 'toggle', default: false },
+      { name: 'color', type: 'color', default: '#9ec5ea' },
+      { name: 'stitchColor', type: 'color', default: '#c9def3' },
+      { name: 'buttonColor', type: 'color', default: '#b4d2f0' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (Button all / Unbutton all).
+    preview: (p, set) => <ShirtModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['ShirtModel.jsx', 'shirt/ShirtScene.jsx', 'shirt/Shirt.jsx', 'shirt/pattern.js', 'shirt/cloth.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
@@ -2852,7 +2964,7 @@ const ALL_COMPONENTS = [
 ]
 
 // What the site shows: everything except the hidden categories.
-export const COMPONENTS = ALL_COMPONENTS.filter((c) => !HIDDEN_CATEGORIES.includes(c.category))
+export const COMPONENTS = ALL_COMPONENTS.filter((c) => !HIDDEN_CATEGORIES.includes(c.category) && !HIDDEN_COMPONENTS.includes(c.slug))
 
 // Components that take children, so usage shows them as wrappers.
 export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'GradientSweep', 'SoftHorizon', 'SpringButton', 'MagneticButton']
