@@ -98,6 +98,8 @@ function rotated(t) {
   return t
 }
 
+const TURN_SHADE = 0.35 // how much a page darkens at the middle of its turn
+
 function Leaf({ k, n, state, opts, chunks, fontsVersion, anisotropy }) {
   const geo = useMemo(leafGeometry, [])
   useEffect(() => () => geo.dispose(), [geo])
@@ -118,6 +120,12 @@ function Leaf({ k, n, state, opts, chunks, fontsVersion, anisotropy }) {
     [maps],
   )
 
+  // Pages are unlit, like printed paper in a flat photo: they show exactly the
+  // paper and ink colours drawn on them (with the grain, vignette and gutter
+  // shadow painted in), so the type keeps full contrast whatever the lights
+  // do. Only while a page is turning does it darken, as a page-flip shadow.
+  const frontMat = useRef()
+  const backMat = useRef()
   const last = useRef(null)
   useFrame(() => {
     const s = state.current.s[k]
@@ -132,15 +140,18 @@ function Leaf({ k, n, state, opts, chunks, fontsVersion, anisotropy }) {
     c = dir > 0 ? -Math.min(c, theta / PAGE_W) : Math.min(c, (Math.PI - theta) / PAGE_W)
     const y = THREE.MathUtils.lerp((n - k + 1) * LEAF_T, k * LEAF_T, e)
     bend(geo, theta, c, y)
+    const shade = 1 - TURN_SHADE * Math.sin(Math.PI * s)
+    frontMat.current?.color.setScalar(shade)
+    backMat.current?.color.setScalar(shade)
   })
 
   return (
     <group>
-      <mesh geometry={geo} castShadow receiveShadow>
-        <meshStandardMaterial map={maps.front} roughness={0.86} side={THREE.FrontSide} />
+      <mesh geometry={geo} castShadow>
+        <meshBasicMaterial ref={frontMat} map={maps.front} side={THREE.FrontSide} toneMapped={false} />
       </mesh>
-      <mesh geometry={geo} receiveShadow>
-        <meshStandardMaterial map={maps.back} roughness={0.86} side={THREE.BackSide} />
+      <mesh geometry={geo}>
+        <meshBasicMaterial ref={backMat} map={maps.back} side={THREE.BackSide} toneMapped={false} />
       </mesh>
     </group>
   )
@@ -171,7 +182,12 @@ function PageBlock({ side, height, paperColor }) {
         (side === 'right' ? i === 0 : i === 1) || i === 4 || i === 5 ? (
           <meshStandardMaterial key={i} attach={`material-${i}`} map={tex} roughness={0.95} />
         ) : (
-          <meshStandardMaterial key={i} attach={`material-${i}`} color={paperColor} roughness={0.9} />
+          // the top of the block is paper seen face on: unlit, to match the pages
+          i === 2 ? (
+            <meshBasicMaterial key={i} attach={`material-${i}`} color={paperColor} toneMapped={false} />
+          ) : (
+            <meshStandardMaterial key={i} attach={`material-${i}`} color={paperColor} roughness={0.9} />
+          )
         ),
       )}
     </mesh>
