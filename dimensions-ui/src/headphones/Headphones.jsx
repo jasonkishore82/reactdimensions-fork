@@ -6,9 +6,13 @@ import * as THREE from 'three'
 // Units are centimetres. The head sits at the origin, +y is up, +z is forward.
 const A = 10.4 // half-width of the headband at its ends
 const END_Y = 4.2 // height where the headband ends and the slider housing starts
-const TOP = 18 // top of the arch
-const BAND_A = 1.3 // half depth of the band (front to back)
-const BAND_B = 0.92 // half thickness of the band
+// The headband is a spring-steel strap wrapped in padding: broad front to
+// back, padded thickest at the crown and thinning toward the ends where the
+// sliders come out. Its width, thickness and arch height are props.
+const BAND_N = 3.6 // superellipse exponent of the cross-section: flat faces, soft rounded edges
+const END_TAPER = 0.72 // thickness at the band ends, as a fraction of the crown thickness
+// half thickness at u along the band (0 .. 1), given the crown half thickness b
+const bandB = (b, u) => b * (END_TAPER + (1 - END_TAPER) * Math.sin(Math.PI * u))
 
 // The slider: a pin that runs from inside the band's end housing down into
 // the cup. It moves with the cup, so the housing is long enough to keep the
@@ -95,9 +99,13 @@ function fabricTexture() {
   return t
 }
 
-// A band with an oval cross-section swept along a curve in the x/y plane.
-// `a` is half its depth (front to back), `b` half its thickness.
-function sweepBand(curve, a, b, N = 260, M = 32) {
+// Signed power, for the superellipse profile.
+const spow = (v, e) => Math.sign(v) * Math.abs(v) ** e
+
+// A band with a rounded-rectangle (superellipse) cross-section swept along a
+// curve in the x/y plane. `a` is half its depth (front to back), `b` half its
+// thickness at u along the curve (0 .. 1).
+function sweepBand(curve, a, bAt, N = 260, M = 64) {
   const pos = []
   const idx = []
   const z = new THREE.Vector3(0, 0, 1)
@@ -105,9 +113,11 @@ function sweepBand(curve, a, b, N = 260, M = 32) {
     const p = curve.getPointAt(i / N)
     const t = curve.getTangentAt(i / N)
     const n = new THREE.Vector3(-t.y, t.x, 0).normalize()
+    const b = bAt(i / N)
     for (let j = 0; j <= M; j++) {
       const ang = (j / M) * Math.PI * 2
-      const v = p.clone().addScaledVector(n, b * Math.cos(ang)).addScaledVector(z, a * Math.sin(ang))
+      const e = 2 / BAND_N
+      const v = p.clone().addScaledVector(n, b * spow(Math.cos(ang), e)).addScaledVector(z, a * spow(Math.sin(ang), e))
       pos.push(v.x, v.y, v.z)
     }
   }
@@ -142,13 +152,14 @@ function sweepBand(curve, a, b, N = 260, M = 32) {
 }
 
 // A stitch line along the band's outer face, `z` off the centre line. It sits
-// on the oval surface, so it reads as a seam rather than disappearing inside.
-function seamGeometry(curve, z) {
-  const lift = BAND_B * Math.sqrt(1 - (z / BAND_A) ** 2) - 0.008
-  const pts = curve.getPoints(160).map((p, i, arr) => {
-    const t = curve.getTangentAt(i / (arr.length - 1))
+// on the band's outer face, so it reads as a seam rather than disappearing inside.
+function seamGeometry(curve, a, bAt, z) {
+  const k = (1 - Math.abs(z / a) ** BAND_N) ** (1 / BAND_N)
+  const pts = curve.getSpacedPoints(160).map((p, i, arr) => {
+    const u = i / (arr.length - 1)
+    const t = curve.getTangentAt(u)
     const n = new THREE.Vector3(-t.y, t.x, 0).normalize()
-    return p.addScaledVector(n, lift).add(new THREE.Vector3(0, 0, z))
+    return p.addScaledVector(n, bAt(u) * k - 0.008).add(new THREE.Vector3(0, 0, z))
   })
   return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 200, 0.025, 6, false)
 }
@@ -168,6 +179,8 @@ function useTwoWay(prop, key, onChange) {
 // bandColor: the padded headband. padColor: the ear cushions. cupColor: the
 // outer shells. accentColor: the metal sliders. finish: 'leather' | 'matte' |
 // 'gloss'. fold: 0 worn .. 1 folded flat. adjust: how far the cups slide down.
+// bandWidth / bandThickness: the strap's size in cm (front to back / at the
+// crown). bandHeight: how far the arch rises above the band ends, in cm.
 export default function Headphones({
   bandColor = '#262c3d',
   padColor = '#262c3d',
@@ -176,13 +189,19 @@ export default function Headphones({
   finish = 'leather',
   fold: foldProp = 0,
   adjust = 0.3,
+  bandWidth = 3.8,
+  bandThickness = 1.3,
+  bandHeight = 10,
   onChange,
 }) {
   const [fold, setFold] = useTwoWay(foldProp, 'fold', onChange)
   const [hover, setHover] = useState(false)
   useCursor(hover, 'pointer')
 
-  const geo = useMemo(() => {
+  const bandA = bandWidth / 2
+  const bandB0 = bandThickness / 2
+  const band = useMemo(() => {
+    const top = END_Y + bandHeight
     // [x, how far up from the yoke to the top of the arch: 0 .. 1]
     const half = [
       [0, 1],
@@ -193,14 +212,28 @@ export default function Headphones({
       [9.9, 0.25],
       [10.3, 0.036],
       [A, 0],
-    ].map(([x, f]) => [x, END_Y + (TOP - END_Y) * f])
+    ].map(([x, f]) => [x, END_Y + (top - END_Y) * f])
     const pts = [...half.slice(1).reverse().map(([x, y]) => new THREE.Vector3(-x, y, 0)), ...half.map(([x, y]) => new THREE.Vector3(x, y, 0))]
     const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal')
+    const bAt = (u) => bandB(bandB0, u)
+    const seamZ = Math.max(bandA - 0.3, bandA * 0.8)
+    return {
+      band: sweepBand(curve, bandA, bAt),
+      seams: [seamGeometry(curve, bandA, bAt, seamZ), seamGeometry(curve, bandA, bAt, -seamZ)],
+    }
+  }, [bandA, bandB0, bandHeight])
+  useEffect(
+    () => () => {
+      band.band.dispose()
+      band.seams.forEach((g) => g.dispose())
+    },
+    [band],
+  )
+
+  const geo = useMemo(() => {
     const drum = new THREE.CylinderGeometry(1, 1, DRUM_HW * 2, 64, 1)
     drum.rotateZ(Math.PI / 2) // axis along x
     return {
-      band: sweepBand(curve, BAND_A, BAND_B),
-      seams: [seamGeometry(curve, 0.95), seamGeometry(curve, -0.95)],
       sphere: new THREE.SphereGeometry(1, 48, 32),
       drum,
       pin: new THREE.BoxGeometry(PIN_W, PIN_TOP - PIN_BOTTOM, PIN_D),
@@ -313,13 +346,13 @@ export default function Headphones({
       onPointerOut={() => setHover(false)}
     >
       <group ref={root} position={[0, -6, 0]}>
-        <mesh geometry={geo.band} material={bandMat} castShadow />
-        {geo.seams.map((g, i) => (
+        <mesh geometry={band.band} material={bandMat} castShadow />
+        {band.seams.map((g, i) => (
           <mesh key={i} geometry={g} material={seamMat} />
         ))}
         {/* slider housings at the band ends: the pins run up inside them */}
         {[-1, 1].map((s) => (
-          <mesh key={s} geometry={geo.sphere} material={bandMat} position={[s * A, END_Y + HOUSING_Y, 0]} scale={[0.98, HOUSING_H, 1.33]} castShadow />
+          <mesh key={s} geometry={geo.sphere} material={bandMat} position={[s * A, END_Y + HOUSING_Y, 0]} scale={[Math.max(0.6, bandB0 * END_TAPER + 0.08), HOUSING_H, bandA * 0.92]} castShadow />
         ))}
         {cup(0)}
         <group scale={[-1, 1, 1]}>{cup(1)}</group>

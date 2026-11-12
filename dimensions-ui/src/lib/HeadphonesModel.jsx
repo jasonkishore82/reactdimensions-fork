@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react'
 
-// 3D over-ear headphones: a thick padded headband, round ear cups with soft
+// 3D over-ear headphones: a broad, thin padded headband, round ear cups with soft
 // oval cushions and fabric speaker grilles, and metal yoke pins. Colour the
 // band, cushions, shells and pins separately; pick leather, matte or gloss;
 // slide the cups down; click it to fold the cups flat. Drag to orbit.
