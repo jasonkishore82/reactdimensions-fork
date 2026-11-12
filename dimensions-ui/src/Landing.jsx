@@ -31,7 +31,7 @@ export default function Landing() {
         </div>
         <div className="hero-copy">
           <h1 className="load" style={{ '--d': 0 }}>
-            Real <em>3D objects</em>, as React components.
+            From flat to <em>fully&nbsp;3D</em>: React components for every style.
           </h1>
           <p className="lede load" style={{ '--d': 1 }}>
             A new component every day.
