@@ -67,9 +67,10 @@ import HeadphonesModel from '../lib/HeadphonesModel.jsx'
 import IpadModel from '../lib/IpadModel.jsx'
 import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
+import KeyboardModel from '../lib/KeyboardModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -709,6 +710,43 @@ export const COMPONENTS = [
     preview: (p) => <CradleModel {...p} height="100%" />,
     fill: true,
     files: ['CradleModel.jsx', 'cradle/CradleScene.jsx', 'cradle/Cradle.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'mechanical-keyboard',
+    name: 'Mechanical Keyboard',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Type on your real keyboard and the matching keycap travels down. Sculpted rows, wire-stabilised space bar, switch sounds and RGB.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Cream', values: { keycapColor: '#efe9dc', modColor: '#b9b2a3', accentColor: '#d9643a', legendColor: '#2b2b2b', caseColor: '#d8d3c8' } },
+          { name: 'Carbon', values: { keycapColor: '#34363b', modColor: '#1f2023', accentColor: '#e8833a', legendColor: '#ececec', caseColor: '#18191b' } },
+          { name: 'Mint', values: { keycapColor: '#e9f4ee', modColor: '#9ccfb8', accentColor: '#2f7d5b', legendColor: '#22433a', caseColor: '#f2f2ef' } },
+          { name: 'Ocean', values: { keycapColor: '#dbe6ef', modColor: '#93afc8', accentColor: '#e07a5f', legendColor: '#14283b', caseColor: '#2c4a6b' } },
+          { name: 'Sunset', values: { keycapColor: '#f7e3c8', modColor: '#eaa66d', accentColor: '#c8423a', legendColor: '#3a2418', caseColor: '#5a2e22' } },
+          { name: 'Retro', values: { keycapColor: '#e6e0d2', modColor: '#a8a296', accentColor: '#b5452f', legendColor: '#24221f', caseColor: '#cfc8b8' } },
+        ],
+      },
+      { name: 'layout', type: 'select', options: ['60%', 'TKL', 'Full'], default: 'TKL' },
+      { name: 'switchType', type: 'select', options: ['tactile', 'linear', 'clicky'], default: 'tactile' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'keycapColor', type: 'color', default: '#efe9dc' },
+      { name: 'modColor', type: 'color', default: '#b9b2a3' },
+      { name: 'accentColor', type: 'color', default: '#d9643a' },
+      { name: 'legendColor', type: 'color', default: '#2b2b2b' },
+      { name: 'caseColor', type: 'color', default: '#d8d3c8' },
+      { name: 'rgb', type: 'toggle', default: true },
+      { name: 'rgbEffect', type: 'select', options: ['wave', 'breathe', 'reactive', 'static'], default: 'wave' },
+      { name: 'rgbColor', type: 'color', default: '#7c5cff' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <KeyboardModel {...p} height="100%" />,
+    fill: true,
+    files: ['KeyboardModel.jsx', 'keyboard/KeyboardScene.jsx', 'keyboard/Keyboard.jsx', 'keyboard/layout.js', 'keyboard/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {

@@ -17,6 +17,7 @@ dispose of its geometry, materials and textures.
 
 | Built | Component |
 | --- | --- |
+| ✓ | 1. Mechanical keyboard |
 | ✓ | 68. Newton's cradle |
 
 Already in the library but not on this list: clear-coat card, pickup, snake,
@@ -27,7 +28,7 @@ headphones, tablet bot and tablet.
 
 ## Everyday objects with a satisfying moving part
 
-### 1. Mechanical keyboard
+### 1. Mechanical keyboard ✓
 - **Interaction:** click or type on your real keyboard and the matching key presses down; hold Shift to see modifiers light.
 - **Sound:** a switch click per key, with tactile, linear and clicky profiles.
 - **Controls:** layout (60%, TKL, full), switch type, keycap colour, legend colour, case colour, RGB on or off, RGB effect.
