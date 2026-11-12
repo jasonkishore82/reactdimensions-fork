@@ -73,6 +73,7 @@ import KeyboardModel from '../lib/KeyboardModel.jsx'
 import TypewriterModel from '../lib/TypewriterModel.jsx'
 import LighterModel from '../lib/LighterModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
+import LorryModel from '../lib/LorryModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -95,7 +96,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -939,6 +940,43 @@ export const COMPONENTS = [
     preview: (p) => <KnifeModel {...p} height="100%" />,
     fill: true,
     files: ['KnifeModel.jsx', 'knife/KnifeScene.jsx', 'knife/Knife.jsx', 'knife/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'lorry',
+    name: 'Lorry',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'An articulated lorry whose trailer pivots on its kingpin as it steers. Drive it round the yard, open the rear doors, switch on the lights.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Red', values: { cabColor: '#b3261e', trailerColor: '#e9e9e4' } },
+          { name: 'Blue', values: { cabColor: '#1b4f9c', trailerColor: '#e9e9e4' } },
+          { name: 'Green', values: { cabColor: '#237a47', trailerColor: '#e6e3d8' } },
+          { name: 'Amber', values: { cabColor: '#c97a12', trailerColor: '#2b2e33' } },
+          { name: 'Violet', values: { cabColor: '#4b3a8c', trailerColor: '#e9e9e4' } },
+          { name: 'Teal', values: { cabColor: '#15737a', trailerColor: '#d9dde2' } },
+        ],
+      },
+      { name: 'drive', type: 'toggle', default: false },
+      { name: 'speed', type: 'range', min: 0, max: 1, step: 0.05, default: 0.5 },
+      { name: 'steer', type: 'range', min: -1, max: 1, step: 0.05, default: 0 },
+      { name: 'doors', type: 'toggle', default: false },
+      { name: 'lights', type: 'toggle', default: true },
+      { name: 'cargo', type: 'toggle', default: true },
+      { name: 'cabColor', type: 'color', default: '#b3261e' },
+      { name: 'trailerColor', type: 'color', default: '#e9e9e4' },
+      { name: 'company', type: 'text', default: 'REACT DIMENSIONS' },
+      { name: 'plate', type: 'text', default: 'RD 01 AB 2026' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking toggles the lights and the doors).
+    preview: (p, set) => <LorryModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['LorryModel.jsx', 'lorry/LorryScene.jsx', 'lorry/Lorry.jsx', 'lorry/textures.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
