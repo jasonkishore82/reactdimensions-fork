@@ -108,6 +108,7 @@ import KeyboardModel from '../lib/KeyboardModel.jsx'
 import TypewriterModel from '../lib/TypewriterModel.jsx'
 import LighterModel from '../lib/LighterModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
+import PenModel from '../lib/PenModel.jsx'
 import LorryModel from '../lib/LorryModel.jsx'
 import ClockModel from '../lib/ClockModel.jsx'
 import LampModel from '../lib/LampModel.jsx'
@@ -140,7 +141,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1627,6 +1628,41 @@ const ALL_COMPONENTS = [
     preview: (p) => <KnifeModel {...p} height="100%" />,
     fill: true,
     files: ['KnifeModel.jsx', 'knife/KnifeScene.jsx', 'knife/Knife.jsx', 'knife/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'fountain-pen',
+    name: 'Fountain Pen',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A piston-filling fountain pen with rigid-body physics: lift it, drop it, throw it, and the clip stops it rolling. Unscrew and post the cap, turn the knob to fill, and write on the paper.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Black & gold', values: { resinColor: '#0b0b0d', trim: 'gold', nibFinish: 'two-tone', inkColor: '#1e2d6b' } },
+          { name: 'Bordeaux', values: { resinColor: '#4a0f17', trim: 'gold', nibFinish: 'gold', inkColor: '#5b1020' } },
+          { name: 'Navy & platinum', values: { resinColor: '#14223f', trim: 'platinum', nibFinish: 'rhodium', inkColor: '#163a8c' } },
+          { name: 'Forest', values: { resinColor: '#123326', trim: 'gold', nibFinish: 'two-tone', inkColor: '#1f5c3a' } },
+          { name: 'Ivory & rose', values: { resinColor: '#e9e2d3', trim: 'rose', nibFinish: 'gold', inkColor: '#3d2a5c' } },
+        ],
+      },
+      { name: 'cap', type: 'select', options: ['on', 'off', 'posted'], default: 'on' },
+      { name: 'ink', type: 'range', min: 0, max: 1, step: 0.01, default: 0.7 },
+      { name: 'xray', type: 'toggle', default: false },
+      { name: 'resinColor', type: 'color', default: '#0b0b0d' },
+      { name: 'trim', type: 'select', options: ['gold', 'rose', 'platinum'], default: 'gold' },
+      { name: 'nibFinish', type: 'select', options: ['two-tone', 'gold', 'rhodium'], default: 'two-tone' },
+      { name: 'inkColor', type: 'color', default: '#1e2d6b' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking the cap, turning the knob).
+    preview: (p, set) => <PenModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['PenModel.jsx', 'pen/PenScene.jsx', 'pen/Pen.jsx', 'pen/physics.js', 'pen/parts.js', 'pen/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
