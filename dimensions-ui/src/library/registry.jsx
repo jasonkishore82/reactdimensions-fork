@@ -119,6 +119,7 @@ import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
+import RingModel from '../lib/RingModel.jsx'
 import LadderModel from '../lib/LadderModel.jsx'
 import ShirtModel from '../lib/ShirtModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
@@ -143,7 +144,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1937,6 +1938,40 @@ const ALL_COMPONENTS = [
     preview: (p) => <PuzzleCubeModel {...p} height="100%" />,
     fill: true,
     files: ['PuzzleCubeModel.jsx', 'cube/CubeScene.jsx', 'cube/Cube.jsx', 'cube/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'ring',
+    name: 'Ring',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A polished metal band standing on its edge, in four classic profiles. Click or flick it and it spins like a coin on a table, tips, rolls round its rim faster and faster and rattles down flat. Scroll in for a close-up.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Silver', values: { metalColor: '#e6e7ea', roughness: 0.14, background: '#e7e7e7' } },
+          { name: 'Yellow gold', values: { metalColor: '#f1c46a', roughness: 0.1, background: '#ece6dc' } },
+          { name: 'Rose gold', values: { metalColor: '#eab39b', roughness: 0.1, background: '#efe6e2' } },
+          { name: 'Brushed titanium', values: { metalColor: '#8d8f94', roughness: 0.32, background: '#dcdcdc' } },
+          { name: 'Black', values: { metalColor: '#3a3a3e', roughness: 0.18, background: '#e2e2e2' } },
+        ],
+      },
+      { name: 'profile', type: 'select', options: ['comfort', 'court', 'd-shape', 'flat'], default: 'comfort' },
+      { name: 'innerDiameter', type: 'range', min: 14, max: 24, step: 0.1, default: 17.3, unit: ' mm' },
+      { name: 'width', type: 'range', min: 2, max: 10, step: 0.5, default: 6, unit: ' mm' },
+      { name: 'thickness', type: 'range', min: 1, max: 3, step: 0.1, default: 1.8, unit: ' mm' },
+      { name: 'metalColor', type: 'color', default: '#e6e7ea' },
+      { name: 'roughness', type: 'range', min: 0, max: 0.6, step: 0.01, default: 0.14 },
+      { name: 'background', type: 'color', default: '#e7e7e7' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <RingModel {...p} height="100%" />,
+    fill: true,
+    files: ['RingModel.jsx', 'ring/RingScene.jsx', 'ring/Ring.jsx', 'ring/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
