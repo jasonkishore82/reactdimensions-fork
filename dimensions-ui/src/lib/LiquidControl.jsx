@@ -34,7 +34,8 @@ function Tile({ className = '', strength, radius = 26, children, ...rest }) {
         className={`lc-tile ${className}`}
         style={glass.style}
         onPointerMove={specular}
-        onKeyDown={(e) => { if (rest.role === 'button' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); rest.onClick?.(e) } }}
+        onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (rest.role === 'button' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); rest.onClick?.(e) } }}
         {...rest}
       >
         {children}
@@ -63,9 +64,10 @@ function Tube({ label, icon, value, onChange, strength }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={value}
-        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); set(e) }}
+        onPointerDown={(e) => { e.preventDefault(); e.currentTarget.dataset.pointer = ''; e.currentTarget.focus({ preventScroll: true }); e.currentTarget.setPointerCapture(e.pointerId); set(e) }}
         onPointerMove={(e) => { specular(e); if (e.buttons) set(e) }}
-        onKeyDown={(e) => { if (e.key === 'ArrowUp') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown') onChange(Math.max(0, value - 5)) }}
+        onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (e.key === 'ArrowUp') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown') onChange(Math.max(0, value - 5)) }}
       >
         <span className="lc-fill" style={{ height: `${value}%` }} />
         <span className="lc-tube-icon"><Icon d={icon} /></span>
@@ -112,7 +114,10 @@ export default function LiquidControl({ strength = 60, accent = '#2f80ff', style
         .lc-music b { display: block; font-size: 13px; }
         .lc-music span { opacity: .85; font-weight: 500; }
         .lc-music .lc-pp { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.25); }
-        .lc-tube { grid-row: span 2; cursor: ns-resize; touch-action: none; }
+        .lc-tube { grid-row: span 2; cursor: ns-resize; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* no outline after a click or drag; an accent ring for keyboard focus only */
+        .lc-tube:focus { outline: none; }
+        .lc-tube:focus-visible:not([data-pointer]) { outline: 2px solid var(--accent); outline-offset: 4px; }
         .lc-fill { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.92); transition: height 80ms; }
         .lc-tube-icon { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); color: #3a3a3c; text-shadow: none; }
         .lc-focus { grid-column: span 2; display: flex; align-items: center; gap: 12px; padding: 0 16px; text-align: left; transition: background 200ms; }
