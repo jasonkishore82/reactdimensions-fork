@@ -39,9 +39,10 @@ function Fader({ value, onChange, label }) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={value}
-      onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); set(e) }}
+      onPointerDown={(e) => { e.preventDefault(); e.currentTarget.dataset.pointer = ''; e.currentTarget.focus({ preventScroll: true }); e.currentTarget.setPointerCapture(e.pointerId); set(e) }}
       onPointerMove={(e) => e.buttons && set(e)}
-      onKeyDown={(e) => { if (e.key === 'ArrowUp') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown') onChange(Math.max(0, value - 5)) }}
+      onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (e.key === 'ArrowUp') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown') onChange(Math.max(0, value - 5)) }}
     >
       <span className="nm-fill" style={{ height: `${value}%` }} />
       <span className="nm-cap nm-up" style={{ bottom: `calc(${value}% - 11px)` }} />
@@ -62,10 +63,11 @@ function Knob({ value, onChange, label }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={value}
-        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); start.current = [e.clientY, value] }}
+        onPointerDown={(e) => { e.preventDefault(); e.currentTarget.dataset.pointer = ''; e.currentTarget.focus({ preventScroll: true }); e.currentTarget.setPointerCapture(e.pointerId); start.current = [e.clientY, value] }}
         onPointerMove={(e) => { if (e.buttons && start.current) onChange(Math.round(Math.min(100, Math.max(0, start.current[1] + (start.current[0] - e.clientY) * 0.8)))) }}
         onPointerUp={() => { start.current = null }}
-        onKeyDown={(e) => { if (e.key === 'ArrowUp' || e.key === 'ArrowRight') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') onChange(Math.max(0, value - 5)) }}
+        onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (e.key === 'ArrowUp' || e.key === 'ArrowRight') onChange(Math.min(100, value + 5)); if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') onChange(Math.max(0, value - 5)) }}
       >
         <i style={{ transform: `rotate(${angle}deg)` }} />
       </div>
@@ -123,7 +125,10 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
         .nm-strip.sel .nm-name { color: var(--accent-ink); }
         .nm-name { font-size: 11.5px; }
         .nm-body { display: flex; gap: 8px; height: 100%; min-height: 120px; }
-        .nm-fader { position: relative; width: 12px; height: 100%; border-radius: 999px; touch-action: none; cursor: ns-resize; }
+        .nm-fader { position: relative; width: 12px; height: 100%; border-radius: 999px; touch-action: none; cursor: ns-resize; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* no outline after a click or drag; an accent ring for keyboard focus only */
+        .nm-fader:focus { outline: none; }
+        .nm-fader:focus-visible:not([data-pointer]) { outline: 2px solid var(--accent); outline-offset: 4px; }
         .nm-fill { position: absolute; left: 3px; right: 3px; bottom: 3px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 70%, var(--base)); max-height: calc(100% - 6px); }
         .nm-cap { position: absolute; left: 50%; width: 30px; height: 22px; margin-left: -15px; border-radius: 7px; pointer-events: none; }
         .nm-cap::after { content: ''; position: absolute; left: 6px; right: 6px; top: 10px; height: 2px; background: var(--muted); border-radius: 2px; }
@@ -142,7 +147,10 @@ export default function NeuMixer({ surface = '#e6ebf2', accent = '#ff7a45', styl
         .nm-knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .nm-knob-wrap span { color: var(--muted); }
         .nm-knob-wrap b { font-variant-numeric: tabular-nums; color: var(--accent-ink); }
-        .nm-knob { position: relative; width: 64px; height: 64px; border-radius: 50%; touch-action: none; cursor: ns-resize; }
+        .nm-knob { position: relative; width: 64px; height: 64px; border-radius: 50%; touch-action: none; cursor: ns-resize; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* no outline after a click or drag; an accent ring for keyboard focus only */
+        .nm-knob:focus { outline: none; }
+        .nm-knob:focus-visible:not([data-pointer]) { outline: 2px solid var(--accent); outline-offset: 4px; }
         .nm-knob i { position: absolute; left: 50%; top: 6px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: var(--accent); transform-origin: 50% 26px; }
         .nm-fx { flex: 1; display: grid; place-items: center; color: var(--muted); border-radius: 20px; }
         @container (max-width: 620px) { .nm-strips { grid-template-columns: repeat(3, 1fr); } .nm-eq { grid-template-columns: repeat(3, 1fr); } }

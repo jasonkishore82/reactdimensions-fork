@@ -496,14 +496,17 @@ export function CategoryPage() {
   const name = cat === 'all' ? 'All' : CATEGORIES.find((c) => catSlug(c) === cat)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('az')
-  const [style, setStyle] = useState('All')
+  // A sectioned category (styles, or icons and emojis) always shows one section
+  // at a time, starting with the first; there is no combined "all styles" view.
+  const firstStyle = SECTIONS[name]?.[0] ?? 'All'
+  const [style, setStyle] = useState(firstStyle)
   const [drawer, setDrawer] = useState(false)
   const [favs] = useFavs()
   const title = name === 'All' ? 'All components' : name
 
   useEffect(() => {
     setQuery('')
-    setStyle('All')
+    setStyle(firstStyle)
     setDrawer(false)
     if (name) document.title = `${title} — React Dimensions`
     window.scrollTo({ top: 0 })
@@ -537,11 +540,11 @@ export function CategoryPage() {
         </header>
         {SECTIONS[name] && (
           <div className="style-chips" role="group" aria-label="Filter by style">
-            {['All', ...SECTIONS[name]].map((st) => {
-              const n = COMPONENTS.filter((c) => c.category === name && (st === 'All' || c.style === st)).length
+            {SECTIONS[name].map((st) => {
+              const n = COMPONENTS.filter((c) => c.category === name && c.style === st).length
               return (
                 <button key={st} aria-pressed={style === st} onClick={() => setStyle(st)}>
-                  {st === 'All' ? 'All styles' : st}<span>{n}</span>
+                  {st}<span>{n}</span>
                 </button>
               )
             })}

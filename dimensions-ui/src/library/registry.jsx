@@ -104,7 +104,12 @@ const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx'
 // Files are named 'X.jsx' (in lib/ or src/) or 'pickup/X.jsx'.
 const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 
-export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
+// Categories kept in the code but not shown on the site. Their components and
+// files stay as they are; take a category out of this list to show it again.
+export const HIDDEN_CATEGORIES = ['Icons & Emojis']
+
+const ALL_CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
+export const CATEGORIES = ALL_CATEGORIES.filter((c) => !HIDDEN_CATEGORIES.includes(c))
 
 // The UI section is grouped by visual style, in this order.
 export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism', 'Skeuomorphism']
@@ -144,7 +149,7 @@ const emoji = (Comp, file, slug, name, description) => ({
 })
 
 // Controls: range | toggle | select | text | color
-export const COMPONENTS = [
+const ALL_COMPONENTS = [
   {
     slug: 'measure-text',
     name: 'Measure Text',
@@ -1897,6 +1902,9 @@ export const COMPONENTS = [
   emoji(FireEmoji, 'FireEmoji.jsx', 'fire', 'Fire', 'An orange flame with a yellow core.'),
   emoji(PleadingEmoji, 'PleadingEmoji.jsx', 'pleading', 'Pleading', 'Pleading face with big glossy eyes.'),
 ]
+
+// What the site shows: everything except the hidden categories.
+export const COMPONENTS = ALL_COMPONENTS.filter((c) => !HIDDEN_CATEGORIES.includes(c.category))
 
 // Components that take children, so usage shows them as wrappers.
 export const WRAPPERS = ['TiltCard', 'DraftingGrid', 'LightSweep', 'Cyclorama', 'GradientSweep', 'SoftHorizon', 'SpringButton', 'MagneticButton']
