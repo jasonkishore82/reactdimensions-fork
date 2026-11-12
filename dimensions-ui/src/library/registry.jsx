@@ -61,6 +61,8 @@ import SunglassesModel from '../lib/SunglassesModel.jsx'
 import WatchModel from '../lib/WatchModel.jsx'
 import LaptopModel from '../lib/LaptopModel.jsx'
 import BottleModel from '../lib/BottleModel.jsx'
+import BookModel from '../lib/BookModel.jsx'
+import { DEFAULT_CONTENT as BOOK_CONTENT } from '../book/content.js'
 import TvModel from '../lib/TvModel.jsx'
 import PhoneModel from '../lib/PhoneModel.jsx'
 import HeadphonesModel from '../lib/HeadphonesModel.jsx'
@@ -69,9 +71,31 @@ import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
 import KeyboardModel from '../lib/KeyboardModel.jsx'
 import TypewriterModel from '../lib/TypewriterModel.jsx'
+import LighterModel from '../lib/LighterModel.jsx'
+import KnifeModel from '../lib/KnifeModel.jsx'
+import HomeIcon from '../lib/HomeIcon.jsx'
+import SearchIcon from '../lib/SearchIcon.jsx'
+import HeartIcon from '../lib/HeartIcon.jsx'
+import StarIcon from '../lib/StarIcon.jsx'
+import BellIcon from '../lib/BellIcon.jsx'
+import UserIcon from '../lib/UserIcon.jsx'
+import MailIcon from '../lib/MailIcon.jsx'
+import SettingsIcon from '../lib/SettingsIcon.jsx'
+import CheckIcon from '../lib/CheckIcon.jsx'
+import CloseIcon from '../lib/CloseIcon.jsx'
+import JoyEmoji from '../lib/JoyEmoji.jsx'
+import HeartEmoji from '../lib/HeartEmoji.jsx'
+import HeartEyesEmoji from '../lib/HeartEyesEmoji.jsx'
+import RoflEmoji from '../lib/RoflEmoji.jsx'
+import SmileEmoji from '../lib/SmileEmoji.jsx'
+import PrayEmoji from '../lib/PrayEmoji.jsx'
+import ThumbsUpEmoji from '../lib/ThumbsUpEmoji.jsx'
+import CryEmoji from '../lib/CryEmoji.jsx'
+import FireEmoji from '../lib/FireEmoji.jsx'
+import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -79,10 +103,44 @@ const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx'
 // Files are named 'X.jsx' (in lib/ or src/) or 'pickup/X.jsx'.
 const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 
-export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds']
+export const CATEGORIES = ['Text', 'Interactions', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
 
 // The UI section is grouped by visual style, in this order.
 export const UI_STYLES = ['Flat', 'Glassmorphism', 'Neumorphism', 'Liquid glass', 'Bento', 'Minimalism', 'Maximalism', 'Skeuomorphism']
+
+export const ICON_STYLES = ['Icons', 'Emojis']
+
+// Basic outline icons share one set of controls; each file is standalone.
+const icon = (Comp, file, slug, name, description) => ({
+  slug: `${slug}-icon`,
+  name: `${name} Icon`,
+  category: 'Icons & Emojis',
+  style: 'Icons',
+  isNew: true,
+  description,
+  controls: [
+    { name: 'size', type: 'range', min: 12, max: 128, step: 2, default: 24, unit: 'px' },
+    { name: 'strokeWidth', type: 'range', min: 0.5, max: 3, step: 0.25, default: 1.75 },
+    { name: 'color', type: 'color', default: '#15171a' },
+  ],
+  preview: (p) => <Comp {...p} />,
+  files: [file],
+  deps: [],
+})
+
+// Filled, full-colour emojis: each file is standalone and only takes a size.
+const emoji = (Comp, file, slug, name, description) => ({
+  slug: `${slug}-emoji`,
+  name: `${name} Emoji`,
+  category: 'Icons & Emojis',
+  style: 'Emojis',
+  isNew: true,
+  description,
+  controls: [{ name: 'size', type: 'range', min: 16, max: 256, step: 4, default: 96, unit: 'px' }],
+  preview: (p) => <Comp {...p} />,
+  files: [file],
+  deps: [],
+})
 
 // Controls: range | toggle | select | text | color
 export const COMPONENTS = [
@@ -126,7 +184,7 @@ export const COMPONENTS = [
     category: 'Interactions',
     description: 'A card that tilts toward the pointer with moving glare.',
     controls: [
-      { name: 'maxTilt', type: 'range', min: 2, max: 30, step: 1, default: 14, unit: 'Â°' },
+      { name: 'maxTilt', type: 'range', min: 2, max: 30, step: 1, default: 14, unit: '°' },
       { name: 'scale', type: 'range', min: 1, max: 1.15, step: 0.01, default: 1.04 },
       { name: 'stiffness', type: 'range', min: 40, max: 400, step: 10, default: 170 },
       { name: 'damping', type: 'range', min: 4, max: 40, step: 1, default: 16 },
@@ -140,7 +198,7 @@ export const COMPONENTS = [
           <span className="demo-tilt-title">
             Tilt <em>me</em>
           </span>
-          <span className="demo-tilt-foot">240 Ã— 320 px Â· spring</span>
+          <span className="demo-tilt-foot">240 × 320 px · spring</span>
         </div>
       </TiltCard>
     ),
@@ -199,7 +257,7 @@ export const COMPONENTS = [
       { name: 'expiry', type: 'text', default: '00-00' },
       { name: 'holder', type: 'text', default: 'FOUNDING MEMBER' },
       { name: 'cvv', type: 'text', default: '123' },
-      { name: 'signatureNote', type: 'text', default: 'AUTHORIZED SIGNATURE â€” NOT VALID UNLESS SIGNED' },
+      { name: 'signatureNote', type: 'text', default: 'AUTHORIZED SIGNATURE — NOT VALID UNLESS SIGNED' },
       { name: 'backLine1', type: 'text', default: 'Rendered in real time. No image assets were used to make this card.' },
       { name: 'backLine2', type: 'text', default: '85.60 x 53.98 mm  /  clear-coat PBR  /  spring physics' },
       { name: 'backName', type: 'text', default: 'react-dimensions' },
@@ -502,6 +560,51 @@ export const COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'book',
+    name: 'Book',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A hardback book with your own title, logo, colours and pages that bend as they turn.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Leather', values: { coverColor: '#4a1014', foilColor: '#c9973b', paperColor: '#f6edd9', inkColor: '#2b1d14', accentColor: '#8a2b1c' } },
+          { name: 'Navy', values: { coverColor: '#14223f', foilColor: '#d8b45a', paperColor: '#f4efe4', inkColor: '#1d2433', accentColor: '#2c4a86' } },
+          { name: 'Forest', values: { coverColor: '#1d3b2c', foilColor: '#d2b46a', paperColor: '#f3eedf', inkColor: '#1f2a22', accentColor: '#2f6b4a' } },
+          { name: 'Black', values: { coverColor: '#18181a', foilColor: '#d9d9de', paperColor: '#f7f6f2', inkColor: '#18181a', accentColor: '#18181a' } },
+          { name: 'Linen', values: { coverColor: '#d8ccb6', foilColor: '#7a3a22', paperColor: '#fbf8f1', inkColor: '#2a2420', accentColor: '#7a3a22' } },
+        ],
+      },
+      { name: 'title', type: 'text', default: 'React Dimensions', maxLength: 40 },
+      { name: 'subtitle', type: 'text', default: 'South Indian Kitchen', maxLength: 48 },
+      { name: 'currency', type: 'select', options: ['$', '€', '£', '₹', '¥', 'A$', 'C$', 'AED'], default: '$' },
+      { name: 'pages', type: 'range', min: 4, max: 40, step: 2, default: 12 },
+      { name: 'logo', type: 'select', options: ['emblem', 'monogram', 'none'], default: 'emblem' },
+      { name: 'logoImage', type: 'image', default: '' },
+      { name: 'coverColor', type: 'color', default: '#4a1014' },
+      { name: 'foilColor', type: 'color', default: '#c9973b' },
+      { name: 'paperColor', type: 'color', default: '#f6edd9' },
+      { name: 'inkColor', type: 'color', default: '#2b1d14' },
+      { name: 'accentColor', type: 'color', default: '#8a2b1c' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+      {
+        name: 'content',
+        type: 'textarea',
+        hint: '--- new page · # heading · > note · Name | Price',
+        rows: 12,
+        maxLength: 20000,
+        default: BOOK_CONTENT,
+      },
+    ],
+    preview: (p) => <BookModel {...p} height="100%" />,
+    fill: true,
+    files: ['BookModel.jsx', 'book/BookScene.jsx', 'book/Book.jsx', 'book/textures.js', 'book/content.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'tv',
     name: 'TV',
     category: '3D & Materials',
@@ -512,16 +615,16 @@ export const COMPONENTS = [
         name: 'quickSize',
         type: 'presets',
         options: [
-          { name: '32â€³', values: { size: 32 } },
-          { name: '43â€³', values: { size: 43 } },
-          { name: '55â€³', values: { size: 55 } },
-          { name: '65â€³', values: { size: 65 } },
-          { name: '75â€³', values: { size: 75 } },
-          { name: '85â€³', values: { size: 85 } },
-          { name: '100â€³', values: { size: 100 } },
+          { name: '32″', values: { size: 32 } },
+          { name: '43″', values: { size: 43 } },
+          { name: '55″', values: { size: 55 } },
+          { name: '65″', values: { size: 65 } },
+          { name: '75″', values: { size: 75 } },
+          { name: '85″', values: { size: 85 } },
+          { name: '100″', values: { size: 100 } },
         ],
       },
-      { name: 'size', type: 'range', min: 32, max: 100, step: 1, default: 55, unit: 'â€³' },
+      { name: 'size', type: 'range', min: 32, max: 100, step: 1, default: 55, unit: '″' },
       { name: 'mount', type: 'select', options: ['feet', 'pedestal', 'wall'], default: 'feet' },
       { name: 'content', type: 'select', options: ['home', 'wallpaper', 'off'], default: 'home' },
       { name: 'frameColor', type: 'color', default: '#15161a' },
@@ -604,6 +707,9 @@ export const COMPONENTS = [
       { name: 'accentColor', type: 'color', default: '#3b3f4b' },
       { name: 'finish', type: 'select', options: ['leather', 'matte', 'gloss'], default: 'leather' },
       { name: 'adjust', type: 'range', min: 0, max: 1, step: 0.02, default: 0.3 },
+      { name: 'bandWidth', type: 'range', min: 2, max: 6, step: 0.1, default: 3.8, unit: 'cm' },
+      { name: 'bandThickness', type: 'range', min: 0.6, max: 2.4, step: 0.05, default: 1.3, unit: 'cm' },
+      { name: 'bandHeight', type: 'range', min: 7, max: 15, step: 0.25, default: 10, unit: 'cm' },
       { name: 'fold', type: 'range', min: 0, max: 1, step: 0.02, default: 0 },
       { name: 'autoRotate', type: 'toggle', default: false },
     ],
@@ -783,6 +889,59 @@ export const COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'lighter',
+    name: 'Lighter',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A flip-top lighter: the lid snaps open on its hinge, the flint wheel throws sparks, and the flame flickers and leans in the wind.',
+    controls: [
+      { name: 'finish', type: 'select', options: ['brushed', 'polished', 'black', 'brass', 'copper'], default: 'brushed' },
+      { name: 'open', type: 'toggle', default: false },
+      { name: 'lit', type: 'toggle', default: false },
+      { name: 'flameSize', type: 'range', min: 0.5, max: 1.6, step: 0.05, default: 1 },
+      { name: 'wind', type: 'range', min: -1, max: 1, step: 0.05, default: 0 },
+      { name: 'engraving', type: 'text', default: 'RD' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (clicking opens the lid and strikes the flame).
+    preview: (p, set) => <LighterModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['LighterModel.jsx', 'lighter/LighterScene.jsx', 'lighter/Lighter.jsx', 'lighter/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'pocket-knife',
+    name: 'Pocket Knife',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'A multi-tool with a blade, small blade, bottle opener and saw on two rivets. Drag a tool to fold it out; it snaps to closed, half open or open.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Classic red', values: { scaleColor: '#b3202b', scaleFinish: 'gloss', steel: 'satin' } },
+          { name: 'Walnut', values: { scaleFinish: 'wood', steel: 'polished' } },
+          { name: 'Alox silver', values: { scaleColor: '#c3c7cd', scaleFinish: 'aluminium', steel: 'satin' } },
+          { name: 'Olive', values: { scaleColor: '#5d6b45', scaleFinish: 'matte', steel: 'black' } },
+          { name: 'Midnight', values: { scaleColor: '#1e2a44', scaleFinish: 'gloss', steel: 'polished' } },
+        ],
+      },
+      { name: 'pose', type: 'select', options: ['closed', 'blade', 'all'], default: 'blade' },
+      { name: 'bladeStyle', type: 'select', options: ['drop', 'clip'], default: 'drop' },
+      { name: 'scaleColor', type: 'color', default: '#b3202b' },
+      { name: 'scaleFinish', type: 'select', options: ['gloss', 'matte', 'wood', 'aluminium'], default: 'gloss' },
+      { name: 'steel', type: 'select', options: ['satin', 'polished', 'black'], default: 'satin' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <KnifeModel {...p} height="100%" />,
+    fill: true,
+    files: ['KnifeModel.jsx', 'knife/KnifeScene.jsx', 'knife/Knife.jsx', 'knife/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'drafting-grid',
     name: 'Drafting Grid',
     category: 'Backgrounds',
@@ -812,7 +971,7 @@ export const COMPONENTS = [
     controls: [
       { name: 'speed', type: 'range', min: 1, max: 8, step: 0.5, default: 3.5, unit: 's' },
       { name: 'pause', type: 'range', min: 0, max: 4, step: 0.2, default: 1.2, unit: 's' },
-      { name: 'angle', type: 'range', min: 0, max: 180, step: 5, default: 115, unit: 'Â°' },
+      { name: 'angle', type: 'range', min: 0, max: 180, step: 5, default: 115, unit: '°' },
       { name: 'intensity', type: 'range', min: 0.1, max: 1, step: 0.05, default: 0.55 },
       { name: 'width', type: 'range', min: 5, max: 50, step: 1, default: 22, unit: '%' },
       { name: 'base', type: 'color', default: '#15171a' },
@@ -1679,6 +1838,26 @@ export const COMPONENTS = [
     files: ['SkeuConsole.jsx', 'ui/onscreen.js'],
     deps: [],
   },
+  icon(HomeIcon, 'HomeIcon.jsx', 'home', 'Home', 'A house outline icon.'),
+  icon(SearchIcon, 'SearchIcon.jsx', 'search', 'Search', 'A magnifying-glass search icon.'),
+  icon(HeartIcon, 'HeartIcon.jsx', 'heart', 'Heart', 'A heart outline icon.'),
+  icon(StarIcon, 'StarIcon.jsx', 'star', 'Star', 'A five-pointed star icon.'),
+  icon(BellIcon, 'BellIcon.jsx', 'bell', 'Bell', 'A notification bell icon.'),
+  icon(UserIcon, 'UserIcon.jsx', 'user', 'User', 'A person / profile icon.'),
+  icon(MailIcon, 'MailIcon.jsx', 'mail', 'Mail', 'An envelope / mail icon.'),
+  icon(SettingsIcon, 'SettingsIcon.jsx', 'settings', 'Settings', 'A settings icon drawn as two sliders.'),
+  icon(CheckIcon, 'CheckIcon.jsx', 'check', 'Check', 'A checkmark icon.'),
+  icon(CloseIcon, 'CloseIcon.jsx', 'close', 'Close', 'A close / dismiss (×) icon.'),
+  emoji(JoyEmoji, 'JoyEmoji.jsx', 'joy', 'Joy', 'Face with tears of joy.'),
+  emoji(HeartEmoji, 'HeartEmoji.jsx', 'red-heart', 'Red Heart', 'A glossy red heart.'),
+  emoji(HeartEyesEmoji, 'HeartEyesEmoji.jsx', 'heart-eyes', 'Heart Eyes', 'Smiling face with heart eyes.'),
+  emoji(RoflEmoji, 'RoflEmoji.jsx', 'rofl', 'ROFL', 'Rolling on the floor laughing.'),
+  emoji(SmileEmoji, 'SmileEmoji.jsx', 'smile', 'Smile', 'Smiling face with blush.'),
+  emoji(PrayEmoji, 'PrayEmoji.jsx', 'folded-hands', 'Folded Hands', 'Hands pressed together.'),
+  emoji(ThumbsUpEmoji, 'ThumbsUpEmoji.jsx', 'thumbs-up', 'Thumbs Up', 'A thumbs-up hand.'),
+  emoji(CryEmoji, 'CryEmoji.jsx', 'loud-cry', 'Loud Cry', 'Loudly crying face with streaming tears.'),
+  emoji(FireEmoji, 'FireEmoji.jsx', 'fire', 'Fire', 'An orange flame with a yellow core.'),
+  emoji(PleadingEmoji, 'PleadingEmoji.jsx', 'pleading', 'Pleading', 'Pleading face with big glossy eyes.'),
 ]
 
 // Components that take children, so usage shows them as wrappers.
@@ -1701,6 +1880,9 @@ export function usageFor(c, values) {
       const v = values[k.name]
       if (typeof v === 'boolean') return v ? k.name : `${k.name}={false}`
       if (typeof v === 'number') return `${k.name}={${v}}`
+      // an uploaded image is a long data URL: show a file path instead
+      if (k.type === 'image') return `${k.name}="/your-logo.png"`
+      if (/["\n\\]/.test(v)) return `${k.name}={${JSON.stringify(v)}}`
       return `${k.name}="${v}"`
     })
   const wraps = WRAPPERS.includes(tag)

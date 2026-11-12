@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { CATEGORIES, COMPONENTS, UI_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
+import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
 import { highlight } from './highlight.js'
 import { markdownFor, promptFor, sourceText, typesFor } from './ai.js'
 import { Icon } from '../Nav.jsx'
@@ -14,7 +14,37 @@ const CAT_ICON = {
   'Phone UI': <path d="M6.5 2.5h7a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 5 16V4a1.5 1.5 0 0 1 1.5-1.5zM8.5 4.5h3M9.5 15h1" />,
   '3D & Materials': <path d="M10 2.5 16.5 6v8L10 17.5 3.5 14V6zM10 10 3.5 6M10 10l6.5-4M10 10v7.5" />,
   Backgrounds: <path d="M3.500 3.500h13v13h-13zM3.500 8h13M3.500 12h13M8 3.500v13M12 3.500v13" />,
+  'Icons & Emojis': <path d="M3.2 6.2a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0-5.6 0zM11.5 3.4h5v5h-5zM10 11l4.5 6h-9z" />,
 }
+
+// Categories that are placeholders until their components land.
+// A small copy button that sits on an icon/emoji card and copies its source.
+function CopyChip({ code }) {
+  const [done, setDone] = useState(false)
+  const copy = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(code)
+      setDone(true)
+      setTimeout(() => setDone(false), 1400)
+    } catch {}
+  }
+  return (
+    <button type="button" className="copy-chip" onClick={copy} aria-label={done ? 'Copied' : 'Copy code'} title={done ? 'Copied' : 'Copy code'}>
+      {done ? (
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" /></svg>
+      ) : (
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="7" width="9" height="9" rx="2" /><path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" /></svg>
+      )}
+    </button>
+  )
+}
+
+// Categories whose pages are split into sections.
+const SECTIONS = { UI: UI_STYLES, 'Icons & Emojis': ICON_STYLES }
+
+const COMING_SOON = ['Phone UI', 'Icons & Emojis']
 
 const PM = { npm: 'npm i', pnpm: 'pnpm add', yarn: 'yarn add', bun: 'bun add' }
 const WIDTHS = { desktop: '100%', tablet: '768px', mobile: '390px' }
@@ -108,7 +138,46 @@ function Control({ c, value, onChange, onPatch, current }) {
         <label className="ctl-name" htmlFor={id}>
           {c.name}
         </label>
-        <input id={id} className="ctl-text" value={value} maxLength={32} onChange={(e) => onChange(e.target.value)} />
+        <input id={id} className="ctl-text" value={value} maxLength={c.maxLength ?? 32} onChange={(e) => onChange(e.target.value)} />
+      </div>
+    )
+  }
+  if (c.type === 'textarea') {
+    return (
+      <div className="ctl ctl-wide">
+        <label className="ctl-name" htmlFor={id}>
+          {c.name}
+          {c.hint && <span className="ctl-hint">{c.hint}</span>}
+        </label>
+        <textarea id={id} className="ctl-text ctl-area" value={value} rows={c.rows ?? 8} maxLength={c.maxLength ?? 6000} spellCheck={false} onChange={(e) => onChange(e.target.value)} />
+      </div>
+    )
+  }
+  if (c.type === 'image') {
+    // Read the chosen file as a data URL, so the preview works without a server.
+    const pick = (e) => {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = () => onChange(String(reader.result))
+      reader.readAsDataURL(file)
+    }
+    return (
+      <div className="ctl">
+        <span className="ctl-name">{c.name}</span>
+        <div className="ctl-image">
+          {value ? <img src={value} alt="" /> : <span className="ctl-image-empty">None</span>}
+          <label className="ctl-image-btn">
+            {value ? 'Replace' : 'Upload'}
+            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={pick} />
+          </label>
+          {value && (
+            <button type="button" className="ctl-image-btn" onClick={() => onChange('')}>
+              Remove
+            </button>
+          )}
+        </div>
       </div>
     )
   }
@@ -317,7 +386,7 @@ function Sidebar({ active, open, onClose, favs, category }) {
           {visible.map((g) => (
             <div className={`lib-cat${g.fav ? ' favs' : ''}`} key={g.name}>
               <h4>{g.fav ? '★ ' : ''}{g.name}</h4>
-              {(g.name === 'UI' ? UI_STYLES.map((st) => ({ st, items: g.items.filter((c) => c.style === st) })).filter((x) => x.items.length) : [{ st: null, items: g.items }]).map(({ st, items }) => (
+              {(SECTIONS[g.name] ? SECTIONS[g.name].map((st) => ({ st, items: g.items.filter((c) => c.style === st) })).filter((x) => x.items.length) : [{ st: null, items: g.items }]).map(({ st, items }) => (
                 <div className={st ? 'lib-style' : undefined} key={st ?? 'all'}>
                 {st && <h5>{st}</h5>}
               {items.map((c) => (
@@ -339,7 +408,7 @@ function Sidebar({ active, open, onClose, favs, category }) {
               ))}
             </div>
           ))}
-          {!visible.length && <p className="lib-none">{cat === 'Phone UI' && !q ? 'Phone UI components are coming soon.' : 'No matching components'}</p>}
+          {!visible.length && <p className="lib-none">{COMING_SOON.includes(cat) && !q ? `${cat} components are coming soon.` : 'No matching components'}</p>}
         </nav>
       </aside>
       {hover && (
@@ -466,10 +535,10 @@ export function CategoryPage() {
             <SortMenu value={sort} onChange={setSort} />
           </div>
         </header>
-        {name === 'UI' && (
+        {SECTIONS[name] && (
           <div className="style-chips" role="group" aria-label="Filter by style">
-            {['All', ...UI_STYLES].map((st) => {
-              const n = COMPONENTS.filter((c) => c.category === 'UI' && (st === 'All' || c.style === st)).length
+            {['All', ...SECTIONS[name]].map((st) => {
+              const n = COMPONENTS.filter((c) => c.category === name && (st === 'All' || c.style === st)).length
               return (
                 <button key={st} aria-pressed={style === st} onClick={() => setStyle(st)}>
                   {st === 'All' ? 'All styles' : st}<span>{n}</span>
@@ -478,19 +547,27 @@ export function CategoryPage() {
             })}
           </div>
         )}
-        <div className="browse-grid">
+        <div className={name === 'Icons & Emojis' ? 'browse-grid compact' : 'browse-grid'}>
           {items.map((c) => (
-            <Link className="browse-card" key={c.slug} to={`/library/${c.slug}`}>
-              <img src={`/previews/${c.slug}.jpg`} alt="" loading="lazy" />
+            <Link className={c.category === 'Icons & Emojis' ? 'browse-card icon' : 'browse-card'} key={c.slug} to={`/library/${c.slug}`}>
+              {/* icons are tiny SVGs, so the card draws them live instead of loading a screenshot */}
+              {c.category === 'Icons & Emojis' ? (
+                <span className="browse-icon">
+                  {c.preview({ ...defaultsFor(c), size: 36, color: 'currentColor' })}
+                  <CopyChip code={sourceFor(c)[0]?.code ?? ''} />
+                </span>
+              ) : (
+                <img src={`/previews/${c.slug}.jpg`} alt="" loading="lazy" />
+              )}
               <strong>
                 {c.name}
                 {c.isNew && <span className="badge">New</span>}
               </strong>
-              <small>{c.style ? `${c.category} · ${c.style}` : c.category}</small>
+              {c.category !== 'Icons & Emojis' && <small>{c.style ? `${c.category} · ${c.style}` : c.category}</small>}
             </Link>
           ))}
         </div>
-        {!items.length && <p className="lib-none">{name === 'Phone UI' && !q ? 'Phone UI components are coming soon.' : 'No matching components'}</p>}
+        {!items.length && <p className="lib-none">{COMING_SOON.includes(name) && !q ? `${name} components are coming soon.` : 'No matching components'}</p>}
       </div>
     </div>
   )
@@ -585,11 +662,6 @@ export default function Library() {
           {comp.isNew && <span className="badge badge-lg">New</span>}
         </h1>
         <p className="lib-desc">{comp.description}</p>
-        <div className="lib-meta">
-          <span>{comp.category}</span>
-          <span>{vc.length} props</span>
-          <span>{deps.length} dependencies</span>
-        </div>
 
         <div className="docs-toolbar">
           <div className="pillswitch" role="tablist" style={{ '--i': tab === 'preview' ? 0 : 1 }}>

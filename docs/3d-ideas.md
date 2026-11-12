@@ -18,6 +18,8 @@ dispose of its geometry, materials and textures.
 | Built | Component |
 | --- | --- |
 | ✓ | 1. Mechanical keyboard |
+| ✓ | 2. Lighter |
+| ✓ | 3. Pocket knife |
 | ✓ | 68. Newton's cradle |
 | ✓ | Typewriter (extra, not one of the 100) |
 
@@ -35,13 +37,13 @@ headphones, tablet bot and tablet.
 - **Controls:** layout (60%, TKL, full), switch type, keycap colour, legend colour, case colour, RGB on or off, RGB effect.
 - **Detail:** keycaps on a sculpted row profile, so each row has its own tilt, and the stabilised space bar rocks on its wire.
 
-### 2. Lighter
+### 2. Lighter ✓
 - **Interaction:** click to flip the lid open, drag down on the wheel to strike, click again to snap it shut and kill the flame.
 - **Sound:** the metallic clink of the lid and a flint scratch.
 - **Controls:** finish (brushed, polished, black, brass), engraving text, flame size, wind.
 - **Detail:** the lid turns on a hinge with a cam spring, so it snaps to fully open or shut, and the flame is a soft shader that leans with wind.
 
-### 3. Pocket knife
+### 3. Pocket knife ✓
 - **Interaction:** click a tool to swing it out; drag it to any angle and it snaps to closed, half-stop or open.
 - **Sound:** a firm click at each detent.
 - **Controls:** number of tools, scale colour, steel finish, blade shape.
