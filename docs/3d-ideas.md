@@ -19,6 +19,7 @@ dispose of its geometry, materials and textures.
 | --- | --- |
 | ✓ | 1. Mechanical keyboard |
 | ✓ | 68. Newton's cradle |
+| ✓ | Typewriter (extra, not one of the 100) |
 
 Already in the library but not on this list: clear-coat card, pickup, snake,
 turntable, vinyl record, sunglasses, watch, laptop, glass bottle, TV, phone,

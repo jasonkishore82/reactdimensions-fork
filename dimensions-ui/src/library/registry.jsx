@@ -68,9 +68,10 @@ import IpadModel from '../lib/IpadModel.jsx'
 import TabletModel from '../lib/TabletModel.jsx'
 import CradleModel from '../lib/CradleModel.jsx'
 import KeyboardModel from '../lib/KeyboardModel.jsx'
+import TypewriterModel from '../lib/TypewriterModel.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -747,6 +748,38 @@ export const COMPONENTS = [
     preview: (p) => <KeyboardModel {...p} height="100%" />,
     fill: true,
     files: ['KeyboardModel.jsx', 'keyboard/KeyboardScene.jsx', 'keyboard/Keyboard.jsx', 'keyboard/layout.js', 'keyboard/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'typewriter',
+    name: 'Typewriter',
+    category: '3D & Materials',
+    isNew: true,
+    description: 'Type and a typebar swings up to strike the platen, ink lands on the paper and the carriage steps along. Bell, lever and line feed included.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Racing green', values: { bodyColor: '#1f3d33', keyColor: '#1b1b1b', legendColor: '#f4efe2' } },
+          { name: 'Cherry', values: { bodyColor: '#8e1f22', keyColor: '#1b1b1b', legendColor: '#f4efe2' } },
+          { name: 'Sky', values: { bodyColor: '#7fb3c8', keyColor: '#f2ede2', legendColor: '#23303a' } },
+          { name: 'Ivory', values: { bodyColor: '#e6dcc6', keyColor: '#3b2f25', legendColor: '#f4efe2' } },
+          { name: 'Matte black', values: { bodyColor: '#1c1c1e', keyColor: '#2b2b2e', legendColor: '#e9e5dc' } },
+        ],
+      },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'bodyColor', type: 'color', default: '#1f3d33' },
+      { name: 'keyColor', type: 'color', default: '#1b1b1b' },
+      { name: 'legendColor', type: 'color', default: '#f4efe2' },
+      { name: 'paperColor', type: 'color', default: '#f8f4ea' },
+      { name: 'inkColor', type: 'color', default: '#1d1b26' },
+      { name: 'ribbonColor', type: 'color', default: '#1a1a1a' },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <TypewriterModel {...p} height="100%" />,
+    fill: true,
+    files: ['TypewriterModel.jsx', 'typewriter/TypewriterScene.jsx', 'typewriter/Typewriter.jsx', 'typewriter/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
