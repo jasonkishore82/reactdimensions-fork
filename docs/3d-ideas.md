@@ -25,6 +25,7 @@ dispose of its geometry, materials and textures.
 | ✓ | 9. Desk lamp |
 | ✓ | 68. Newton's cradle |
 | ✓ | Typewriter (extra, not one of the 100) |
+| ✓ | Dice (extra: rigid-body physics, no physics library) |
 
 Already in the library but not on this list: clear-coat card, pickup, snake,
 turntable, vinyl record, sunglasses, watch, laptop, glass bottle, TV, phone,
