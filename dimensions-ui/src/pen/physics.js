@@ -22,7 +22,7 @@ const ITER = 8
 const MU = 0.32 // resin on paper
 const REST = 0.28
 const REST_MIN = 14 // below this closing speed a contact does not bounce
-const ROLL = 0.035 // rolling resistance (a length: how far the push sits ahead)
+const ROLL = 0.006 // rolling resistance (a length: how far ahead of the contact the push sits)
 const SPIN = 0.05 // resistance to spinning flat on the desk
 const SLOP = 0.004
 
