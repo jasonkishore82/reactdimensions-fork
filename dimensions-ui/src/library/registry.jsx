@@ -17,6 +17,8 @@ import RopeSway from '../lib/RopeSway.jsx'
 import IsolatePart from '../lib/IsolatePart.jsx'
 import HotspotNotes from '../lib/HotspotNotes.jsx'
 import ScrollAssembly from '../lib/ScrollAssembly.jsx'
+import StickyColor from '../lib/StickyColor.jsx'
+import ReadingRing from '../lib/ReadingRing.jsx'
 import ScrollRotate from '../lib/ScrollRotate.jsx'
 import ScrollGallery from '../lib/ScrollGallery.jsx'
 import ScrollSkew from '../lib/ScrollSkew.jsx'
@@ -2003,6 +2005,46 @@ const ALL_COMPONENTS = [
     preview: (p, set) => <ShirtModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['ShirtModel.jsx', 'shirt/ShirtScene.jsx', 'shirt/Shirt.jsx', 'shirt/pattern.js', 'shirt/cloth.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'sticky-color',
+    name: 'Sticky Color',
+    category: '3D & Materials',
+    style: 'Interactive 3D',
+    isNew: true,
+    description: "Copy scrolls past while the pinned bottle takes on each block's colourway, blending smoothly as you go, with the backdrop tinted to match.",
+    controls: [
+      { name: 'colors', type: 'text', default: '#8fa58a, #c4704f, #2f3b52, #e2b33c, #e8e3d8' },
+      { name: 'names', type: 'text', default: 'Sage, Clay, Ink, Sun, Chalk' },
+      { name: 'tint', type: 'range', min: 0, max: 0.6, step: 0.02, default: 0.22 },
+      { name: 'background', type: 'color', default: '#f4f1ea' },
+      { name: 'ink', type: 'color', default: '#1c1a16' },
+    ],
+    preview: (p) => <StickyColor {...p} height="100%" />,
+    fill: true,
+    files: ['StickyColor.jsx', 'ix/StickyColor.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'reading-ring',
+    name: 'Reading Ring',
+    category: '3D & Materials',
+    style: 'Interactive 3D',
+    isNew: true,
+    description: 'A glossy 3D ring fills as you read the article, showing the percentage and minutes left, and pops when you reach the end. Click it to jump a section.',
+    controls: [
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+      { name: 'done', type: 'color', default: '#2f9e62' },
+      { name: 'track', type: 'color', default: '#d9d3c7' },
+      { name: 'background', type: 'color', default: '#f4f1ea' },
+      { name: 'ink', type: 'color', default: '#1c1a16' },
+      { name: 'wpm', type: 'range', min: 120, max: 400, step: 10, default: 230 },
+      { name: 'ringSize', type: 'range', min: 72, max: 180, step: 4, default: 112, unit: 'px' },
+    ],
+    preview: (p) => <ReadingRing {...p} height="100%" />,
+    fill: true,
+    files: ['ReadingRing.jsx', 'ix/ReadingRing.jsx'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
