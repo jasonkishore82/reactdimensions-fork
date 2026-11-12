@@ -655,6 +655,9 @@
 .ai-pop button:hover, .ai-pop button:focus-visible { background: var(--glass-2); outline: 0; }
 .ai-pop strong { display: block; font: 500 14px/1.2 var(--sans); }
 .ai-pop small { display: block; margin-top: 3px; font: 400 12.5px/1.35 var(--sans); color: var(--ink-3); }
+.ai-pop .ai-sep { height: 1px; margin: 4px 8px; background: var(--glass-2); }
+.ai-pop .ai-open { display: flex; align-items: center; gap: 10px; color: var(--ink-2, var(--ink)); }
+.ai-pop .ai-open svg { flex: none; color: var(--ink-3); }
 .fav-btn { font-size: 15px; padding: 7px 11px; }
 .fav-btn.on { color: var(--signal-ink); border-color: color-mix(in srgb, var(--signal) 45%, transparent); background: color-mix(in srgb, var(--signal) 12%, transparent); }
 .lang-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 26px 0 -14px; }
