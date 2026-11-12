@@ -219,8 +219,9 @@ export function makeGeometry() {
     // the works
     head: new THREE.CylinderGeometry(0.57, 0.57, PISTON.half * 2, 40).rotateZ(Math.PI / 2),
     seal: new THREE.TorusGeometry(0.575, 0.03, 8, 40).rotateY(Math.PI / 2),
-    ink: new THREE.CylinderGeometry(0.585, 0.585, 1, 40, 1, true).rotateZ(Math.PI / 2),
-    inkCap: new THREE.CircleGeometry(0.585, 40).rotateY(-Math.PI / 2),
+    ink: new THREE.CylinderGeometry(0.585, 0.585, 1, 40).rotateZ(Math.PI / 2),
+    // the inside of the barrel, so the window never shows through to the room
+    bore: new THREE.CylinderGeometry(0.6, 0.6, 7.92, 40, 1, true).rotateZ(Math.PI / 2).translate(-1.46, 0, 0),
     tube: new THREE.CylinderGeometry(0.22, 0.22, 1, 24).rotateZ(Math.PI / 2),
     tubeOuter: new THREE.CylinderGeometry(0.27, 0.27, 1, 24).rotateZ(Math.PI / 2),
     spindle: new THREE.CylinderGeometry(SPINDLE.r - 0.02, SPINDLE.r - 0.02, SPINDLE.x1 - SPINDLE.x0, 20).rotateZ(Math.PI / 2).translate((SPINDLE.x0 + SPINDLE.x1) / 2, 0, 0),
