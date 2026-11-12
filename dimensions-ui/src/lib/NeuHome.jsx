@@ -79,7 +79,11 @@ export default function NeuHome({ surface = '#e6ebf2', accent = '#ff7a45', style
         .nh-room[aria-current='true'] { color: var(--accent-ink); }
         .nh-room[aria-current='true'] i { background: var(--accent); }
         .nh-center { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .nh-dial { position: relative; width: 220px; height: 220px; border-radius: 50%; display: grid; place-items: center; touch-action: none; cursor: grab; }
+        .nh-dial { position: relative; width: 220px; height: 220px; border-radius: 50%; display: grid; place-items: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        .nh-dial:active { cursor: grabbing; }
+        /* no outline after a click or drag; a ring in the accent colour for keyboard focus only */
+        .nh-dial:focus { outline: none; }
+        .nh-dial:focus-visible:not([data-pointer]) { outline: 2px solid var(--accent); outline-offset: 6px; }
         .nh-dial svg { position: absolute; inset: 0; }
         .nh-core { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; text-align: center; pointer-events: none; }
         .nh-core b { display: block; font-size: 38px; font-weight: 300; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
@@ -125,9 +129,17 @@ export default function NeuHome({ surface = '#e6ebf2', accent = '#ff7a45', style
             aria-valuemin={MIN}
             aria-valuemax={MAX}
             aria-valuenow={temp}
-            onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); fromPointer(e) }}
+            onPointerDown={(e) => {
+              // a drag on the dial turns it; it must never start a text selection
+              e.preventDefault()
+              e.currentTarget.dataset.pointer = '' // focus came from the pointer: no ring
+              e.currentTarget.focus({ preventScroll: true })
+              e.currentTarget.setPointerCapture(e.pointerId)
+              fromPointer(e)
+            }}
             onPointerMove={(e) => e.buttons && fromPointer(e)}
-            onKeyDown={(e) => { if (e.key === 'ArrowUp' || e.key === 'ArrowRight') setTemp(temp + 0.5); if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') setTemp(temp - 0.5) }}
+            onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (e.key === 'ArrowUp' || e.key === 'ArrowRight') setTemp(temp + 0.5); if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') setTemp(temp - 0.5) }}
           >
             <svg viewBox="0 0 220 220" aria-hidden="true">
               <circle cx="110" cy="110" r={R} fill="none" stroke="var(--lo)" strokeOpacity=".35" strokeWidth="10" strokeDasharray={`${(SWEEP / 360) * C} ${C}`} strokeLinecap="round" transform="rotate(135 110 110)" />

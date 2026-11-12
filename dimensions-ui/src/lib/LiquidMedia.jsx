@@ -81,7 +81,10 @@ export default function LiquidMedia({ strength = 70, autoHide = true, style }) {
         .lm-center { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 22px; }
         .lm-bar { position: absolute; left: 22px; right: 22px; bottom: 18px; display: flex; align-items: center; gap: 12px; }
         .lm-time { font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0,0,0,.5); min-width: 38px; }
-        .lm-tube { flex: 1; height: 28px; border-radius: 14px; cursor: pointer; touch-action: none; }
+        .lm-tube { flex: 1; height: 28px; border-radius: 14px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* no outline after a click or drag; an accent ring for keyboard focus only */
+        .lm-tube:focus { outline: none; }
+        .lm-tube:focus-visible:not([data-pointer]) { outline: 2px solid var(--accent); outline-offset: 4px; }
         .lm-played { position: absolute; left: 4px; top: 50%; height: 6px; margin-top: -3px; border-radius: 3px; background: rgba(255,255,255,.85); pointer-events: none; }
         .lm-drop { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e8eefc 40%, #b7c5e8); box-shadow: 0 2px 6px rgba(0,0,0,.35); pointer-events: none; }
         .lm-marks i { position: absolute; top: 50%; width: 2px; height: 10px; margin-top: -5px; background: rgba(255,255,255,.55); pointer-events: none; }
@@ -134,9 +137,10 @@ export default function LiquidMedia({ strength = 70, autoHide = true, style }) {
             aria-valuemin={0}
             aria-valuemax={LENGTH}
             aria-valuenow={Math.floor(t)}
-            onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); seek(e) }}
+            onPointerDown={(e) => { e.preventDefault(); e.currentTarget.dataset.pointer = ''; e.currentTarget.focus({ preventScroll: true }); e.currentTarget.setPointerCapture(e.pointerId); seek(e) }}
             onPointerMove={(e) => { specular(e); if (e.buttons) seek(e) }}
-            onKeyDown={(e) => { if (e.key === 'ArrowRight') setT(Math.min(LENGTH, t + 5)); if (e.key === 'ArrowLeft') setT(Math.max(0, t - 5)) }}
+            onBlur={(e) => { delete e.currentTarget.dataset.pointer }}
+            onKeyDown={(e) => { delete e.currentTarget.dataset.pointer; if (e.key === 'ArrowRight') setT(Math.min(LENGTH, t + 5)); if (e.key === 'ArrowLeft') setT(Math.max(0, t - 5)) }}
           >
             <span className="lm-marks">{CHAPTERS.slice(1).map(([n, s]) => <i key={n} style={{ left: `${(s / LENGTH) * 100}%` }} />)}</span>
             <span className="lm-played" style={{ width: `calc(${(t / LENGTH) * 100}% - 4px)` }} />
