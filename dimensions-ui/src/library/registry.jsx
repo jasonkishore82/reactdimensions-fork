@@ -86,6 +86,8 @@ import JellyText from '../lib/JellyText.jsx'
 import AutumnLeaves from '../lib/AutumnLeaves.jsx'
 import VineText from '../lib/VineText.jsx'
 import ConstellationText from '../lib/ConstellationText.jsx'
+import FootballModel from '../lib/FootballModel.jsx'
+import BasketballModel from '../lib/BasketballModel.jsx'
 import { lazy, Suspense } from 'react'
 const ExtrudedText = lazy(() => import('../lib/ExtrudedText.jsx'))
 const CylinderText = lazy(() => import('../lib/CylinderText.jsx'))
@@ -3632,6 +3634,80 @@ const ALL_COMPONENTS = [
     preview: (p) => <DiceModel {...p} height="100%" />,
     fill: true,
     files: ['DiceModel.jsx', 'dice/DiceScene.jsx', 'dice/Dice.jsx', 'dice/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'football',
+    name: 'Football',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A classic 32-panel football at real size and weight, with stitched seams and grained leather. Real ball physics: it bounces and squashes, rolls to a stop, and bends in the air from its spin. Tap it to kick it (off-centre for curl), drag it to throw it.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Classic', values: { panel: '#f3f3f1', patch: '#121214', thread: '#d8d8d4' } },
+          { name: 'Retro', values: { panel: '#e9dcbc', patch: '#3b2a1c', thread: '#cbb98f' } },
+          { name: 'Winter', values: { panel: '#ffb21a', patch: '#1a1a1d', thread: '#e7a020' } },
+          { name: 'Red', values: { panel: '#f6f3ee', patch: '#c8102e', thread: '#dcd6cc' } },
+        ],
+      },
+      { name: 'panel', type: 'color', default: '#f3f3f1' },
+      { name: 'patch', type: 'color', default: '#121214' },
+      { name: 'thread', type: 'color', default: '#d8d8d4' },
+      { name: 'pressure', type: 'range', min: 0.3, max: 1.6, step: 0.05, default: 1 },
+      { name: 'kick', type: 'range', min: 4, max: 32, step: 1, default: 16, unit: 'm/s' },
+      { name: 'curve', type: 'range', min: 0, max: 3, step: 0.1, default: 1 },
+      { name: 'gravity', type: 'range', min: 0.2, max: 2, step: 0.05, default: 1, unit: 'g' },
+      { name: 'background', type: 'color', default: '#d6d6d6' },
+      { name: 'floor', type: 'color', default: '#cfcfcf' },
+      { name: 'follow', type: 'toggle', default: true },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <FootballModel {...p} height="100%" />,
+    fill: true,
+    files: ['FootballModel.jsx', 'football/FootballScene.jsx', 'football/Football.jsx', 'football/physics.js', 'football/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'basketball',
+    name: 'Basketball',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'An 8-panel basketball at real size and weight: pebbled rubber, grooved channels and a valve. It bounces to a regulation height on a hardwood floor, squashes, rolls and spins. Dribble it, slap it, throw it with backspin, or twirl it.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Indoor', values: { panel: '#c8582b', seam: '#1b1714', floor: '#b98d5f' } },
+          { name: 'Outdoor', values: { panel: '#a9532f', seam: '#231a15', floor: '#7d8288' } },
+          { name: 'Tan', values: { panel: '#d07a3c', seam: '#2a1d14', floor: '#c49a68' } },
+          { name: 'Street', values: { panel: '#2b3a8f', seam: '#f2f2ee', floor: '#5b5e63' } },
+        ],
+      },
+      { name: 'panel', type: 'color', default: '#c8582b' },
+      { name: 'seam', type: 'color', default: '#1b1714' },
+      { name: 'pressure', type: 'range', min: 0.3, max: 1.6, step: 0.05, default: 1 },
+      { name: 'push', type: 'range', min: 2, max: 14, step: 0.5, default: 6, unit: 'm/s' },
+      { name: 'backspin', type: 'range', min: 0, max: 3, step: 0.1, default: 1 },
+      { name: 'dribbleHeight', type: 'range', min: 0.45, max: 1.4, step: 0.05, default: 0.85, unit: 'm' },
+      { name: 'gravity', type: 'range', min: 0.2, max: 2, step: 0.05, default: 1, unit: 'g' },
+      { name: 'background', type: 'color', default: '#d9d6d2' },
+      { name: 'floor', type: 'color', default: '#b98d5f' },
+      { name: 'follow', type: 'toggle', default: true },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <BasketballModel {...p} height="100%" />,
+    fill: true,
+    files: ['BasketballModel.jsx', 'basketball/BasketballScene.jsx', 'basketball/Basketball.jsx', 'basketball/physics.js', 'basketball/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
