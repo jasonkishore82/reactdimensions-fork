@@ -121,6 +121,7 @@ import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
 import GuitarModel from '../lib/GuitarModel.jsx'
+import DumbbellModel from '../lib/DumbbellModel.jsx'
 import GamepadModel from '../lib/GamepadModel.jsx'
 import LadderModel from '../lib/LadderModel.jsx'
 import ShirtModel from '../lib/ShirtModel.jsx'
@@ -147,7 +148,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../guitar/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -2009,6 +2010,38 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'dumbbells',
+    name: 'Dumbbells',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A pair of round rubber dumbbells with real rigid-body physics: true mass and inertia for the weight, rubber that grips, barely bounces and rolls to a stop. Pick one up anywhere and it hangs and swings from that point; drop it, throw it at the other, or click to roll it.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Black rubber', values: { rubberColor: '#161616', metalColor: '#dcdde0', background: '#e4e4e4' } },
+          { name: 'Graphite', values: { rubberColor: '#3a3c41', metalColor: '#d4d5d8', background: '#e8e8e6' } },
+          { name: 'Red', values: { rubberColor: '#8c1f1f', metalColor: '#dcdde0', background: '#ece7e4' } },
+          { name: 'Blue', values: { rubberColor: '#1f3a6b', metalColor: '#dcdde0', background: '#e5e8ec' } },
+          { name: 'Black chrome', values: { rubberColor: '#141414', metalColor: '#5a5c60', background: '#d9d9d9' } },
+        ],
+      },
+      { name: 'weight', type: 'range', min: 2.5, max: 30, step: 2.5, default: 10, unit: ' kg' },
+      { name: 'rubberColor', type: 'color', default: '#161616' },
+      { name: 'metalColor', type: 'color', default: '#dcdde0' },
+      { name: 'background', type: 'color', default: '#e4e4e4' },
+      { name: 'label', type: 'toggle', default: true },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <DumbbellModel {...p} height="100%" />,
+    fill: true,
+    files: ['DumbbellModel.jsx', 'dumbbell/DumbbellScene.jsx', 'dumbbell/Dumbbell.jsx', 'dumbbell/physics.js', 'dumbbell/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'gamepad',
     name: 'Gamepad',
     category: '3D & Materials',
@@ -2037,7 +2070,7 @@ const ALL_COMPONENTS = [
     ],
     preview: (p) => <GamepadModel {...p} height="100%" />,
     fill: true,
-    files: ['GamepadModel.jsx', 'gamepad/GamepadScene.jsx', 'gamepad/Gamepad.jsx', 'gamepad/audio.js'],
+    files: ['GamepadModel.jsx', 'gamepad/GamepadScene.jsx', 'gamepad/Gamepad.jsx', 'gamepad/shell.js', 'gamepad/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
