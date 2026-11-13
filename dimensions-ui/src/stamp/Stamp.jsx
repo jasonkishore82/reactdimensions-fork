@@ -523,7 +523,7 @@ export default function Stamp({
   const bodyRef = useRef()
   const upperRef = useRef()
   const cushionRef = useRef()
-  const st = useRef({ x: 0.6, z: 0.4, yaw: 0, tx: 0.6, tz: 0.4, y: 0, t: -1, printed: false, squash: 0, flip: faceProp ? 1 : 0, lift: 0, tilt: 0, nextYaw: 0 })
+  const st = useRef({ x: 0.6, z: 0.4, yaw: 0, tx: 0.6, tz: 0.4, y: 0, t: -1, printed: false, squash: 0, flip: faceProp ? 1 : 0, lift: 0, tilt: 0, nextYaw: 0, spinX: 0, spinY: 0 })
   const grab = useRef(null)
 
   const stampNow = () => {
@@ -551,7 +551,14 @@ export default function Stamp({
         gr.moved = true
         setDragging(true)
       }
-      if (gr.moved) {
+      if (gr.moved && gr.spin) {
+        // turned over: dragging spins it in the hand to look at the die
+        const s = st.current
+        s.spinY += (e.clientX - gr.lx) * 0.012
+        s.spinX = THREE.MathUtils.clamp(s.spinX + (e.clientY - gr.ly) * 0.01, -1.2, 1.2)
+        gr.lx = e.clientX
+        gr.ly = e.clientY
+      } else if (gr.moved) {
         const p = deskPoint(e.clientX, e.clientY)
         if (p) {
           const s = st.current
@@ -570,7 +577,7 @@ export default function Stamp({
       if (!gr.moved) {
         if (live.current.showFace) setShowFace(false)
         else stampNow()
-      } else play('tap', 0.6)
+      } else if (!gr.spin) play('tap', 0.6)
     }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
@@ -587,7 +594,7 @@ export default function Stamp({
     const s = st.current
     if (s.t >= 0) return
     const p = deskPoint(e.clientX, e.clientY)
-    grab.current = { sx: e.clientX, sy: e.clientY, moved: false, ox: p ? p.x - s.x : 0, oz: p ? p.z - s.z : 0 }
+    grab.current = { sx: e.clientX, sy: e.clientY, lx: e.clientX, ly: e.clientY, spin: live.current.showFace, moved: false, ox: p ? p.x - s.x : 0, oz: p ? p.z - s.z : 0 }
     if (controls) controls.enabled = false
   }
 
@@ -639,12 +646,18 @@ export default function Stamp({
     s.flip += ((w.showFace ? 1 : 0) - s.flip) * (1 - Math.exp(-dt * 6))
     const f = s.flip
     const fe = f * f * (3 - 2 * f)
+    if (!w.showFace) {
+      // set down square again
+      const r = 1 - Math.exp(-dt * 6)
+      s.spinX -= s.spinX * r
+      s.spinY -= s.spinY * r
+    }
 
     rootRef.current.position.set(s.x, PAPER.t + s.y + s.lift + fe * 4.2, s.z)
-    rootRef.current.rotation.set(s.tilt * 0.4, s.yaw, -s.tilt)
+    rootRef.current.rotation.set(s.tilt * 0.4, s.yaw + s.spinY, -s.tilt)
     // the turn is about the block's middle
     bodyRef.current.position.y = -(RELIEF + RUB_T + CUSH_T + S.h / 2)
-    bodyRef.current.parent.rotation.x = -2.05 * fe
+    bodyRef.current.parent.rotation.x = (-2.05 + s.spinX) * fe
     cushionRef.current.scale.y = 1 - s.squash * 0.38
     upperRef.current.position.y = RELIEF + RUB_T + CUSH_T * (1 - s.squash * 0.38)
   })

@@ -5,10 +5,28 @@ import { useEffect, useRef } from 'react'
 // shrunken image of what's behind it, as you do in real raindrops. Small
 // drops land and sit; bigger ones get heavy, slide down in a wobbly path,
 // swallow the small drops in their way and leave a clear trail behind.
+// Drops that land on a drop join it, so they grow until they're heavy
+// enough to let go.
+const FONTS = {
+  rounded: "700 SIZEpx 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif",
+  serif: "700 SIZEpx Georgia, 'Times New Roman', serif",
+  script: "italic 700 SIZEpx 'Brush Script MT', 'Segoe Script', cursive",
+  condensed: "800 SIZEpx 'Arial Narrow', Impact, sans-serif",
+}
+
 export default function RainWindow({
   text = 'OPEN',
   sign = '#ff3d6e',
+  font = 'rounded',
+  glow = 1,
+  night = '#141a26',
+  lights = true,
   rain = 1,
+  dropSize = 1,
+  slide = 1,
+  blur = 10,
+  zoom = 1,
+  trails = true,
   style,
 }) {
   const box = useRef()
@@ -31,12 +49,12 @@ export default function RainWindow({
     const sg = scene.getContext('2d')
     sg.scale(dpr, dpr)
     const bg = sg.createLinearGradient(0, 0, 0, H)
-    bg.addColorStop(0, '#141a26')
-    bg.addColorStop(1, '#0a0d14')
+    bg.addColorStop(0, night)
+    bg.addColorStop(1, '#05070b')
     sg.fillStyle = bg
     sg.fillRect(0, 0, W, H)
     // a few street lights
-    for (const [x, y, col, r] of [[0.15, 0.25, '#ffd28a', 60], [0.85, 0.3, '#8ad8ff', 50], [0.7, 0.85, '#ffb070', 70]]) {
+    for (const [x, y, col, r] of lights ? [[0.15, 0.25, '#ffd28a', 60], [0.85, 0.3, '#8ad8ff', 50], [0.7, 0.85, '#ffb070', 70]] : []) {
       const gl = sg.createRadialGradient(x * W, y * H, 0, x * W, y * H, r)
       gl.addColorStop(0, col)
       gl.addColorStop(1, 'transparent')
@@ -44,20 +62,20 @@ export default function RainWindow({
       sg.fillRect(0, 0, W, H)
     }
     let size = H * 0.34
-    const font = (s) => `700 ${s}px 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif`
-    sg.font = font(size)
+    const face = (s) => (FONTS[font] || FONTS.rounded).replace('SIZE', s)
+    sg.font = face(size)
     const tw = sg.measureText(text).width
     if (tw > W * 0.7) size *= (W * 0.7) / tw
-    sg.font = font(size)
+    sg.font = face(size)
     sg.textAlign = 'center'
     sg.textBaseline = 'middle'
     sg.shadowColor = sign
-    sg.shadowBlur = 30
+    sg.shadowBlur = 30 * glow
     sg.fillStyle = sign
     sg.fillText(text, W / 2, H / 2)
     sg.shadowBlur = 0
     sg.fillStyle = '#fff3f6'
-    sg.globalAlpha = 0.6
+    sg.globalAlpha = Math.min(1, 0.6 * glow)
     sg.fillText(text, W / 2, H / 2)
     sg.globalAlpha = 1
     // the same, blurred: the view through wet glass
@@ -65,12 +83,25 @@ export default function RainWindow({
     blurred.width = scene.width
     blurred.height = scene.height
     const bgc = blurred.getContext('2d')
-    bgc.filter = `blur(${10 * dpr}px)`
+    bgc.filter = `blur(${blur * dpr}px)`
     bgc.drawImage(scene, 0, 0)
 
     const drops = []
-    const add = (x, y, r) => drops.push({ x, y, r, vy: 0, slide: false, wob: Math.random() * 10 })
-    for (let k = 0; k < 160; k++) add(Math.random() * W, Math.random() * H, 1 + Math.random() * 3.5)
+    // a drop landing on a drop joins it (volume adds, so radius goes as
+    // the cube root); that's how drops grow heavy enough to run
+    const add = (x, y, r) => {
+      for (const d of drops) {
+        if (!d.slide && Math.hypot(d.x - x, d.y - y) < d.r + r) {
+          d.r = Math.cbrt(d.r ** 3 + r ** 3)
+          return
+        }
+      }
+      drops.push({ x, y, r, vy: 0, slide: false, wob: Math.random() * 10 })
+    }
+    const ds = dropSize
+    // how big a drop must be before gravity beats the glass holding it
+    const letGo = 4.6 * ds / Math.max(0.2, slide)
+    for (let k = 0; k < 160; k++) add(Math.random() * W, Math.random() * H, (1 + Math.random() * 3) * ds)
     // trails: a canvas where sliding drops wipe the blur away
     const trail = document.createElement('canvas')
     trail.width = W * dpr
@@ -89,25 +120,25 @@ export default function RainWindow({
       const dt = Math.min(0.05, (now - (last || now)) / 1000)
       last = now
       // new drops land
-      for (let k = 0; k < 18 * rain * dt * 10; k++) if (Math.random() < 0.1) add(Math.random() * W, Math.random() * H, 0.8 + Math.random() * 3.2)
+      for (let k = 0; k < 18 * rain * dt * 10; k++) if (Math.random() < 0.1) add(Math.random() * W, Math.random() * H, (0.8 + Math.random() * 2.4) * ds)
       // big drops start to slide; small ones grow slowly from mist
       for (const d of drops) {
-        if (!d.slide && d.r > 4.2 && Math.random() < 0.02) d.slide = true
+        if (!d.slide && d.r > letGo && Math.random() < 0.05) d.slide = true
         if (d.slide) {
-          d.vy = Math.min(220, d.vy + 300 * dt)
+          d.vy = Math.min(220 * slide, d.vy + 300 * slide * dt)
           d.wob += dt * 6
           const nx = d.x + Math.sin(d.wob) * 0.4
           const ny = d.y + d.vy * dt * (0.6 + Math.random() * 0.8)
           // clear a trail
-          tg.fillStyle = '#000'
+          tg.fillStyle = trails ? '#000' : 'rgba(0,0,0,0)'
           tg.beginPath()
           tg.ellipse(nx, ny - d.r, d.r * 0.55, d.r * 1.4, 0, 0, Math.PI * 2)
           tg.fill()
           d.x = nx
           d.y = ny
           // leave small beads behind now and then, losing water
-          if (Math.random() < 0.08 && d.r > 3) {
-            add(d.x, d.y - d.r * 2, d.r * 0.3)
+          if (Math.random() < 0.08 && d.r > 3 * ds) {
+            drops.push({ x: d.x, y: d.y - d.r * 2, r: d.r * 0.3, vy: 0, slide: false, wob: 0 })
             d.r *= 0.985
           }
         }
@@ -118,7 +149,7 @@ export default function RainWindow({
         for (const b of drops) {
           if (a === b || b.dead || b.slide) continue
           if (Math.hypot(a.x - b.x, a.y - b.y) < a.r + b.r) {
-            a.r = Math.sqrt(a.r * a.r + b.r * b.r * 0.6)
+            a.r = Math.min(9 * ds, Math.cbrt(a.r ** 3 + b.r ** 3))
             b.dead = true
           }
         }
@@ -144,7 +175,7 @@ export default function RainWindow({
       // each drop: a lens showing the scene behind it, flipped and shrunk
       for (const d of drops) {
         const r = d.r * (d.slide ? 1.1 : 1)
-        const span = r * 9 // how much of the scene a drop "sees"
+        const span = (r * 9) / zoom // how much of the scene a drop "sees"
         g.save()
         g.beginPath()
         g.ellipse(d.x, d.y, r, r * (d.slide ? 1.15 : 1), 0, 0, Math.PI * 2)
@@ -168,10 +199,10 @@ export default function RainWindow({
     }
     raf = requestAnimationFrame(frame)
     return () => cancelAnimationFrame(raf)
-  }, [text, sign, rain])
+  }, [text, sign, font, glow, night, lights, rain, dropSize, slide, blur, zoom, trails])
 
   return (
-    <div ref={box} role="img" aria-label={text} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#0a0d14', ...style }}>
+    <div ref={box} role="img" aria-label={text} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: night, ...style }}>
       <canvas ref={cv} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
     </div>
   )
