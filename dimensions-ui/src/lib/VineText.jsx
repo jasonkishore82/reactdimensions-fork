@@ -148,9 +148,11 @@ export default function VineText({
       last = now
       let growing = false
       for (const v of vines) {
+        // keep the loop alive while any vine is unfinished, even on a frame
+        // with no time in it (the first one), or it would stop before starting
+        if (v.i < v.pts.length - 1) growing = true
         let budget = speed * v.rate * dt
         while (budget > 0 && v.i < v.pts.length - 1) {
-          growing = true
           const a = v.pts[v.i]
           const b = v.pts[v.i + 1]
           const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 0.01

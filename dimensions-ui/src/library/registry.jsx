@@ -63,7 +63,6 @@ import EmbroideryText from '../lib/EmbroideryText.jsx'
 import KnitText from '../lib/KnitText.jsx'
 import BrickText from '../lib/BrickText.jsx'
 import OrigamiText from '../lib/OrigamiText.jsx'
-import FlipbookText from '../lib/FlipbookText.jsx'
 import RansomNote from '../lib/RansomNote.jsx'
 import ScratchCard from '../lib/ScratchCard.jsx'
 import ShadowType from '../lib/ShadowType.jsx'
@@ -2167,22 +2166,6 @@ const ALL_COMPONENTS = [
     deps: [],
   },
   {
-    slug: 'flipbook-text',
-    name: 'Flipbook Text',
-    category: 'Text',
-    isNew: true,
-    description: 'A flipbook: pages flip over one by one, each a hand-drawn frame of the letters hopping in turn, so they read as motion. Hold the pointer down to riffle faster.',
-    controls: [
-      { name: 'text', type: 'text', default: 'HOP', maxLength: 6 },
-      { name: 'fps', type: 'range', min: 4, max: 24, step: 1, default: 12 },
-      { name: 'paper', type: 'color', default: '#fbf8f1' },
-      { name: 'accent', type: 'color', default: '#ff4d1a' },
-    ],
-    preview: (p) => <FlipbookText {...p} style={{ fontSize: 'clamp(46px, 8vw, 90px)' }} />,
-    files: ['FlipbookText.jsx'],
-    deps: [],
-  },
-  {
     slug: 'ransom-note',
     name: 'Ransom Note',
     category: 'Text',
@@ -2412,7 +2395,16 @@ const ALL_COMPONENTS = [
     controls: [
       { name: 'text', type: 'text', default: 'OPEN', maxLength: 10 },
       { name: 'sign', type: 'color', default: '#ff3d6e' },
+      { name: 'font', type: 'select', options: ['rounded', 'serif', 'script', 'condensed'], default: 'rounded' },
+      { name: 'glow', type: 'range', min: 0, max: 2.5, step: 0.1, default: 1 },
+      { name: 'night', type: 'color', default: '#141a26' },
+      { name: 'lights', type: 'toggle', default: true },
       { name: 'rain', type: 'range', min: 0, max: 4, step: 0.1, default: 1 },
+      { name: 'dropSize', type: 'range', min: 0.5, max: 2.5, step: 0.1, default: 1 },
+      { name: 'slide', type: 'range', min: 0.2, max: 3, step: 0.1, default: 1 },
+      { name: 'blur', type: 'range', min: 0, max: 24, step: 1, default: 10, unit: 'px' },
+      { name: 'zoom', type: 'range', min: 0.4, max: 3, step: 0.1, default: 1 },
+      { name: 'trails', type: 'toggle', default: true },
     ],
     fill: true,
     preview: (p) => <RainWindow {...p} style={{ position: 'absolute', inset: 0 }} />,
