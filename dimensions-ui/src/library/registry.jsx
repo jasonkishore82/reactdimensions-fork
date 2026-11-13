@@ -121,6 +121,7 @@ import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
 import SneakerModel from '../lib/SneakerModel.jsx'
+import GrandPianoModel from '../lib/GrandPianoModel.jsx'
 import GuitarModel from '../lib/GuitarModel.jsx'
 import DumbbellModel from '../lib/DumbbellModel.jsx'
 import GamepadModel from '../lib/GamepadModel.jsx'
@@ -149,7 +150,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -2011,6 +2012,37 @@ const ALL_COMPONENTS = [
     preview: (p) => <SneakerModel {...p} height="100%" />,
     fill: true,
     files: ['SneakerModel.jsx', 'sneaker/SneakerScene.jsx', 'sneaker/Sneaker.jsx', 'sneaker/last.js', 'sneaker/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'grand-piano',
+    name: 'Grand Piano',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A grand piano with a working action: hammers strike as hard as you play, dampers lift and fall, strings ring and all three pedals work. Play it with the mouse, your keyboard or a MIDI keyboard; click the lid to close it.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Ebony gloss', values: { lacquerColor: '#0c0c0e', woodColor: '#9a6a3c', plateColor: '#b48d3e', keyColor: '#f3eee2', background: '#e6e4e0' } },
+          { name: 'White lacquer', values: { lacquerColor: '#f2f0ec', woodColor: '#b8875a', plateColor: '#c7a24f', keyColor: '#f6f2e8', background: '#d9d6d1' } },
+          { name: 'Walnut', values: { lacquerColor: '#4a2c1a', woodColor: '#7a4a28', plateColor: '#a8873f', keyColor: '#efe6d2', background: '#e7e1d8' } },
+          { name: 'Red', values: { lacquerColor: '#6e0f16', woodColor: '#9a6a3c', plateColor: '#b48d3e', keyColor: '#f3eee2', background: '#e8e2df' } },
+        ],
+      },
+      { name: 'lacquerColor', type: 'color', default: '#0c0c0e' },
+      { name: 'woodColor', type: 'color', default: '#9a6a3c' },
+      { name: 'plateColor', type: 'color', default: '#b48d3e' },
+      { name: 'keyColor', type: 'color', default: '#f3eee2' },
+      { name: 'background', type: 'color', default: '#e6e4e0' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <GrandPianoModel {...p} height="100%" />,
+    fill: true,
+    files: ['GrandPianoModel.jsx', 'piano/PianoScene.jsx', 'piano/Piano.jsx', 'piano/layout.js', 'piano/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
