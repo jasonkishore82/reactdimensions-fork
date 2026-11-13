@@ -120,6 +120,7 @@ import OceanModel from '../lib/OceanModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
+import SneakerModel from '../lib/SneakerModel.jsx'
 import GuitarModel from '../lib/GuitarModel.jsx'
 import DumbbellModel from '../lib/DumbbellModel.jsx'
 import GamepadModel from '../lib/GamepadModel.jsx'
@@ -148,7 +149,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -1976,6 +1977,40 @@ const ALL_COMPONENTS = [
     preview: (p) => <RingModel {...p} height="100%" />,
     fill: true,
     files: ['RingModel.jsx', 'ring/RingScene.jsx', 'ring/Ring.jsx', 'ring/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'sneaker',
+    name: 'Sneaker',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A low-top leather court sneaker: a moulded upper with suede toe and heel overlays, a perforated toe box, mesh quarters, stitching, a padded tongue and real laces, on a cupsole with a full tread underneath. Drag the toe up and the forefoot flexes at the ball and springs back; click the shoe and it hops, lands with a thud and rocks to rest on its curved sole.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Triple white', values: { leatherColor: '#f3f3f1', suedeColor: '#dcdcd8', meshColor: '#efefed', soleColor: '#f6f6f4', laceColor: '#f2f2f0', background: '#d2d2d2' } },
+          { name: 'Cloud grey', values: { leatherColor: '#f1f1ef', suedeColor: '#b4b6b8', meshColor: '#e2e3e3', soleColor: '#f4f4f2', laceColor: '#ededeb', background: '#cfd0d2' } },
+          { name: 'Black & gum', values: { leatherColor: '#2a2a2c', suedeColor: '#1e1e20', meshColor: '#38383b', soleColor: '#b9834d', laceColor: '#2a2a2c', background: '#d9d6d0' } },
+          { name: 'Cream & tan', values: { leatherColor: '#efe7d8', suedeColor: '#c39b72', meshColor: '#e9e0cf', soleColor: '#f0e8d8', laceColor: '#efe7d8', background: '#e2dbd0' } },
+          { name: 'Navy', values: { leatherColor: '#f2f2f0', suedeColor: '#28324a', meshColor: '#e8e9ea', soleColor: '#f5f5f3', laceColor: '#f2f2f0', background: '#d4d6da' } },
+        ],
+      },
+      { name: 'leatherColor', type: 'color', default: '#f3f3f1' },
+      { name: 'suedeColor', type: 'color', default: '#dcdcd8' },
+      { name: 'meshColor', type: 'color', default: '#efefed' },
+      { name: 'soleColor', type: 'color', default: '#f6f6f4' },
+      { name: 'laceColor', type: 'color', default: '#f2f2f0' },
+      { name: 'perforations', type: 'toggle', default: true },
+      { name: 'background', type: 'color', default: '#d2d2d2' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <SneakerModel {...p} height="100%" />,
+    fill: true,
+    files: ['SneakerModel.jsx', 'sneaker/SneakerScene.jsx', 'sneaker/Sneaker.jsx', 'sneaker/last.js', 'sneaker/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {

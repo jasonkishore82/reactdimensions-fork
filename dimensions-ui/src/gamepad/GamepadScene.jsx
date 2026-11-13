@@ -76,7 +76,7 @@ export default function GamepadScene({ background = '#e4e4e4', autoRotate = fals
         <group position={[0, 0.3, 0]}>
           <Gamepad ref={pad} {...props} keys={keys} onStatus={setConnected} />
         </group>
-        <ContactShadows position={[0, -1.85, 0]} opacity={0.35} scale={26} blur={2.6} far={3} />
+        <ContactShadows position={[0, -2.35, 0]} opacity={0.4} scale={26} blur={2.4} far={3.5} />
         <Rig />
         <OrbitControls makeDefault enablePan={false} target={[0, 0.4, 0.4]} autoRotate={autoRotate} autoRotateSpeed={0.5} minDistance={7} maxDistance={60} />
       </Canvas>
