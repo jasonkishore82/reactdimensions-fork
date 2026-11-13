@@ -1,0 +1,994 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { useCursor } from '@react-three/drei'
+import * as THREE from 'three'
+import { createCricketAudio } from './audio.js'
+import { BAIL, BAIL_Y, BALL, STUMP, STUMP_COM, STUMP_X, PlantedStump, ballBody, bailBody, closestOnSegment, collide, stumpBody } from './physics.js'
+
+// A cricket wicket and bat, with the physics that makes them interesting.
+// Bowl and the ball is released from the far end, pitches, and comes on to
+// the stumps. Leave it and it hits them: the struck stump is driven back in
+// the soil (or, at pace, uprooted), the bails jump out of their grooves and
+// tumble to the turf. Swing the bat in time and willow meets leather: the
+// ball comes off the face with the bat's speed added to it.
+// SI units: metres. The stumps stand on the crease at z = 0, the bowler is
+// off along -z, the batter's bat is held just in front of the stumps.
+
+// ---- the bat (dimensions of a short-handle senior bat) ----
+const BLADE_L = 0.56
+const BLADE_HW = 0.054 // half width
+const FACE_Z = -0.022 // the face looks at the bowler, along -z
+const EDGE_T = 0.038
+const BAT_L = 0.955
+const PIVOT_Y = 0.8 // the hands, up the handle from the toe
+const BAT_Z = -0.62
+const BACKLIFT = -0.62
+const FOLLOW = 2.25
+const T_BACK = 0.22
+const T_DOWN = 0.16
+const REST_X = { leave: 0.42, block: 0, drive: 0 }
+
+const BOWL_Z = -9 // release point
+const RELEASE_Y = 2.1
+const SUB = 1 / 3000
+
+const BALL_COLORS = { red: '#8f1a17', white: '#ece8de', pink: '#e2508d' }
+export const CRICKET_BALLS = Object.keys(BALL_COLORS)
+
+// ---- textures ----
+function rng(seed) {
+  let s = seed >>> 0
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0
+    let t = s
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+function valueNoise(seed) {
+  const h = (x, y) => {
+    const s = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453
+    return s - Math.floor(s)
+  }
+  const n = (x, y) => {
+    const xi = Math.floor(x)
+    const yi = Math.floor(y)
+    const xf = x - xi
+    const yf = y - yi
+    const u = xf * xf * (3 - 2 * xf)
+    const v = yf * yf * (3 - 2 * yf)
+    const a = h(xi, yi)
+    const b = h(xi + 1, yi)
+    const c = h(xi, yi + 1)
+    const d = h(xi + 1, yi + 1)
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
+  }
+  return (x, y, oct = 4) => {
+    let t = 0
+    let amp = 0.5
+    let f = 1
+    for (let i = 0; i < oct; i++) {
+      t += n(x * f, y * f) * amp
+      f *= 2
+      amp *= 0.5
+    }
+    return t
+  }
+}
+
+// Wood with its grain running along the texture's v (up the stump or bat):
+// fine straight streaks, with ash's bolder growth lines when `rings` is high.
+function woodTexture(base, dark, { rings = 1, seed = 2 } = {}) {
+  const S = 512
+  const fbm = valueNoise(seed)
+  const r = rng(seed * 131)
+  const b = new THREE.Color(base)
+  const k = new THREE.Color(dark)
+  const c = Object.assign(document.createElement('canvas'), { width: S, height: S })
+  const bm = Object.assign(document.createElement('canvas'), { width: S, height: S })
+  const ci = c.getContext('2d').createImageData(S, S)
+  const bi = bm.getContext('2d').createImageData(S, S)
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      // lines run along y: the pattern varies across x
+      const warp = fbm(x / 60, y / 220) * 1.6 * rings
+      const ring = (x / S) * 9 * rings + warp
+      const f = ring - Math.floor(ring)
+      const late = Math.pow(f, 6) * rings
+      const streak = fbm(x / 1.8, y / 240, 3)
+      const pore = r() < 0.006 * rings ? 0.6 : 0
+      const t = Math.min(1, Math.max(0, late * 0.55 + (streak - 0.4) * 0.6 + pore * 0.3 + 0.15))
+      const i = (y * S + x) * 4
+      ci.data[i] = (b.r + (k.r - b.r) * t) * 255
+      ci.data[i + 1] = (b.g + (k.g - b.g) * t) * 255
+      ci.data[i + 2] = (b.b + (k.b - b.b) * t) * 255
+      ci.data[i + 3] = 255
+      const v = 190 - t * 90
+      bi.data[i] = bi.data[i + 1] = bi.data[i + 2] = v
+      bi.data[i + 3] = 255
+    }
+  }
+  c.getContext('2d').putImageData(ci, 0, 0)
+  bm.getContext('2d').putImageData(bi, 0, 0)
+  const mk = (cv, srgb) => {
+    const t = new THREE.CanvasTexture(cv)
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.anisotropy = 8
+    return t
+  }
+  return { map: mk(c, true), bump: mk(bm) }
+}
+
+// A rubber bat grip: a field of little raised diamonds, wound on as a spiral
+// so the wraps show as a faint helical seam.
+function gripTexture() {
+  const S = 256
+  const c = Object.assign(document.createElement('canvas'), { width: S, height: S })
+  const g = c.getContext('2d')
+  g.fillStyle = '#9a9a9a'
+  g.fillRect(0, 0, S, S)
+  const n = 16
+  const s = S / n
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const x = i * s + (j % 2 ? s / 2 : 0)
+      const y = j * s
+      g.fillStyle = '#ececec'
+      g.beginPath()
+      g.moveTo(x, y + s * 0.12)
+      g.lineTo(x + s * 0.38, y + s / 2)
+      g.lineTo(x, y + s * 0.88)
+      g.lineTo(x - s * 0.38, y + s / 2)
+      g.closePath()
+      g.fill()
+    }
+  // the wrap seam
+  g.strokeStyle = '#6d6d6d'
+  g.lineWidth = 3
+  for (const o of [-S, 0, S]) {
+    g.beginPath()
+    g.moveTo(o, S)
+    g.lineTo(o + S, 0)
+    g.stroke()
+  }
+  const t = new THREE.CanvasTexture(c)
+  t.wrapS = t.wrapT = THREE.RepeatWrapping
+  t.repeat.set(2, 7)
+  t.anisotropy = 8
+  return t
+}
+
+// The ball: polished leather in four quarters, a raised seam of six rows of
+// stitches round its equator and a fainter quarter seam.
+function ballTexture(color) {
+  const W = 1024
+  const H = 512
+  const c = Object.assign(document.createElement('canvas'), { width: W, height: H })
+  const g = c.getContext('2d')
+  g.fillStyle = color
+  g.fillRect(0, 0, W, H)
+  const r = rng(11)
+  for (let i = 0; i < 9000; i++) {
+    g.fillStyle = r() < 0.5 ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)'
+    g.fillRect(r() * W, r() * H, 2, 2)
+  }
+  const light = color === BALL_COLORS.white ? '#5a6a7a' : '#f1e6cf'
+  // main seam
+  g.fillStyle = 'rgba(0,0,0,0.25)'
+  g.fillRect(0, H / 2 - 7, W, 14)
+  g.fillStyle = light
+  for (const dy of [-22, -15, -8, 8, 15, 22])
+    for (let x = 0; x < W; x += 9) {
+      g.save()
+      g.translate(x, H / 2 + dy)
+      g.rotate(dy < 0 ? -0.5 : 0.5)
+      g.fillRect(-3, -1.2, 6, 2.4)
+      g.restore()
+    }
+  // quarter seam, running pole to pole on the two halves
+  g.strokeStyle = 'rgba(0,0,0,0.3)'
+  g.lineWidth = 2
+  for (const x of [W * 0.25, W * 0.75]) {
+    g.beginPath()
+    g.moveTo(x, 0)
+    g.lineTo(x, H / 2 - 30)
+    g.moveTo(x + W * 0.25 * (x < W / 2 ? 1 : -1), H / 2 + 30)
+    g.lineTo(x + W * 0.25 * (x < W / 2 ? 1 : -1), H)
+    g.stroke()
+  }
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 8
+  return t
+}
+
+// A strip of pitch: dry rolled turf with the creases painted on.
+function pitchTexture() {
+  const W = 512
+  const H = 2048
+  const c = Object.assign(document.createElement('canvas'), { width: W, height: H })
+  const g = c.getContext('2d')
+  g.fillStyle = '#cbbd96'
+  g.fillRect(0, 0, W, H)
+  const r = rng(5)
+  for (let i = 0; i < 40000; i++) {
+    const v = r()
+    g.fillStyle = v < 0.5 ? `rgba(110,95,60,${0.05 + r() * 0.08})` : `rgba(245,238,215,${0.05 + r() * 0.08})`
+    g.fillRect(r() * W, r() * H, 1 + r() * 2, 1 + r() * 3)
+  }
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 8
+  return { canvas: c, tex: t }
+}
+
+// ---- geometry ----
+function lathe(profile, segs = 40) {
+  return new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), segs)
+}
+// a stump: pointed spike, round shaft, domed top. Origin at the ground line.
+function stumpGeometry() {
+  const R = STUMP.r
+  return lathe([
+    [0, -STUMP.spike],
+    [0.003, -STUMP.spike + 0.012],
+    [0.009, -0.11],
+    [0.0155, -0.045],
+    [R, -0.012],
+    [R, STUMP.h - 0.016],
+    [R * 0.96, STUMP.h - 0.008],
+    [R * 0.8, STUMP.h - 0.003],
+    [R * 0.45, STUMP.h],
+    [0, STUMP.h + 0.0008],
+  ])
+}
+// a bail: two turned barrels with rings, a waist, spigots at each end. Axis x.
+function bailGeometry() {
+  const L = BAIL.len / 2
+  const sp = BAIL.spigot
+  const R = BAIL.r
+  const half = [
+    [0, -L],
+    [sp * 0.7, -L + 0.0006],
+    [sp, -L + 0.002],
+    [sp, -L + 0.019],
+    [R * 0.8, -L + 0.021],
+    [R, -L + 0.025],
+    [R, -0.03],
+    [R * 0.84, -0.028],
+    [R * 0.84, -0.024],
+    [R, -0.022],
+    [R, -0.017],
+    [R * 0.84, -0.015],
+    [R * 0.84, -0.011],
+    [R * 0.95, -0.009],
+    [R * 0.62, -0.006],
+    [R * 0.58, 0],
+  ]
+  const full = [...half, ...half.slice(0, -1).reverse().map(([r, y]) => [r, -y])]
+  return lathe(full, 28).rotateZ(-Math.PI / 2)
+}
+
+// The blade: a flat face, the back built up into a spine (thickest low down
+// where the middle of the bat is), rounded edges, the slight bow of the face,
+// and shoulders sloping in to the handle. Toe at y = 0, face toward -z.
+function bladeGeometry() {
+  const N = 72
+  const M = 32 // across the back
+  const F = 10 // across the face
+  const rows = []
+  const sm = (a, b, x) => {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+  }
+  for (let i = 0; i <= N; i++) {
+    const y = (i / N) * BLADE_L
+    const sh = sm(BLADE_L - 0.055, BLADE_L, y) // the shoulder slope
+    const toe = 1 - sm(0, 0.014, y) * 1
+    const hw = BLADE_HW * (1 - 0.66 * sh) * (1 - 0.06 * toe)
+    const spine = 0.064 * Math.exp(-(((y - 0.17) / 0.2) ** 2)) + 0.046 * (1 - Math.exp(-(((y - 0.17) / 0.2) ** 2)))
+    const ts = (spine - 0.008 * toe) * (1 - 0.55 * sh)
+    const te = (EDGE_T - 0.006 * toe) * (1 - 0.6 * sh)
+    const z0 = FACE_Z + 0.004 * Math.sin((Math.PI * y) / BLADE_L) * (1 - sh)
+    const ring = []
+    // the back, edge to edge, with the edges rolled round to the face
+    for (let k = 0; k <= M; k++) {
+      const s = -1 + (2 * k) / M
+      const roll = Math.sqrt(Math.max(0, 1 - Math.pow(Math.abs(s), 10)))
+      const zb = z0 + (te + (ts - te) * Math.pow(1 - s * s, 0.75)) * roll
+      ring.push([s * hw, y, zb, (s + 1) / 2])
+    }
+    // the face, back across
+    for (let k = 1; k < F; k++) {
+      const s = 1 - (2 * k) / F
+      ring.push([s * hw, y, z0 - 0.0015 * (1 - s * s), (s + 1) / 2])
+    }
+    rows.push(ring)
+  }
+  const P = rows[0].length
+  const pos = []
+  const uv = []
+  const idx = []
+  for (const ring of rows) {
+    for (const [x, y, z, u] of ring) {
+      pos.push(x, y, z)
+      uv.push(u * 0.25, y / BLADE_L)
+    }
+  }
+  for (let i = 0; i < N; i++)
+    for (let k = 0; k < P; k++) {
+      const a = i * P + k
+      const b = i * P + ((k + 1) % P)
+      const c = (i + 1) * P + k
+      const d = (i + 1) * P + ((k + 1) % P)
+      idx.push(a, c, b, b, c, d)
+    }
+  // caps: a fan at the toe and at the top of the shoulders
+  for (const [i, flip] of [
+    [0, true],
+    [N, false],
+  ]) {
+    const ring = rows[i]
+    const cx = 0
+    const cz = ring.reduce((t, p) => t + p[2], 0) / P
+    const ci = pos.length / 3
+    pos.push(cx, ring[0][1], cz)
+    uv.push(0.12, i ? 1 : 0)
+    for (let k = 0; k < P; k++) {
+      const a = i * P + k
+      const b = i * P + ((k + 1) % P)
+      flip ? idx.push(ci, a, b) : idx.push(ci, b, a)
+    }
+  }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2))
+  g.setIndex(idx)
+  g.computeVertexNormals()
+  return g
+}
+
+// the V of the splice where the handle is let into the blade
+function spliceTexture() {
+  const c = Object.assign(document.createElement('canvas'), { width: 64, height: 256 })
+  const g = c.getContext('2d')
+  g.fillStyle = '#fff'
+  g.beginPath()
+  g.moveTo(8, 0)
+  g.lineTo(56, 0)
+  g.lineTo(32, 256)
+  g.closePath()
+  g.fill()
+  return new THREE.CanvasTexture(c)
+}
+
+const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
+const clamp01 = (t) => Math.min(1, Math.max(0, t))
+
+// batting: leave | block | drive (drive swings by itself, timed to the ball).
+// line: middle | off | leg | random. pace: km/h. slowMotion: how fast time
+// runs (1 = real time). autoBowl: bowl again by itself once things settle.
+// bowl, swing, reset: bump these numbers to do it. sound: the cracks.
+export default function Cricket({
+  batting = 'leave',
+  line = 'middle',
+  pace = 110,
+  slowMotion = 0.3,
+  autoBowl = false,
+  stumpWood = '#c99447',
+  batWood = '#e4cba0',
+  gripColor = '#f4f4f2',
+  ball: ballColor = 'red',
+  sound = false,
+  bowl = 0,
+  swing = 0,
+  reset = 0,
+}) {
+  const [hover, setHover] = useState(false)
+  useCursor(hover)
+
+  // ---- geometry, textures, materials ----
+  const geo = useMemo(
+    () => ({
+      stump: stumpGeometry(),
+      notch: new THREE.BoxGeometry(STUMP.r * 2.05, 0.004, 0.008),
+      bail: bailGeometry(),
+      blade: bladeGeometry(),
+      handle: new THREE.CylinderGeometry(0.0158, 0.0162, BAT_L - BLADE_L + 0.01, 24),
+      grip: new THREE.CylinderGeometry(0.0188, 0.0188, BAT_L - BLADE_L - 0.04, 40, 1, true),
+      gripEnd: new THREE.SphereGeometry(0.0188, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+      twine: new THREE.CylinderGeometry(0.0192, 0.021, 0.026, 32),
+      splice: new THREE.PlaneGeometry(0.03, 0.105),
+      ball: new THREE.SphereGeometry(BALL.r, 48, 32),
+      pitch: new THREE.PlaneGeometry(3.05, 12),
+      crease: new THREE.PlaneGeometry(1, 1),
+    }),
+    [],
+  )
+  useEffect(() => () => Object.values(geo).forEach((g) => g.dispose()), [geo])
+
+  const stumpTex = useMemo(() => woodTexture(stumpWood, new THREE.Color(stumpWood).multiplyScalar(0.62).getStyle(), { rings: 1, seed: 4 }), [stumpWood])
+  const batTex = useMemo(() => woodTexture(batWood, new THREE.Color(batWood).multiplyScalar(0.8).getStyle(), { rings: 0.35, seed: 9 }), [batWood])
+  const gripTex = useMemo(() => gripTexture(), [])
+  const ballTex = useMemo(() => ballTexture(BALL_COLORS[ballColor] || BALL_COLORS.red), [ballColor])
+  const pitch = useMemo(() => pitchTexture(), [])
+  const spliceTex = useMemo(() => spliceTexture(), [])
+  useEffect(() => () => [stumpTex.map, stumpTex.bump].forEach((t) => t.dispose()), [stumpTex])
+  useEffect(() => () => [batTex.map, batTex.bump].forEach((t) => t.dispose()), [batTex])
+  useEffect(() => () => ballTex.dispose(), [ballTex])
+  useEffect(
+    () => () => {
+      gripTex.dispose()
+      pitch.tex.dispose()
+      spliceTex.dispose()
+    },
+    [gripTex, pitch, spliceTex],
+  )
+
+  const mats = useMemo(() => {
+    // stumps are lacquered ash; the bat is oiled willow
+    const stump = new THREE.MeshPhysicalMaterial({ roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.25, bumpScale: 0.6 })
+    const bail = stump.clone()
+    const blade = new THREE.MeshPhysicalMaterial({ roughness: 0.55, clearcoat: 0.18, clearcoatRoughness: 0.5, bumpScale: 0.4 })
+    return {
+      stump,
+      bail,
+      blade,
+      notch: new THREE.MeshStandardMaterial({ color: '#4a2f15', roughness: 0.8 }),
+      handle: new THREE.MeshStandardMaterial({ color: '#c9a66a', roughness: 0.6 }),
+      grip: new THREE.MeshStandardMaterial({ roughness: 0.75 }),
+      twine: new THREE.MeshStandardMaterial({ color: '#8a6b3d', roughness: 0.8 }),
+      splice: new THREE.MeshStandardMaterial({ color: '#b48d55', roughness: 0.7, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
+      ball: new THREE.MeshPhysicalMaterial({ roughness: 0.38, clearcoat: 0.7, clearcoatRoughness: 0.2 }),
+      pitch: new THREE.MeshStandardMaterial({ roughness: 0.95 }),
+      crease: new THREE.MeshStandardMaterial({ color: '#fbfaf6', roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -1 }),
+    }
+  }, [])
+  useEffect(() => () => Object.values(mats).forEach((m) => m.dispose()), [mats])
+  useEffect(() => {
+    for (const m of [mats.stump, mats.bail]) {
+      m.map = stumpTex.map
+      m.bumpMap = stumpTex.bump
+      m.needsUpdate = true
+    }
+    mats.blade.map = batTex.map
+    mats.blade.bumpMap = batTex.bump
+    mats.blade.needsUpdate = true
+    mats.grip.map = gripTex
+    mats.grip.bumpMap = gripTex
+    mats.grip.bumpScale = 1.5
+    mats.grip.color.set(gripColor)
+    mats.grip.needsUpdate = true
+    mats.splice.alphaMap = spliceTex
+    mats.splice.color.set(batWood).multiplyScalar(0.72)
+    mats.splice.needsUpdate = true
+    mats.ball.map = ballTex
+    mats.ball.needsUpdate = true
+    mats.pitch.map = pitch.tex
+    mats.pitch.needsUpdate = true
+  }, [mats, stumpTex, batTex, gripTex, gripColor, spliceTex, batWood, ballTex, pitch])
+
+  // ---- sound ----
+  const audio = useRef(null)
+  const live = useRef({})
+  live.current = { batting, line, pace, slowMotion, autoBowl, sound }
+  useEffect(() => {
+    if (!sound) {
+      audio.current?.dispose()
+      audio.current = null
+    }
+  }, [sound])
+  useEffect(() => () => audio.current?.dispose(), [])
+  const lastSound = useRef({})
+  const play = (name, s) => {
+    if (!live.current.sound) return
+    const now = performance.now()
+    if (now - (lastSound.current[name] || 0) < 40) return
+    lastSound.current[name] = now
+    if (!audio.current) audio.current = createCricketAudio()
+    audio.current?.[name](s)
+  }
+
+  // ---- the world ----
+  const world = useMemo(() => {
+    const stumps = STUMP_X.map((x) => new PlantedStump(x))
+    return {
+      t: 0,
+      stumps,
+      free: [null, null, null], // stumps once uprooted
+      bails: [
+        { seated: true, body: bailBody() },
+        { seated: true, body: bailBody() },
+      ],
+      ball: ballBody(),
+      bowledAt: -1,
+      bat: { x: REST_X.leave, tx: REST_X.leave, theta: 0, omega: 0, phase: 'rest', t: 0, from: 0, hold: false, backDur: T_BACK },
+      autoSwingAt: -1,
+      settleTimer: 0,
+      disturbed: false,
+    }
+  }, [])
+
+  const tmp = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), q: new THREE.Vector3(), n: new THREE.Vector3(), p: new THREE.Vector3(), v: new THREE.Vector3() }), [])
+
+  // the seat of bail i: on the tops of stumps i and i+1
+  const seat = (i, pos, quat) => {
+    const ta = world.stumps[i].top(tmp.a)
+    const tb = world.stumps[i + 1].top(tmp.b)
+    pos.addVectors(ta, tb).multiplyScalar(0.5)
+    pos.y += BAIL_Y - STUMP.h
+    tmp.v.subVectors(tb, ta).normalize()
+    quat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), tmp.v)
+  }
+
+  const resetWorld = () => {
+    const w = world
+    w.stumps.forEach((s) => s.reset())
+    w.free = [null, null, null]
+    w.bails.forEach((b, i) => {
+      b.seated = true
+      b.body.active = false
+      seat(i, b.body.pos, b.body.quat)
+    })
+    w.ball.active = false
+    w.ball.pos.set(0, -1, BOWL_Z)
+    w.bowledAt = -1
+    w.autoSwingAt = -1
+    w.disturbed = false
+    const bt = w.bat
+    bt.phase = 'rest'
+    bt.theta = 0
+    bt.omega = 0
+    bt.tx = REST_X[live.current.batting] ?? 0
+  }
+
+  // where the ball should go: aim it so that, after pitching, it arrives at
+  // the stumps at about a third of their height. Found by shooting: fly a
+  // ghost ball and adjust its release until it arrives where it should.
+  const aim = (x, v) => {
+    const ghost = ballBody()
+    const fly = (vy) => {
+      ghost.active = true
+      ghost.pos.set(x, RELEASE_Y, BOWL_Z)
+      ghost.vel.set(0, vy, v)
+      ghost.ang.set(0, 0, 0)
+      ghost.quat.identity()
+      let t = 0
+      let tBat = -1
+      while (t < 3) {
+        ghost.step(SUB)
+        t += SUB
+        if (tBat < 0 && ghost.pos.z >= BAT_Z + FACE_Z) tBat = t
+        if (ghost.pos.z >= 0) return { y: ghost.pos.y, tBat }
+        if (!ghost.active) break
+      }
+      return { y: -1, tBat }
+    }
+    // Two releases reach the stumps at any height: a full toss, and one that
+    // pitches first. Search only among those that pitch before the crease
+    // (steeper than the one that lands right on it), where a steeper release
+    // pitches shorter and comes on higher.
+    const target = STUMP.h * 0.56
+    const T = -BOWL_Z / v
+    const vyCrease = (BALL.r - RELEASE_Y + 0.5 * 9.81 * T * T) / T
+    let lo = vyCrease - 14
+    let hi = vyCrease - 0.05
+    let best = { y: 0, tBat: 0.3 }
+    let bestVy = -4
+    for (let i = 0; i < 22; i++) {
+      const mid = (lo + hi) / 2
+      const r = fly(mid)
+      best = r
+      bestVy = mid
+      if (r.y < target) hi = mid
+      else lo = mid
+    }
+    return { vy: bestVy, tBat: best.tBat }
+  }
+
+  const doBowl = () => {
+    const w = world
+    if (w.disturbed || w.ball.active || w.bowledAt >= 0) resetWorld()
+    const L = live.current
+    const lineX = { middle: 0, off: 0.085, leg: -0.085 }[L.line] ?? (Math.random() - 0.5) * 0.36
+    const v = L.pace / 3.6
+    const { vy, tBat } = aim(lineX, v)
+    const b = w.ball
+    b.active = true
+    b.still = 0
+    b.pos.set(lineX, RELEASE_Y, BOWL_Z)
+    b.vel.set(0, vy, v)
+    b.ang.set(-v / BALL.r * 0.15, 0, 0) // a little backspin off the fingers
+    b.quat.identity()
+    w.bowledAt = w.t
+    w.settleTimer = 0
+    // the batter lines up with the ball
+    w.bat.tx = L.batting === 'leave' ? REST_X.leave : lineX
+    if (L.batting === 'drive') {
+      // the backlift goes up as the ball is released and waits at the top;
+      // the downswing starts so the bat is vertical as the ball arrives
+      const tVert = T_DOWN * Math.sqrt(-BACKLIFT / (FOLLOW - BACKLIFT))
+      const bt = w.bat
+      bt.phase = 'back'
+      bt.t = 0
+      bt.from = bt.theta
+      bt.hold = true
+      bt.backDur = Math.min(T_BACK, Math.max(0.05, tBat - tVert - 0.01))
+      w.autoSwingAt = w.t + Math.max(0, tBat - tVert)
+    }
+  }
+
+  const doSwing = () => {
+    const bt = world.bat
+    if (bt.phase === 'ready') {
+      bt.phase = 'down'
+      bt.t = 0
+      return
+    }
+    if (bt.phase !== 'rest') return
+    bt.phase = 'back'
+    bt.t = 0
+    bt.from = bt.theta
+    bt.hold = false
+    bt.backDur = T_BACK
+  }
+
+  // commands from the scene's buttons
+  const first = useRef(true)
+  useEffect(() => {
+    if (first.current) return
+    doBowl()
+  }, [bowl]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (first.current) return
+    doSwing()
+  }, [swing]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (first.current) return
+    resetWorld()
+  }, [reset]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    first.current = false
+    resetWorld()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (world.bat.phase === 'rest' && world.bowledAt < 0) world.bat.tx = REST_X[batting] ?? 0
+  }, [batting, world])
+
+  // ---- one physics substep ----
+  const batKinematics = (h) => {
+    const bt = world.bat
+    const prev = bt.theta
+    bt.t += h
+    if (bt.phase === 'back') {
+      const k = clamp01(bt.t / bt.backDur)
+      bt.theta = bt.from + (BACKLIFT - bt.from) * easeInOut(k)
+      if (k >= 1) {
+        bt.phase = bt.hold ? 'ready' : 'down'
+        bt.t = 0
+      }
+    } else if (bt.phase === 'ready') {
+      bt.theta = BACKLIFT
+    } else if (bt.phase === 'down') {
+      const k = clamp01(bt.t / T_DOWN)
+      bt.theta = BACKLIFT + (FOLLOW - BACKLIFT) * k * k
+      if (k >= 1) {
+        bt.phase = 'through'
+        bt.t = 0
+      }
+    } else if (bt.phase === 'through') {
+      const k = clamp01(bt.t / 0.14)
+      bt.theta = FOLLOW + 0.3 * (1 - (1 - k) * (1 - k))
+      if (bt.t > 0.45) {
+        bt.phase = 'return'
+        bt.t = 0
+        bt.from = bt.theta
+      }
+    } else if (bt.phase === 'return') {
+      const k = clamp01(bt.t / 0.6)
+      bt.theta = bt.from * (1 - easeInOut(k))
+      if (k >= 1) bt.phase = 'rest'
+    }
+    bt.omega = (bt.theta - prev) / h
+    bt.x += (bt.tx - bt.x) * (1 - Math.exp(-h * 9))
+  }
+
+  // ball against the bat: the blade as a box in the bat's own frame
+  const batHit = () => {
+    const b = world.ball
+    const bt = world.bat
+    const c = Math.cos(-bt.theta)
+    const s = Math.sin(-bt.theta)
+    const px = b.pos.x - bt.x
+    const py = b.pos.y - PIVOT_Y
+    const pz = b.pos.z - BAT_Z
+    // into the bat frame (undo its turn about x)
+    const ly = py * c - pz * s
+    const lz = py * s + pz * c
+    const qx = THREE.MathUtils.clamp(px, -BLADE_HW, BLADE_HW)
+    const qy = THREE.MathUtils.clamp(ly, -PIVOT_Y, -PIVOT_Y + BLADE_L)
+    const qz = THREE.MathUtils.clamp(lz, FACE_Z, FACE_Z + 0.06)
+    let nx = px - qx
+    let ny = ly - qy
+    let nz = lz - qz
+    const d = Math.hypot(nx, ny, nz)
+    if (d >= BALL.r) return
+    if (d < 1e-6) {
+      nx = 0
+      ny = 0
+      nz = -1
+    } else {
+      nx /= d
+      ny /= d
+      nz /= d
+    }
+    // back to the world
+    const c2 = Math.cos(bt.theta)
+    const s2 = Math.sin(bt.theta)
+    const n = tmp.n.set(nx, ny * c2 - nz * s2, ny * s2 + nz * c2)
+    const cp = tmp.p.set(bt.x + qx, PIVOT_Y + qy * c2 - qz * s2, BAT_Z + qy * s2 + qz * c2)
+    const vb = new THREE.Vector3(bt.omega, 0, 0).cross(new THREE.Vector3(0, cp.y - PIVOT_Y, cp.z - BAT_Z))
+    const speed = collide(b, null, cp, n, 0.48, 0.2, vb)
+    // push out of the blade
+    b.pos.copy(cp).addScaledVector(n, BALL.r + 0.0005)
+    if (speed > 0.5) play('bat', speed / 25)
+  }
+
+  // ball against a stump given its axis a→b
+  const ballStump = (a, bEnd, target) => {
+    const b = world.ball
+    closestOnSegment(a, bEnd, b.pos, tmp.q)
+    tmp.n.subVectors(b.pos, tmp.q)
+    const d = tmp.n.length()
+    if (d >= BALL.r + STUMP.r || d < 1e-7) return
+    tmp.n.divideScalar(d)
+    const cp = tmp.p.copy(tmp.q).addScaledVector(tmp.n, STUMP.r)
+    const speed = collide(b, target, cp, tmp.n.clone(), 0.38, 0.15)
+    if (target.invInertia && speed > 0) {
+      target.active = true // wake a stump lying on the grass
+      target.still = 0
+    }
+    b.pos.copy(tmp.q).addScaledVector(tmp.n, BALL.r + STUMP.r + 0.0003)
+    if (speed > 0.3) {
+      play('stump', speed / 25)
+      world.disturbed = true
+    }
+  }
+
+  const freeStumpAxis = (body, a, b) => {
+    a.set(0, -STUMP.spike - STUMP_COM, 0).applyQuaternion(body.quat).add(body.pos)
+    b.set(0, STUMP.h - STUMP_COM, 0).applyQuaternion(body.quat).add(body.pos)
+  }
+
+  const releaseBail = (i, extra) => {
+    const bl = world.bails[i]
+    if (!bl.seated) return
+    bl.seated = false
+    world.disturbed = true
+    const B = bl.body
+    seat(i, B.pos, B.quat)
+    // it leaves with the tops of the stumps that were carrying it
+    const sa = world.stumps[i]
+    const sb = world.stumps[i + 1]
+    const va = sa.pointVel(sa.top(tmp.a), new THREE.Vector3())
+    const vb = sb.pointVel(sb.top(tmp.b), new THREE.Vector3())
+    B.vel.addVectors(va, vb).multiplyScalar(0.55)
+    if (extra) B.vel.add(extra)
+    const kick = Math.min(6, B.vel.length())
+    B.vel.y += 0.6 + kick * (0.35 + Math.random() * 0.35)
+    B.ang.set((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2).multiplyScalar(20 + kick * 14)
+    B.active = true
+    B.still = 0
+    play('bail', 0.5)
+  }
+
+  const substep = (h) => {
+    const w = world
+    w.t += h
+    if (w.autoSwingAt >= 0 && w.t >= w.autoSwingAt) {
+      w.autoSwingAt = -1
+      doSwing()
+    }
+    batKinematics(h)
+
+    // the ball
+    const b = w.ball
+    if (b.active) {
+      b.step(h, (_, s) => play('pitch', s / 8))
+      batHit()
+      w.stumps.forEach((s) => {
+        if (s.planted) ballStump(s.base, s.top(tmp.b).clone(), s)
+      })
+      w.free.forEach((f) => {
+        if (!f) return
+        const a = new THREE.Vector3()
+        const e = new THREE.Vector3()
+        freeStumpAxis(f, a, e)
+        ballStump(a, e, f)
+      })
+      // straight into a seated bail
+      w.bails.forEach((bl, i) => {
+        if (!bl.seated) return
+        const pos = new THREE.Vector3()
+        const quat = new THREE.Quaternion()
+        seat(i, pos, quat)
+        const ax = new THREE.Vector3(1, 0, 0).applyQuaternion(quat).multiplyScalar(BAIL.len / 2)
+        closestOnSegment(pos.clone().sub(ax), pos.clone().add(ax), b.pos, tmp.q)
+        const d = tmp.q.distanceTo(b.pos)
+        if (d < BALL.r + BAIL.r) {
+          releaseBail(i, b.vel.clone().multiplyScalar(0.6))
+          tmp.n.subVectors(b.pos, tmp.q).normalize()
+          collide(b, bl.body, tmp.q.clone().addScaledVector(tmp.n, BAIL.r), tmp.n.clone(), 0.4, 0.1)
+        }
+      })
+      if (b.pos.lengthSq() > 900) b.active = false
+    }
+
+    // the stumps
+    w.stumps.forEach((s, i) => {
+      if (!s.planted) return
+      if (s.step(h)) {
+        // out of the ground: it flies free from here
+        s.planted = false
+        const f = stumpBody()
+        const u = s.up(new THREE.Vector3())
+        f.pos.copy(s.base).addScaledVector(u, STUMP_COM)
+        f.quat.copy(s.quat)
+        f.vel.copy(s.pointVel(f.pos, new THREE.Vector3()))
+        f.vel.y += 0.8
+        f.ang.copy(s.ang)
+        f.active = true
+        w.free[i] = f
+      }
+    })
+    w.free.forEach((f) => f?.step(h, (_, s) => play('stump', s / 12)))
+
+    // the bails: they stay seated while the stumps under them stay put
+    w.bails.forEach((bl, i) => {
+      if (bl.seated) {
+        const sa = w.stumps[i]
+        const sb = w.stumps[i + 1]
+        if (!sa.planted || !sb.planted) return releaseBail(i)
+        const da = sa.top(tmp.a).distanceTo(tmp.b.set(sa.base.x, STUMP.h, 0))
+        const db = sb.top(tmp.a).distanceTo(tmp.b.set(sb.base.x, STUMP.h, 0))
+        if (Math.max(da, db) > 0.005) releaseBail(i)
+        return
+      }
+      const B = bl.body
+      B.step(h, (_, s) => play('bail', s / 4))
+      // a flying bail knocks against the stumps still standing
+      if (!B.active) return
+      w.stumps.forEach((s) => {
+        if (!s.planted) return
+        const top = s.top(new THREE.Vector3())
+        for (const sp of B.spheres) {
+          const wp = tmp.p.copy(sp.p).applyQuaternion(B.quat).add(B.pos)
+          closestOnSegment(s.base, top, wp, tmp.q)
+          tmp.n.subVectors(wp, tmp.q)
+          const d = tmp.n.length()
+          if (d >= sp.r + STUMP.r || d < 1e-7) continue
+          tmp.n.divideScalar(d)
+          collide(B, s, tmp.q.clone().addScaledVector(tmp.n, STUMP.r), tmp.n.clone(), 0.3, 0.2)
+          B.pos.addScaledVector(tmp.n, sp.r + STUMP.r - d)
+        }
+      })
+    })
+  }
+
+  // ---- render ----
+  const ballRef = useRef()
+  const batRef = useRef()
+  const stumpRefs = [useRef(), useRef(), useRef()]
+  const bailRefs = [useRef(), useRef()]
+  const autoT = useRef(0)
+
+  useFrame((_, delta) => {
+    const real = Math.min(delta, 1 / 20)
+    if (!(real > 0)) return
+    const L = live.current
+    const sim = real * THREE.MathUtils.clamp(L.slowMotion, 0.05, 1)
+    const n = Math.max(1, Math.ceil(sim / SUB))
+    for (let i = 0; i < n; i++) substep(sim / n)
+
+    const w = world
+    // bowl again by itself once everything has come to rest
+    if (L.autoBowl) {
+      const busy = w.ball.active || w.free.some((f) => f?.active) || w.bails.some((b) => b.body.active) || w.bat.phase !== 'rest'
+      autoT.current = busy ? 0 : autoT.current + real
+      if (autoT.current > (w.bowledAt < 0 ? 0.8 : 1.6)) {
+        autoT.current = 0
+        doBowl()
+      }
+    }
+
+    // ball
+    const b = w.ball
+    ballRef.current.visible = b.active || w.bowledAt >= 0
+    ballRef.current.position.copy(b.pos)
+    ballRef.current.quaternion.copy(b.quat)
+    // bat
+    batRef.current.position.set(w.bat.x, PIVOT_Y, BAT_Z)
+    batRef.current.rotation.x = w.bat.theta
+    // stumps: drawn about their centre of mass either way
+    w.stumps.forEach((s, i) => {
+      const g = stumpRefs[i].current
+      const f = w.free[i]
+      if (f) {
+        g.position.copy(f.pos)
+        g.quaternion.copy(f.quat)
+      } else {
+        g.position.copy(s.base).addScaledVector(s.up(tmp.v), STUMP_COM)
+        g.quaternion.copy(s.quat)
+      }
+    })
+    // bails
+    w.bails.forEach((bl, i) => {
+      const g = bailRefs[i].current
+      if (bl.seated) seat(i, g.position, g.quaternion)
+      else {
+        g.position.copy(bl.body.pos)
+        g.quaternion.copy(bl.body.quat)
+      }
+    })
+  })
+
+  const clickable = (fn) => ({
+    onClick: (e) => {
+      e.stopPropagation()
+      if (e.delta > 4) return
+      fn()
+    },
+    onPointerOver: (e) => {
+      e.stopPropagation()
+      setHover(true)
+    },
+    onPointerOut: () => setHover(false),
+  })
+
+  return (
+    <group>
+      {/* the pitch: a strip of rolled turf with the creases on it */}
+      <mesh geometry={geo.pitch} material={mats.pitch} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0005, -4.5]} receiveShadow />
+      {/* bowling crease through the stumps, popping crease 1.22 m in front, return creases */}
+      <mesh geometry={geo.crease} material={mats.crease} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} scale={[2.64, 0.05, 1]} receiveShadow />
+      <mesh geometry={geo.crease} material={mats.crease} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, -1.22]} scale={[3.05, 0.05, 1]} receiveShadow />
+      {[-1.32, 1.32].map((x) => (
+        <mesh key={x} geometry={geo.crease} material={mats.crease} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.001, -0.6]} scale={[0.05, 2.44, 1]} receiveShadow />
+      ))}
+
+      {/* the stumps */}
+      {STUMP_X.map((x, i) => (
+        <group key={x} ref={stumpRefs[i]} {...clickable(doBowl)}>
+          <group position={[0, -STUMP_COM, 0]}>
+            <mesh geometry={geo.stump} material={mats.stump} castShadow receiveShadow />
+            {/* the groove the bails sit in */}
+            <mesh geometry={geo.notch} material={mats.notch} position={[0, STUMP.h - 0.0012, 0]} />
+          </group>
+        </group>
+      ))}
+      {/* the bails */}
+      {[0, 1].map((i) => (
+        <group key={i} ref={bailRefs[i]} {...clickable(doBowl)}>
+          <mesh geometry={geo.bail} material={mats.bail} castShadow />
+        </group>
+      ))}
+
+      {/* the bat, held at the hands and swung about them */}
+      <group ref={batRef} {...clickable(doSwing)}>
+        <group position={[0, -PIVOT_Y, 0]}>
+          <mesh geometry={geo.blade} material={mats.blade} castShadow receiveShadow />
+          <mesh geometry={geo.splice} material={mats.splice} position={[0, BLADE_L - 0.052, FACE_Z - 0.0025]} rotation={[0, Math.PI, 0]} />
+          <mesh geometry={geo.handle} material={mats.handle} position={[0, BLADE_L + (BAT_L - BLADE_L) / 2 - 0.02, -0.009]} castShadow />
+          <mesh geometry={geo.twine} material={mats.twine} position={[0, BLADE_L + 0.006, -0.009]} castShadow />
+          <mesh geometry={geo.grip} material={mats.grip} position={[0, BLADE_L + 0.02 + (BAT_L - BLADE_L - 0.04) / 2, -0.009]} castShadow />
+          <mesh geometry={geo.gripEnd} material={mats.grip} position={[0, BAT_L - 0.02, -0.009]} scale={[1, 0.6, 1]} castShadow />
+        </group>
+      </group>
+
+      {/* the ball */}
+      <mesh ref={ballRef} geometry={geo.ball} material={mats.ball} castShadow visible={false} />
+    </group>
+  )
+}

@@ -88,6 +88,8 @@ import VineText from '../lib/VineText.jsx'
 import ConstellationText from '../lib/ConstellationText.jsx'
 import FootballModel from '../lib/FootballModel.jsx'
 import BasketballModel from '../lib/BasketballModel.jsx'
+import HourglassModel from '../lib/HourglassModel.jsx'
+import DartboardModel from '../lib/DartboardModel.jsx'
 import { lazy, Suspense } from 'react'
 const ExtrudedText = lazy(() => import('../lib/ExtrudedText.jsx'))
 const CylinderText = lazy(() => import('../lib/CylinderText.jsx'))
@@ -201,6 +203,7 @@ import TypewriterModel from '../lib/TypewriterModel.jsx'
 import LighterModel from '../lib/LighterModel.jsx'
 import InkPadModel from '../lib/InkPadModel.jsx'
 import StampModel from '../lib/StampModel.jsx'
+import CricketModel from '../lib/CricketModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
 import PenModel from '../lib/PenModel.jsx'
 import LorryModel from '../lib/LorryModel.jsx'
@@ -209,6 +212,7 @@ import LampModel from '../lib/LampModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
+import CloudModel from '../lib/CloudModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
@@ -243,7 +247,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../cloud/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -3334,6 +3338,31 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'cricket-wicket',
+    name: 'Cricket Wicket',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'Stumps, bails, bat and ball with real rigid-body physics. Bowl and leave it: the stump is driven back in the soil or uprooted, and the bails jump their grooves and tumble. Swing in time and willow meets leather.',
+    controls: [
+      { name: 'batting', type: 'select', options: ['leave', 'block', 'drive'], default: 'leave' },
+      { name: 'line', type: 'select', options: ['middle', 'off', 'leg', 'random'], default: 'middle' },
+      { name: 'pace', type: 'range', min: 60, max: 160, step: 5, default: 110, unit: 'km/h' },
+      { name: 'slowMotion', type: 'range', min: 0.05, max: 1, step: 0.05, default: 0.3 },
+      { name: 'autoBowl', type: 'toggle', default: false },
+      { name: 'ball', type: 'select', options: ['red', 'white', 'pink'], default: 'red' },
+      { name: 'stumpWood', type: 'color', default: '#c99447' },
+      { name: 'batWood', type: 'color', default: '#e4cba0' },
+      { name: 'gripColor', type: 'color', default: '#f4f4f2' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <CricketModel {...p} height="100%" />,
+    fill: true,
+    files: ['CricketModel.jsx', 'cricket/CricketScene.jsx', 'cricket/Cricket.jsx', 'cricket/physics.js', 'cricket/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'pocket-knife',
     name: 'Pocket Knife',
     category: '3D & Materials',
@@ -3605,6 +3634,41 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'cloud',
+    name: 'Cloud',
+    category: '3D & Materials',
+    style: 'Nature & world',
+    isNew: true,
+    description: 'A single cumulus raymarched as a true volume under a physical sky: Perlin-Worley billows, sunlight marched through the vapour with multiple scattering and a silver lining. It drifts and churns; fly around it or right into it.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Afternoon', values: { elevation: 22, azimuth: 150, exposure: 0.5, density: 0.55, coverage: 1.05, sunIntensity: 1 } },
+          { name: 'Noon', values: { elevation: 60, azimuth: 120, exposure: 0.4, density: 0.5, coverage: 1.05, sunIntensity: 1 } },
+          { name: 'Golden hour', values: { elevation: 4, azimuth: 20, exposure: 0.65, density: 0.55, coverage: 1.05, sunIntensity: 1.2 } },
+          { name: 'Storm', values: { elevation: 30, azimuth: 150, exposure: 0.45, density: 1.4, coverage: 1.25, sunIntensity: 0.7 } },
+        ],
+      },
+      { name: 'elevation', type: 'range', min: 0, max: 90, step: 0.5, default: 22, unit: '°' },
+      { name: 'azimuth', type: 'range', min: -180, max: 180, step: 1, default: 150, unit: '°' },
+      { name: 'exposure', type: 'range', min: 0.1, max: 1.5, step: 0.01, default: 0.5 },
+      { name: 'sunIntensity', type: 'range', min: 0.2, max: 2, step: 0.05, default: 1 },
+      { name: 'density', type: 'range', min: 0.1, max: 2, step: 0.01, default: 0.55 },
+      { name: 'coverage', type: 'range', min: 0.6, max: 1.5, step: 0.01, default: 1.05 },
+      { name: 'detail', type: 'range', min: 0, max: 2, step: 0.01, default: 1 },
+      { name: 'wind', type: 'range', min: 0, max: 5, step: 0.1, default: 1 },
+      { name: 'seed', type: 'range', min: 1, max: 20, step: 1, default: 3 },
+      { name: 'quality', type: 'range', min: 40, max: 160, step: 1, default: 90 },
+      { name: 'autoRotate', type: 'toggle', default: true },
+    ],
+    preview: (p) => <CloudModel {...p} height="100%" />,
+    fill: true,
+    files: ['CloudModel.jsx', 'cloud/CloudScene.jsx', 'cloud/Cloud.jsx', 'cloud/cloudShader.js', 'cloud/noise.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'dice',
     name: 'Dice',
     category: '3D & Materials',
@@ -3708,6 +3772,72 @@ const ALL_COMPONENTS = [
     preview: (p) => <BasketballModel {...p} height="100%" />,
     fill: true,
     files: ['BasketballModel.jsx', 'basketball/BasketballScene.jsx', 'basketball/Basketball.jsx', 'basketball/physics.js', 'basketball/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'hourglass',
+    name: 'Hourglass',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A turned-walnut hourglass with blown glass and real sand behaviour: a constant flow rate, a crater above and a cone below at the angle of repose, and a falling stream. Click it to turn it over.',
+    controls: [
+      { name: 'duration', type: 'range', min: 10, max: 300, step: 5, default: 60, unit: 's' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Gold sand', values: { sand: '#c9a24b', wood: 1 } },
+          { name: 'White sand', values: { sand: '#ece6d6', wood: 0.8 } },
+          { name: 'Black sand', values: { sand: '#2a2724', wood: 1.25 } },
+          { name: 'Rose', values: { sand: '#d98c8c', wood: 1.1 } },
+        ],
+      },
+      { name: 'sand', type: 'color', default: '#c9a24b' },
+      { name: 'wood', type: 'range', min: 0.5, max: 1.6, step: 0.05, default: 1 },
+      { name: 'glassTint', type: 'color', default: '#ffffff' },
+      { name: 'background', type: 'color', default: '#e4e3e0' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <HourglassModel {...p} height="100%" />,
+    fill: true,
+    files: ['HourglassModel.jsx', 'hourglass/HourglassScene.jsx', 'hourglass/Hourglass.jsx', 'hourglass/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'dartboard',
+    name: 'Dartboard',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A regulation bristle dartboard with a wire spider and three steel-tip darts. Click to throw from the oche: real flight, darts landing nose-up and sticking with a wobble or bouncing off the wire, and every dart scored.',
+    controls: [
+      { name: 'accuracy', type: 'range', min: 0, max: 60, step: 1, default: 18, unit: 'mm' },
+      { name: 'speed', type: 'range', min: 8, max: 22, step: 0.5, default: 14, unit: 'm/s' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Classic', values: { red: '#c4161c', green: '#1b8a3c', black: '#141414', cream: '#e9dfc3' } },
+          { name: 'Blue', values: { red: '#1d4fbf', green: '#c4161c', black: '#141414', cream: '#e9dfc3' } },
+          { name: 'Mono', values: { red: '#3a3a3a', green: '#8c8c8c', black: '#141414', cream: '#e9e7e2' } },
+        ],
+      },
+      { name: 'red', type: 'color', default: '#c4161c' },
+      { name: 'green', type: 'color', default: '#1b8a3c' },
+      { name: 'black', type: 'color', default: '#141414' },
+      { name: 'cream', type: 'color', default: '#e9dfc3' },
+      { name: 'flight', type: 'color', default: '#c8141e' },
+      { name: 'barrel', type: 'select', options: ['brass', 'tungsten'], default: 'brass' },
+      { name: 'wall', type: 'color', default: '#c9c9c7' },
+      { name: 'sound', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <DartboardModel {...p} height="100%" />,
+    fill: true,
+    files: ['DartboardModel.jsx', 'darts/DartsScene.jsx', 'darts/Dartboard.jsx', 'darts/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
