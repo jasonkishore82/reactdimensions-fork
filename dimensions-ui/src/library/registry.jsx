@@ -2,6 +2,37 @@ import TiltCard from '../lib/TiltCard.jsx'
 import SpringButton from '../lib/SpringButton.jsx'
 import MagneticButton from '../lib/MagneticButton.jsx'
 import HandwritingText from '../lib/HandwritingText.jsx'
+import TypewriterText from '../lib/TypewriterText.jsx'
+import DropInText from '../lib/DropInText.jsx'
+import BlurRevealText from '../lib/BlurRevealText.jsx'
+import MaskWipeText from '../lib/MaskWipeText.jsx'
+import SplitFlapText from '../lib/SplitFlapText.jsx'
+import CountUpText from '../lib/CountUpText.jsx'
+import UnfoldText from '../lib/UnfoldText.jsx'
+import InkBleedText from '../lib/InkBleedText.jsx'
+import DotMatrixText from '../lib/DotMatrixText.jsx'
+import MagneticText from '../lib/MagneticText.jsx'
+import WeightWaveText from '../lib/WeightWaveText.jsx'
+import SpotlightText from '../lib/SpotlightText.jsx'
+import RepelText from '../lib/RepelText.jsx'
+import SlantText from '../lib/SlantText.jsx'
+import LensText from '../lib/LensText.jsx'
+import GlyphSwapText from '../lib/GlyphSwapText.jsx'
+import RubberBandText from '../lib/RubberBandText.jsx'
+import VelocityMarquee from '../lib/VelocityMarquee.jsx'
+import ParallaxLines from '../lib/ParallaxLines.jsx'
+import StickyHeadline from '../lib/StickyHeadline.jsx'
+import ScrollFillText from '../lib/ScrollFillText.jsx'
+import ScrubSentence from '../lib/ScrubSentence.jsx'
+import StackLines from '../lib/StackLines.jsx'
+import TumbleText from '../lib/TumbleText.jsx'
+import NeonText from '../lib/NeonText.jsx'
+import EmbossPlate from '../lib/EmbossPlate.jsx'
+import WordCloud3D from '../lib/WordCloud3D.jsx'
+import { lazy, Suspense } from 'react'
+const ExtrudedText = lazy(() => import('../lib/ExtrudedText.jsx'))
+const CylinderText = lazy(() => import('../lib/CylinderText.jsx'))
+const RibbonText = lazy(() => import('../lib/RibbonText.jsx'))
 import PeekCard from '../lib/PeekCard.jsx'
 import HoverScrub from '../lib/HoverScrub.jsx'
 import CursorTrail from '../lib/CursorTrail.jsx'
@@ -124,6 +155,7 @@ import SneakerModel from '../lib/SneakerModel.jsx'
 import GrandPianoModel from '../lib/GrandPianoModel.jsx'
 import GuitarModel from '../lib/GuitarModel.jsx'
 import DumbbellModel from '../lib/DumbbellModel.jsx'
+import MugModel from '../lib/MugModel.jsx'
 import GamepadModel from '../lib/GamepadModel.jsx'
 import LadderModel from '../lib/LadderModel.jsx'
 import ShirtModel from '../lib/ShirtModel.jsx'
@@ -150,7 +182,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -912,6 +944,565 @@ const ALL_COMPONENTS = [
     replay: true,
     preview: (p) => <HandwritingText {...p} />,
     files: ['HandwritingText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'typewriter-text',
+    name: 'Typewriter Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Types like a person: uneven key timing, pauses at punctuation, a caret that blinks only while it waits. Separate phrases with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Design it.|Build it.|Ship it.', maxLength: 80 },
+      { name: 'speed', type: 'range', min: 20, max: 200, step: 5, default: 70, unit: 'ms' },
+      { name: 'jitter', type: 'range', min: 0, max: 1, step: 0.05, default: 0.6 },
+      { name: 'hold', type: 'range', min: 0.3, max: 5, step: 0.1, default: 1.6, unit: 's' },
+      { name: 'loop', type: 'toggle', default: true },
+      { name: 'caret', type: 'toggle', default: true },
+    ],
+    replay: true,
+    preview: (p) => <TypewriterText {...p} style={{ font: '500 clamp(32px, 6vw, 64px)/1.1 ui-monospace, Menlo, monospace' }} />,
+    files: ['TypewriterText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'drop-in-text',
+    name: 'Drop-in Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters fall into place one by one under gravity and bounce on the baseline until they settle.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Falling into place', maxLength: 48 },
+      { name: 'stagger', type: 'range', min: 10, max: 200, step: 5, default: 55, unit: 'ms' },
+      { name: 'height', type: 'range', min: 0.4, max: 4, step: 0.1, default: 1.6, unit: 'em' },
+      { name: 'gravity', type: 'range', min: 15, max: 150, step: 5, default: 60 },
+      { name: 'bounciness', type: 'range', min: 0, max: 0.8, step: 0.05, default: 0.45 },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <DropInText {...p} style={{ font: '400 clamp(44px, 8vw, 96px)/1 var(--serif)' }} />,
+    files: ['DropInText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'blur-reveal-text',
+    name: 'Blur Reveal Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Words pull into focus one at a time, from a soft blur to sharp.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Words resolve out of the blur, one at a time.', maxLength: 90 },
+      { name: 'stagger', type: 'range', min: 20, max: 400, step: 10, default: 120, unit: 'ms' },
+      { name: 'duration', type: 'range', min: 200, max: 2500, step: 50, default: 900, unit: 'ms' },
+      { name: 'blur', type: 'range', min: 2, max: 30, step: 1, default: 12, unit: 'px' },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => (
+      <div style={{ maxWidth: 760, padding: '0 24px', textAlign: 'center' }}>
+        <BlurRevealText {...p} style={{ font: '400 clamp(32px, 5vw, 60px)/1.15 var(--serif)' }} />
+      </div>
+    ),
+    files: ['BlurRevealText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'mask-wipe-text',
+    name: 'Mask Wipe Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A bar sweeps across each line, and the text is there when it pulls away. Separate lines with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Masked|and revealed.', maxLength: 80 },
+      { name: 'duration', type: 'range', min: 400, max: 3000, step: 50, default: 1100, unit: 'ms' },
+      { name: 'stagger', type: 'range', min: 0, max: 600, step: 20, default: 160, unit: 'ms' },
+      { name: 'direction', type: 'select', options: ['left', 'right'], default: 'left' },
+      { name: 'barColor', type: 'color', default: '#ff4d1a' },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <MaskWipeText {...p} style={{ font: '400 clamp(44px, 8vw, 96px)/1.05 var(--serif)' }} />,
+    files: ['MaskWipeText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'split-flap-text',
+    name: 'Split-Flap Text',
+    category: 'Text',
+    isNew: true,
+    description: 'An airport departures board: every cell clatters through its drum of flaps, one at a time, to reach the next character.',
+    controls: [
+      { name: 'text', type: 'text', default: 'DEPARTS 09:45', maxLength: 24 },
+      { name: 'flipMs', type: 'range', min: 30, max: 250, step: 5, default: 80, unit: 'ms' },
+      { name: 'stagger', type: 'range', min: 0, max: 200, step: 5, default: 40, unit: 'ms' },
+      { name: 'background', type: 'color', default: '#1b1b1d' },
+      { name: 'color', type: 'color', default: '#f2efe6' },
+      { name: 'sound', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <SplitFlapText {...p} style={{ fontSize: 'clamp(28px, 5vw, 58px)' }} />,
+    files: ['SplitFlapText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'count-up-text',
+    name: 'Count-up Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A number that rolls up to its target on odometer wheels: the units blur past while each wheel to the left only turns as its neighbour rolls over.',
+    controls: [
+      { name: 'value', type: 'text', default: '$12,480.50', maxLength: 18 },
+      { name: 'from', type: 'range', min: 0, max: 100000, step: 100, default: 0 },
+      { name: 'duration', type: 'range', min: 300, max: 6000, step: 100, default: 2400, unit: 'ms' },
+      { name: 'easing', type: 'select', options: ['out', 'expo', 'linear'], default: 'out' },
+      { name: 'roll', type: 'toggle', default: true },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <CountUpText {...p} style={{ font: '600 clamp(44px, 8vw, 96px) var(--sans, system-ui)', letterSpacing: '-0.02em' }} />,
+    files: ['CountUpText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'unfold-text',
+    name: 'Unfold Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Each word is hinged on its top edge and swings down like a pendulum, back and forth until the hinge friction settles it.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Swinging down from the hinge', maxLength: 60 },
+      { name: 'stagger', type: 'range', min: 0, max: 400, step: 10, default: 110, unit: 'ms' },
+      { name: 'swing', type: 'range', min: 5, max: 30, step: 1, default: 13 },
+      { name: 'friction', type: 'range', min: 0.5, max: 15, step: 0.5, default: 4.5 },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => (
+      <div style={{ maxWidth: 820, padding: '0 24px', textAlign: 'center' }}>
+        <UnfoldText {...p} style={{ font: '400 clamp(38px, 6vw, 76px)/1.15 var(--serif)' }} />
+      </div>
+    ),
+    files: ['UnfoldText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'ink-bleed-text',
+    name: 'Ink Bleed Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Drops of ink land along the line and wick out through the paper, fast at first and slowing as they soak in, with ragged fibrous edges.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Ink on paper', maxLength: 32 },
+      { name: 'color', type: 'color', default: '#1d2b4f' },
+      { name: 'drops', type: 'range', min: 1, max: 24, step: 1, default: 12 },
+      { name: 'stagger', type: 'range', min: 0, max: 500, step: 10, default: 130, unit: 'ms' },
+      { name: 'soak', type: 'range', min: 300, max: 4000, step: 100, default: 1600, unit: 'ms' },
+      { name: 'roughness', type: 'range', min: 0, max: 0.8, step: 0.05, default: 0.25 },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <InkBleedText {...p} style={{ font: 'italic 400 clamp(52px, 9vw, 110px) var(--serif)' }} />,
+    files: ['InkBleedText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'dot-matrix-text',
+    name: 'Dot-Matrix Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A pin print head sweeps across the paper firing pins column by column, printing each line in one pass, both directions. Separate lines with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'DOT MATRIX|PRINTING...', maxLength: 60 },
+      { name: 'pins', type: 'range', min: 7, max: 24, step: 1, default: 12 },
+      { name: 'speed', type: 'range', min: 20, max: 300, step: 5, default: 90, unit: 'col/s' },
+      { name: 'color', type: 'color', default: '#262626' },
+      { name: 'sound', type: 'toggle', default: false },
+    ],
+    replay: true,
+    preview: (p) => <DotMatrixText {...p} style={{ fontSize: 'clamp(30px, 5vw, 56px)' }} />,
+    files: ['DotMatrixText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'magnetic-text',
+    name: 'Magnetic Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters drift toward the cursor like iron to a magnet, then wobble back home on springs when it leaves.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Magnetic letters', maxLength: 40 },
+      { name: 'strength', type: 'range', min: 0.05, max: 0.8, step: 0.05, default: 0.25 },
+      { name: 'radius', type: 'range', min: 40, max: 400, step: 10, default: 160, unit: 'px' },
+      { name: 'stiffness', type: 'range', min: 40, max: 500, step: 10, default: 170 },
+      { name: 'damping', type: 'range', min: 2, max: 40, step: 1, default: 13 },
+    ],
+    preview: (p) => <MagneticText {...p} style={{ font: '400 clamp(48px, 8vw, 100px)/1 var(--serif)' }} />,
+    files: ['MagneticText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'weight-wave-text',
+    name: 'Weight Wave Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters swell from thin to heavy as the pointer passes, on a variable font, then ease back to thin.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Swell under the pointer', maxLength: 40 },
+      { name: 'minWeight', type: 'range', min: 100, max: 500, step: 10, default: 200 },
+      { name: 'maxWeight', type: 'range', min: 500, max: 1000, step: 10, default: 900 },
+      { name: 'radius', type: 'range', min: 30, max: 300, step: 10, default: 120, unit: 'px' },
+      { name: 'ease', type: 'range', min: 2, max: 30, step: 1, default: 10 },
+    ],
+    preview: (p) => <WeightWaveText {...p} style={{ fontSize: 'clamp(34px, 5.6vw, 72px)' }} />,
+    files: ['WeightWaveText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'spotlight-text',
+    name: 'Spotlight Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Text in the dark: only the letters near the pointer are lit, by a soft spotlight that trails the cursor.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Only what you point at is lit', maxLength: 48 },
+      { name: 'radius', type: 'range', min: 40, max: 400, step: 10, default: 140, unit: 'px' },
+      { name: 'dim', type: 'range', min: 0, max: 0.6, step: 0.02, default: 0.14 },
+      { name: 'color', type: 'color', default: '#1c1a16' },
+      { name: 'glow', type: 'color', default: '#ff9a3c' },
+      { name: 'lag', type: 'range', min: 2, max: 30, step: 1, default: 9 },
+      { name: 'idle', type: 'toggle', default: true },
+    ],
+    preview: (p) => (
+      <div style={{ maxWidth: 820, padding: '0 24px', textAlign: 'center' }}>
+        <SpotlightText {...p} style={{ font: '400 clamp(40px, 7vw, 84px)/1.1 var(--serif)' }} />
+      </div>
+    ),
+    files: ['SpotlightText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'repel-text',
+    name: 'Repel Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters scatter away from the cursor, spinning as they are knocked aside, then spring back into line.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Keep your distance', maxLength: 40 },
+      { name: 'radius', type: 'range', min: 30, max: 300, step: 10, default: 110, unit: 'px' },
+      { name: 'force', type: 'range', min: 10, max: 160, step: 5, default: 60, unit: 'px' },
+      { name: 'spin', type: 'range', min: 0, max: 90, step: 5, default: 25, unit: '°' },
+      { name: 'stiffness', type: 'range', min: 40, max: 500, step: 10, default: 160 },
+      { name: 'damping', type: 'range', min: 2, max: 40, step: 1, default: 11 },
+    ],
+    preview: (p) => <RepelText {...p} style={{ font: '400 clamp(48px, 8vw, 100px)/1 var(--serif)' }} />,
+    files: ['RepelText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'slant-text',
+    name: 'Slant Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters lean toward the pointer like grass toward a hand, swaying on springs and standing back up when it leaves.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Leaning toward you', maxLength: 40 },
+      { name: 'maxSlant', type: 'range', min: 4, max: 40, step: 1, default: 22, unit: '°' },
+      { name: 'reach', type: 'range', min: 40, max: 400, step: 10, default: 160, unit: 'px' },
+      { name: 'stiffness', type: 'range', min: 40, max: 400, step: 10, default: 140 },
+      { name: 'damping', type: 'range', min: 2, max: 40, step: 1, default: 12 },
+    ],
+    preview: (p) => <SlantText {...p} style={{ font: '400 clamp(48px, 8vw, 100px)/1 var(--serif)' }} />,
+    files: ['SlantText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'lens-text',
+    name: 'Lens Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A magnifying glass glides after the pointer, showing the text under it enlarged exactly in place.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Read the fine print', maxLength: 40 },
+      { name: 'zoom', type: 'range', min: 1.2, max: 4, step: 0.1, default: 2.2 },
+      { name: 'size', type: 'range', min: 60, max: 260, step: 10, default: 120, unit: 'px' },
+      { name: 'lag', type: 'range', min: 3, max: 40, step: 1, default: 14 },
+      { name: 'ring', type: 'color', default: '#1c1a16' },
+    ],
+    preview: (p) => <LensText {...p} style={{ font: '400 clamp(30px, 4.5vw, 52px)/1.1 var(--serif)' }} />,
+    files: ['LensText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'glyph-swap-text',
+    name: 'Glyph Swap Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Touch a letter and it flips like a card to an alternate italic glyph, rippling to its neighbours before flipping back.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Flip the letters', maxLength: 40 },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+      { name: 'spread', type: 'range', min: 0, max: 5, step: 1, default: 2 },
+      { name: 'hold', type: 'range', min: 100, max: 3000, step: 50, default: 700, unit: 'ms' },
+      { name: 'flip', type: 'range', min: 100, max: 800, step: 20, default: 260, unit: 'ms' },
+    ],
+    preview: (p) => <GlyphSwapText {...p} style={{ font: '600 clamp(44px, 8vw, 96px)/1.1 var(--sans, system-ui)', letterSpacing: '-0.02em' }} />,
+    files: ['GlyphSwapText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'rubber-band-text',
+    name: 'Rubber Band Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Grab a word and pull: it stretches after your finger, resisting more the further it goes, and wobbles home when you let go.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Pull any word', maxLength: 40 },
+      { name: 'resistance', type: 'range', min: 40, max: 400, step: 10, default: 140, unit: 'px' },
+      { name: 'stiffness', type: 'range', min: 60, max: 800, step: 10, default: 320 },
+      { name: 'damping', type: 'range', min: 2, max: 40, step: 1, default: 9 },
+    ],
+    preview: (p) => <RubberBandText {...p} style={{ font: '400 clamp(48px, 8vw, 100px)/1 var(--serif)' }} />,
+    files: ['RubberBandText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'velocity-marquee',
+    name: 'Velocity Marquee',
+    category: 'Text',
+    isNew: true,
+    description: 'Marquee bands that speed up with your scroll velocity, turn around when you scroll back, and glide back to cruising speed.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Scroll faster', maxLength: 40 },
+      { name: 'rows', type: 'range', min: 1, max: 5, step: 1, default: 3 },
+      { name: 'speed', type: 'range', min: 0, max: 300, step: 5, default: 60, unit: 'px/s' },
+      { name: 'boost', type: 'range', min: 0, max: 12, step: 0.5, default: 4 },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <VelocityMarquee {...p} style={{ position: 'absolute', inset: 0, font: '700 clamp(48px, 9vw, 110px)/1 var(--sans, system-ui)', letterSpacing: '-0.03em', textTransform: 'uppercase' }} />,
+    files: ['VelocityMarquee.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'parallax-lines',
+    name: 'Parallax Lines',
+    category: 'Text',
+    isNew: true,
+    description: 'Lines of type at different depths scroll past at different rates: near ones big, sharp and fast, far ones small, soft and slow. Separate lines with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Near things rush past|Middle ground drifts|Far away barely moves|The horizon holds still', maxLength: 140 },
+      { name: 'depth', type: 'range', min: 0, max: 2, step: 0.05, default: 1 },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <ParallaxLines {...p} style={{ position: 'absolute', inset: 0, font: '400 clamp(40px, 7vw, 84px)/1 var(--serif)' }} />,
+    files: ['ParallaxLines.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'sticky-headline',
+    name: 'Sticky Headline',
+    category: 'Text',
+    isNew: true,
+    description: 'A big headline that shrinks and slides up into the top bar as you scroll the article, becoming its title, and grows back out at the top.',
+    controls: [
+      { name: 'headline', type: 'text', default: 'The quiet hour', maxLength: 40 },
+      { name: 'kicker', type: 'text', default: 'Essay · 6 min read', maxLength: 40 },
+      { name: 'titleSize', type: 'range', min: 11, max: 24, step: 1, default: 15, unit: 'px' },
+      { name: 'distance', type: 'range', min: 60, max: 500, step: 10, default: 180, unit: 'px' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <StickyHeadline {...p} style={{ position: 'absolute', inset: 0, font: '400 clamp(44px, 7.5vw, 88px)/1 var(--serif)' }} />,
+    files: ['StickyHeadline.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'scroll-fill-text',
+    name: 'Scroll Fill Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A passage that fills with ink as you read down it: each line fills left to right as it crosses the middle, and drains when you scroll back.',
+    controls: [
+      { name: 'ink', type: 'color', default: '#1c1a16' },
+      { name: 'muted', type: 'color', default: '#d6d3cc' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+      { name: 'softness', type: 'range', min: 0.2, max: 2, step: 0.05, default: 0.6 },
+    ],
+    fill: true,
+    preview: (p) => <ScrollFillText {...p} style={{ position: 'absolute', inset: 0, font: '400 clamp(30px, 4.6vw, 54px)/1.18 var(--serif)' }} />,
+    files: ['ScrollFillText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'scrub-sentence',
+    name: 'Scrub Sentence',
+    category: 'Text',
+    isNew: true,
+    description: 'One long sentence on a single line that pans sideways as you scroll, lighting the word in the middle and leaning with your speed.',
+    controls: [
+      { name: 'text', type: 'text', default: 'A long sentence that pans past as you scroll, one word at a time, until you reach the end.', maxLength: 160 },
+      { name: 'lean', type: 'range', min: 0, max: 3, step: 0.1, default: 1 },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <ScrubSentence {...p} style={{ position: 'absolute', inset: 0, font: '400 clamp(56px, 10vw, 128px)/1 var(--serif)' }} />,
+    files: ['ScrubSentence.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'stack-lines',
+    name: 'Stack Lines',
+    category: 'Text',
+    isNew: true,
+    description: 'Lines on cards rise from the bottom as you scroll and pile onto a stack, the covered ones sinking back like a deck. Separate lines with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Collect the lines|Stack them like cards|Each one lands on the last|The ones underneath sink back|Scroll up to lift them off', maxLength: 200 },
+      { name: 'peek', type: 'range', min: 4, max: 40, step: 1, default: 16, unit: 'px' },
+      { name: 'card', type: 'color', default: '#ffffff' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <StackLines {...p} style={{ position: 'absolute', inset: 0, font: '400 clamp(28px, 4vw, 46px)/1 var(--serif)' }} />,
+    files: ['StackLines.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'extruded-text',
+    name: 'Extruded Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A solid 3D headline with rounded bevels on every edge, lit by a studio of soft boxes so highlights roll along the bevels as it turns.',
+    controls: [
+      { name: 'text', type: 'text', default: 'DEPTH', maxLength: 14 },
+      { name: 'material', type: 'select', options: ['chrome', 'gold', 'plastic', 'glass'], default: 'chrome' },
+      { name: 'color', type: 'color', default: '#ff4d1a' },
+      { name: 'depth', type: 'range', min: 0.05, max: 1.2, step: 0.05, default: 0.45 },
+      { name: 'bevel', type: 'range', min: 0, max: 0.12, step: 0.01, default: 0.06 },
+    ],
+    fill: true,
+    preview: (p) => (
+      <Suspense fallback={null}>
+        <ExtrudedText {...p} style={{ position: 'absolute', inset: 0 }} />
+      </Suspense>
+    ),
+    files: ['ExtrudedText.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'cylinder-text',
+    name: 'Cylinder Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Text printed round a clear drum. Drag to spin it; it keeps your speed and slows under friction to an idle drift, the far side showing through.',
+    controls: [
+      { name: 'text', type: 'text', default: 'ROUND AND ROUND', maxLength: 40 },
+      { name: 'color', type: 'color', default: '#1c1a16' },
+      { name: 'friction', type: 'range', min: 0.2, max: 5, step: 0.1, default: 1.2 },
+      { name: 'idle', type: 'range', min: -1, max: 1, step: 0.05, default: 0.35, unit: 'rad/s' },
+    ],
+    fill: true,
+    preview: (p) => (
+      <Suspense fallback={null}>
+        <CylinderText {...p} style={{ position: 'absolute', inset: 0 }} />
+      </Suspense>
+    ),
+    files: ['CylinderText.jsx'],
+    deps: ['three', '@react-three/fiber'],
+  },
+  {
+    slug: 'tumble-text',
+    name: 'Tumble Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters as solid blocks with real rigid-body physics: they drop in, knock into each other, tip over and pile up. Grab one to throw it.',
+    controls: [
+      { name: 'text', type: 'text', default: 'TUMBLE', maxLength: 14 },
+      { name: 'stagger', type: 'range', min: 0, max: 600, step: 20, default: 160, unit: 'ms' },
+      { name: 'spin', type: 'range', min: 0, max: 3, step: 0.1, default: 1 },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    replay: true,
+    fill: true,
+    preview: (p) => <TumbleText {...p} style={{ position: 'absolute', inset: 0, font: '800 clamp(72px, 12vw, 140px)/1 var(--sans, system-ui)' }} />,
+    files: ['TumbleText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'neon-text',
+    name: 'Neon Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A neon sign on a brick wall: each tube stutters before it catches, the glow spills onto the wall, and a worn tube flickers now and then. Click to switch it.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Open late', maxLength: 24 },
+      { name: 'color', type: 'color', default: '#ff3d7f' },
+      { name: 'wall', type: 'color', default: '#17141a' },
+      { name: 'flicker', type: 'range', min: 0, max: 2, step: 0.1, default: 0.5 },
+      { name: 'sound', type: 'toggle', default: false },
+    ],
+    replay: true,
+    fill: true,
+    preview: (p) => <NeonText {...p} style={{ position: 'absolute', inset: 0, font: "italic 500 clamp(60px, 10vw, 120px)/1 'Brush Script MT', 'Segoe Script', var(--serif), cursive" }} />,
+    files: ['NeonText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'emboss-plate',
+    name: 'Emboss Plate',
+    category: 'Text',
+    isNew: true,
+    description: 'Lettering raised from and sunk into a brushed metal plate, lit by a light that follows the pointer, so highlights and shadows swap sides as you move.',
+    controls: [
+      { name: 'top', type: 'text', default: 'EMBOSSED', maxLength: 12 },
+      { name: 'bottom', type: 'text', default: 'debossed', maxLength: 14 },
+      { name: 'metal', type: 'color', default: '#b9bcc2' },
+      { name: 'depth', type: 'range', min: 1, max: 10, step: 0.5, default: 4 },
+      { name: 'shine', type: 'range', min: 0, max: 2, step: 0.05, default: 0.9 },
+    ],
+    fill: true,
+    preview: (p) => <EmbossPlate {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['EmbossPlate.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'ribbon-text',
+    name: 'Ribbon Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Text on a long satin ribbon that ripples and twists in the wind, with the light sliding over every fold.',
+    controls: [
+      { name: 'text', type: 'text', default: 'CARRIED ON THE WIND', maxLength: 40 },
+      { name: 'ribbon', type: 'color', default: '#ff4d1a' },
+      { name: 'ink', type: 'color', default: '#fff7ee' },
+      { name: 'wind', type: 'range', min: 0, max: 5, step: 0.1, default: 1.6 },
+      { name: 'amplitude', type: 'range', min: 0, max: 2, step: 0.05, default: 0.7 },
+      { name: 'twist', type: 'range', min: 0, max: 3, step: 0.05, default: 0.9 },
+    ],
+    fill: true,
+    preview: (p) => (
+      <Suspense fallback={null}>
+        <RibbonText {...p} style={{ position: 'absolute', inset: 0 }} />
+      </Suspense>
+    ),
+    files: ['RibbonText.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'word-cloud-3d',
+    name: 'Word Cloud 3D',
+    category: 'Text',
+    isNew: true,
+    description: 'Words spread evenly over a slowly turning sphere. Drag to spin it with inertia; front words are big and sharp, back ones small and soft.',
+    controls: [
+      { name: 'words', type: 'text', default: 'Motion, Depth, Light, Physics, Spring, Inertia, Orbit, Gravity, Friction, Torque, Mass, Momentum, Bounce, Drift, Shadow, Glass, Metal, Texture, Lens, Focus, Scroll, Hover, Tilt, Rotate', maxLength: 400 },
+      { name: 'radius', type: 'range', min: 0.2, max: 0.5, step: 0.01, default: 0.36 },
+      { name: 'speed', type: 'range', min: -1.5, max: 1.5, step: 0.05, default: 0.25, unit: 'rad/s' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <WordCloud3D {...p} style={{ position: 'absolute', inset: 0, font: '600 clamp(22px, 3.2vw, 36px)/1 var(--sans, system-ui)' }} />,
+    files: ['WordCloud3D.jsx'],
     deps: [],
   },
   {
@@ -2106,6 +2697,38 @@ const ALL_COMPONENTS = [
     preview: (p) => <DumbbellModel {...p} height="100%" />,
     fill: true,
     files: ['DumbbellModel.jsx', 'dumbbell/DumbbellScene.jsx', 'dumbbell/Dumbbell.jsx', 'dumbbell/physics.js', 'dumbbell/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'mug',
+    name: 'Mug',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A matte glazed mug of something hot. Slide it and the drink sloshes in its real first mode; push too hard and it slops over the rim into puddles. Pour from a stream that stays put, hear the pitch rise as it fills, and watch the steam fade as it cools.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Mint', values: { color: '#a3dbc4', background: '#e6e6e4' } },
+          { name: 'Blush', values: { color: '#efc3bd', background: '#ebe6e4' } },
+          { name: 'Butter', values: { color: '#f1dd9a', background: '#ebe9e2' } },
+          { name: 'Sky', values: { color: '#a9c8e8', background: '#e4e7ea' } },
+          { name: 'Chalk', values: { color: '#efece6', background: '#d9d7d2' } },
+          { name: 'Charcoal', values: { color: '#3b3d40', background: '#e2e2e0' } },
+        ],
+      },
+      { name: 'drink', type: 'select', options: ['coffee', 'latte', 'tea', 'matcha', 'cocoa', 'water'], default: 'coffee' },
+      { name: 'color', type: 'color', default: '#a3dbc4' },
+      { name: 'background', type: 'color', default: '#e6e6e4' },
+      { name: 'coolingSpeed', type: 'range', min: 1, max: 120, step: 1, default: 30, unit: '×' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <MugModel {...p} height="100%" />,
+    fill: true,
+    files: ['MugModel.jsx', 'mug/MugScene.jsx', 'mug/Mug.jsx', 'mug/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {

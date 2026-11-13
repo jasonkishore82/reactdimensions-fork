@@ -4,6 +4,7 @@ import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, OBJECT_STYLES, defaults
 import { highlight } from './highlight.js'
 import { markdownFor, openPromptFor, promptFor, sourceText, typesFor } from './ai.js'
 import { Icon } from '../Nav.jsx'
+import ColorPicker from './ColorPicker.jsx'
 import './library.css'
 
 const CAT_ICON = {
@@ -182,13 +183,7 @@ function Control({ c, value, onChange, onPatch, current }) {
     )
   }
   if (c.type === 'color') {
-    return (
-      <label className="ctl ctl-color" htmlFor={id}>
-        <span className="ctl-name">{c.name}</span>
-        <span className="ctl-color-val">{value}</span>
-        <input id={id} type="color" value={value} onChange={(e) => onChange(e.target.value)} />
-      </label>
-    )
+    return <ColorPicker id={id} name={c.name} value={value} onChange={onChange} />
   }
   return (
     <div className="ctl">
@@ -720,7 +715,7 @@ export default function Library() {
               {isFav ? '★' : '☆'}
             </button>
             <button className="tool-btn" onClick={() => setReload((n) => n + 1)} title="Reload the preview" aria-label="Reload the preview">
-              ↻<span> Reload</span>
+              Reload
             </button>
             <button
               className="tool-btn"
