@@ -67,6 +67,9 @@ export default function ThermalText({
     const md = mg.getImageData(0, 0, cw, ch).data
     const metal = new Float32Array(cw * ch)
     for (let i = 0; i < cw * ch; i++) metal[i] = md[i * 4 + 3] / 255
+    // thermal conductivity of each cell: metal 1, the panel 1/20 of that
+    const K = new Float32Array(cw * ch)
+    for (let i = 0; i < cw * ch; i++) K[i] = 0.05 + 0.95 * metal[i]
 
     let T = new Float32Array(cw * ch)
     let N = new Float32Array(cw * ch)
@@ -78,11 +81,13 @@ export default function ThermalText({
     const frame = (now) => {
       const dt = Math.min(0.033, (now - (last || now)) / 1000)
       last = now
-      if (demo < 2.6) {
+      // a demo: a hand rubbed back and forth over the whole panel, so the
+      // word warms up and then shows as the panel cools around it
+      if (demo < 5) {
         demo += dt
-        const k = demo / 2.6
-        hand = { x: cw * (0.08 + 0.84 * k), y: ch / 2 + Math.sin(k * 12) * ch * 0.18 }
-        if (demo >= 2.6) hand = null
+        const k = demo / 5
+        hand = { x: cw * (0.06 + 0.88 * k), y: ch * (0.5 + 0.34 * Math.sin(k * Math.PI * 10)) }
+        if (demo >= 5) hand = null
       }
       // heat in from the hand
       if (hand) {
@@ -90,20 +95,33 @@ export default function ThermalText({
         for (let y = Math.max(0, (hand.y - R) | 0); y < Math.min(ch, hand.y + R); y++) {
           for (let x = Math.max(0, (hand.x - R) | 0); x < Math.min(cw, hand.x + R); x++) {
             const d = Math.hypot(x - hand.x, y - hand.y)
-            if (d < R) T[y * cw + x] += (1 - d / R) * dt * 5
+            // the metal inlay takes up heat from the hand faster than the panel
+            if (d < R) T[y * cw + x] += (1 - d / R) * dt * 14 * (1 + metal[y * cw + x] * 0.9)
           }
         }
       }
-      // diffusion (explicit, a few substeps), and cooling to the room. The
-      // metal conducts within itself and loses heat to the air more slowly.
-      for (let s = 0; s < 3; s++) {
+      // conduction, per second: each pair of neighbouring cells exchanges
+      // heat in proportion to their temperature difference and to the
+      // conductance of the joint between them (the harmonic mean of the two
+      // materials' conductivities). Metal conducts well and the panel
+      // poorly, so heat races through a letter but leaks only slowly from
+      // the letter into the panel. Both lose heat to the room, the panel
+      // fast, the polished metal slowly (it radiates poorly).
+      const D = 9 * spread
+      const SUB = Math.max(1, Math.ceil((dt * D * 4) / 0.8))
+      const h = dt / SUB
+      for (let s = 0; s < SUB; s++) {
         for (let y = 1; y < ch - 1; y++) {
           for (let x = 1; x < cw - 1; x++) {
             const i = y * cw + x
-            const lap = T[i - 1] + T[i + 1] + T[i - cw] + T[i + cw] - 4 * T[i]
-            const kd = 0.12 * spread * (0.5 + metal[i] * 0.5)
-            const cool = metal[i] > 0.5 ? 0.12 / hold : 0.9
-            N[i] = Math.max(0, T[i] + kd * lap - T[i] * cool * (dt / 3))
+            const ki = K[i]
+            let flux = 0
+            for (const j of [i - 1, i + 1, i - cw, i + cw]) {
+              const kj = K[j]
+              flux += ((2 * ki * kj) / (ki + kj)) * (T[j] - T[i])
+            }
+            const cool = metal[i] > 0.5 ? 0.07 / hold : 0.9
+            N[i] = Math.max(0, T[i] + D * h * flux - T[i] * cool * h)
           }
         }
         const t = T
@@ -112,7 +130,7 @@ export default function ThermalText({
       }
       for (let i = 0; i < cw * ch; i++) {
         // the camera reads a little noise, as real sensors do
-        const v = 0.08 + T[i] * 0.75 + (Math.random() - 0.5) * 0.012
+        const v = 0.07 + T[i] * 1.4 + (Math.random() - 0.5) * 0.012
         const [r, gg, b] = ironbow(v)
         img.data[i * 4] = r
         img.data[i * 4 + 1] = gg
