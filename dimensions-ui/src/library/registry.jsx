@@ -29,6 +29,23 @@ import TumbleText from '../lib/TumbleText.jsx'
 import NeonText from '../lib/NeonText.jsx'
 import EmbossPlate from '../lib/EmbossPlate.jsx'
 import WordCloud3D from '../lib/WordCloud3D.jsx'
+import LetterpressText from '../lib/LetterpressText.jsx'
+import ChromeText from '../lib/ChromeText.jsx'
+import CutoutSlab from '../lib/CutoutSlab.jsx'
+import TerminalText from '../lib/TerminalText.jsx'
+import CodeScroll from '../lib/CodeScroll.jsx'
+import SevenSegment from '../lib/SevenSegment.jsx'
+import TickerTape from '../lib/TickerTape.jsx'
+import LogStream from '../lib/LogStream.jsx'
+import EncodeText from '../lib/EncodeText.jsx'
+import ChromaticText from '../lib/ChromaticText.jsx'
+import CrtText from '../lib/CrtText.jsx'
+import WaveText from '../lib/WaveText.jsx'
+import PixelSortText from '../lib/PixelSortText.jsx'
+import MeltText from '../lib/MeltText.jsx'
+import StaticSwap from '../lib/StaticSwap.jsx'
+import KineticPoster from '../lib/KineticPoster.jsx'
+import BilingualFlip from '../lib/BilingualFlip.jsx'
 import { lazy, Suspense } from 'react'
 const ExtrudedText = lazy(() => import('../lib/ExtrudedText.jsx'))
 const CylinderText = lazy(() => import('../lib/CylinderText.jsx'))
@@ -1503,6 +1520,289 @@ const ALL_COMPONENTS = [
     fill: true,
     preview: (p) => <WordCloud3D {...p} style={{ position: 'absolute', inset: 0, font: '600 clamp(22px, 3.2vw, 36px)/1 var(--sans, system-ui)' }} />,
     files: ['WordCloud3D.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'letterpress-text',
+    name: 'Letterpress Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Type pressed into thick cotton paper: the platen comes down, the letters bite in with a shadow inside and a light lip below.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Pressed', maxLength: 14 },
+      { name: 'ink', type: 'color', default: '#2b3a67' },
+      { name: 'paper', type: 'color', default: '#f4efe4' },
+      { name: 'depth', type: 'range', min: 0.3, max: 2.5, step: 0.1, default: 1 },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    fill: true,
+    preview: (p) => <LetterpressText {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LetterpressText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'chrome-text',
+    name: 'Chrome Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Airbrushed chrome lettering whose sky-and-horizon reflection slides across the face as you move the pointer.',
+    controls: [
+      { name: 'text', type: 'text', default: 'CHROME', maxLength: 14 },
+      { name: 'sky', type: 'color', default: '#9fd3ff' },
+      { name: 'horizon', type: 'color', default: '#3b2a1f' },
+      { name: 'idle', type: 'toggle', default: true },
+    ],
+    preview: (p) => <ChromeText {...p} style={{ font: "italic 900 clamp(52px, 9.5vw, 124px)/1 'Helvetica Neue', Arial, sans-serif" }} />,
+    files: ['ChromeText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'cutout-slab',
+    name: 'Cutout Slab',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters cut through a dark slab with a lamp behind: light pours through and lands on the floor as stretched shapes that swing as you move the light.',
+    controls: [
+      { name: 'text', type: 'text', default: 'LIGHT', maxLength: 10 },
+      { name: 'light', type: 'color', default: '#ffd27a' },
+      { name: 'slab', type: 'color', default: '#1d1c21' },
+    ],
+    fill: true,
+    preview: (p) => <CutoutSlab {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['CutoutSlab.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'terminal-text',
+    name: 'Terminal Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A terminal that plays itself: commands typed key by key, then output streaming in with progress bars, and a block cursor that blinks while it waits.',
+    controls: [
+      { name: 'script', type: 'select', options: ['install', 'git', 'deploy'], default: 'install' },
+      { name: 'prompt', type: 'text', default: '~/site $', maxLength: 24 },
+      { name: 'speed', type: 'range', min: 15, max: 200, step: 5, default: 55, unit: 'ms' },
+      { name: 'loop', type: 'toggle', default: true },
+      { name: 'accent', type: 'color', default: '#7ee787' },
+    ],
+    replay: true,
+    preview: (p) => <TerminalText {...p} />,
+    files: ['TerminalText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'code-scroll',
+    name: 'Code Scroll',
+    category: 'Text',
+    isNew: true,
+    description: 'Syntax-coloured code, or its hex dump, scrolling up in a seamless loop under a glowing scan line.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['code', 'hex'], default: 'code' },
+      { name: 'speed', type: 'range', min: 4, max: 120, step: 2, default: 22, unit: 'px/s' },
+      { name: 'accent', type: 'color', default: '#ff7b54' },
+    ],
+    fill: true,
+    preview: (p) => <CodeScroll {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['CodeScroll.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'seven-segment',
+    name: 'Seven Segment',
+    category: 'Text',
+    isNew: true,
+    description: 'A seven-segment LED display with the faint ghost of unlit segments: a live clock, a stopwatch, or your own text.',
+    controls: [
+      { name: 'mode', type: 'select', options: ['clock', 'stopwatch', 'text'], default: 'clock' },
+      { name: 'text', type: 'text', default: 'HELLO', maxLength: 10 },
+      { name: 'color', type: 'color', default: '#ff3b2f' },
+      { name: 'panel', type: 'color', default: '#120f10' },
+    ],
+    preview: (p) => <SevenSegment {...p} style={{ fontSize: 'clamp(48px, 9vw, 110px)' }} />,
+    files: ['SevenSegment.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'ticker-tape',
+    name: 'Ticker Tape',
+    category: 'Text',
+    isNew: true,
+    description: 'A scrolling ticker of prices that random-walk like real ones, flashing green or red on every tick. Hover to pause it.',
+    controls: [
+      { name: 'speed', type: 'range', min: 10, max: 200, step: 5, default: 60, unit: 'px/s' },
+      { name: 'rate', type: 'range', min: 0.2, max: 6, step: 0.1, default: 1.4, unit: '/s' },
+      { name: 'up', type: 'color', default: '#1fbf75' },
+      { name: 'down', type: 'color', default: '#ef4c4c' },
+    ],
+    preview: (p) => <TickerTape {...p} />,
+    files: ['TickerTape.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'log-stream',
+    name: 'Log Stream',
+    category: 'Text',
+    isNew: true,
+    description: 'Timestamped log lines arriving in bursts, coloured by level and pinned to the newest. Scroll up to read back; it pauses until you jump to latest.',
+    controls: [{ name: 'rate', type: 'range', min: 0.3, max: 10, step: 0.1, default: 2.5, unit: '/s' }],
+    preview: (p) => <LogStream {...p} />,
+    files: ['LogStream.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'encode-text',
+    name: 'Encode Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Hover a word and it turns into real Braille, Morse or 8-bit binary, letter by letter, then back when you leave.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Hover any word to encode it', maxLength: 60 },
+      { name: 'mode', type: 'select', options: ['braille', 'morse', 'binary'], default: 'braille' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    preview: (p) => (
+      <div style={{ maxWidth: 860, padding: '0 24px', textAlign: 'center' }}>
+        <EncodeText {...p} style={{ font: '400 clamp(32px, 5vw, 60px)/1.3 var(--serif)' }} />
+      </div>
+    ),
+    files: ['EncodeText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'chromatic-text',
+    name: 'Chromatic Text',
+    category: 'Text',
+    isNew: true,
+    description: 'The text tears into its colour channels as the pointer moves past, by its speed and direction, and springs back into focus.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Aberration', maxLength: 24 },
+      { name: 'strength', type: 'range', min: 0, max: 3, step: 0.1, default: 1 },
+      { name: 'stiffness', type: 'range', min: 40, max: 500, step: 10, default: 220 },
+      { name: 'damping', type: 'range', min: 2, max: 40, step: 1, default: 14 },
+    ],
+    preview: (p) => <ChromaticText {...p} style={{ font: '800 clamp(56px, 10vw, 128px)/1 var(--sans, system-ui)', letterSpacing: '-0.03em' }} />,
+    files: ['ChromaticText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'crt-text',
+    name: 'CRT Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Text on an old monitor: phosphor glow, scanlines, a rolling refresh bar, flicker and a real barrel bulge from the curved glass. Separate lines with |.',
+    controls: [
+      { name: 'text', type: 'text', default: 'SYSTEM READY|> LOADING DIMENSIONS..._', maxLength: 80 },
+      { name: 'color', type: 'color', default: '#62ff9b' },
+      { name: 'curve', type: 'range', min: 0, max: 0.4, step: 0.01, default: 0.18 },
+      { name: 'flicker', type: 'range', min: 0, max: 2, step: 0.1, default: 0.5 },
+    ],
+    fill: true,
+    preview: (p) => <CrtText {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['CrtText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'wave-text',
+    name: 'Wave Text',
+    category: 'Text',
+    isNew: true,
+    description: 'A sine swell travels along the baseline and the letters ride it; run the pointer along and ripples spread from each letter you touch.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Ripples on the line', maxLength: 40 },
+      { name: 'amplitude', type: 'range', min: 0, max: 0.3, step: 0.01, default: 0.08, unit: 'em' },
+      { name: 'wavelength', type: 'range', min: 2, max: 20, step: 0.5, default: 6 },
+      { name: 'speed', type: 'range', min: 0, max: 4, step: 0.1, default: 1.2 },
+      { name: 'ripple', type: 'range', min: 0, max: 0.8, step: 0.05, default: 0.35, unit: 'em' },
+    ],
+    preview: (p) => <WaveText {...p} style={{ font: '400 clamp(44px, 8vw, 96px)/1 var(--serif)' }} />,
+    files: ['WaveText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'pixel-sort-text',
+    name: 'Pixel Sort Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Glitch-art pixel sorting in reverse: the ink starts sorted into streaks and each column un-sorts back up into clean letters.',
+    controls: [
+      { name: 'text', type: 'text', default: 'SORTED', maxLength: 14 },
+      { name: 'duration', type: 'range', min: 400, max: 5000, step: 100, default: 1600, unit: 'ms' },
+      { name: 'color', type: 'color', default: '#1c1a16' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+      { name: 'trigger', type: 'select', options: ['mount', 'hover'], default: 'mount' },
+    ],
+    replay: true,
+    preview: (p) => <PixelSortText {...p} style={{ font: '900 clamp(64px, 11vw, 140px)/1 var(--sans, system-ui)' }} />,
+    files: ['PixelSortText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'melt-text',
+    name: 'Melt Text',
+    category: 'Text',
+    isNew: true,
+    description: 'Letters melt like wax, sagging and dripping into each other, then pull themselves back into shape, on a loop.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Melting', maxLength: 16 },
+      { name: 'color', type: 'color', default: '#ff4d1a' },
+      { name: 'cycle', type: 'range', min: 2, max: 10, step: 0.5, default: 4.5, unit: 's' },
+      { name: 'amount', type: 'range', min: 0.2, max: 2, step: 0.1, default: 1 },
+    ],
+    preview: (p) => <MeltText {...p} style={{ font: '900 clamp(60px, 11vw, 136px)/1 var(--sans, system-ui)' }} />,
+    files: ['MeltText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'static-swap',
+    name: 'Static Swap',
+    category: 'Text',
+    isNew: true,
+    description: 'Words that change channel: each dissolves into a burst of TV static inside its letters, and the next word tunes in. Separate words with |.',
+    controls: [
+      { name: 'words', type: 'text', default: 'Signal|Static|Noise|Tuned', maxLength: 80 },
+      { name: 'interval', type: 'range', min: 0.8, max: 6, step: 0.1, default: 2.2, unit: 's' },
+      { name: 'burst', type: 'range', min: 80, max: 800, step: 20, default: 260, unit: 'ms' },
+      { name: 'color', type: 'color', default: '#1c1a16' },
+    ],
+    preview: (p) => <StaticSwap {...p} style={{ font: '900 clamp(64px, 12vw, 150px)/1 var(--sans, system-ui)', letterSpacing: '-0.03em' }} />,
+    files: ['StaticSwap.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'kinetic-poster',
+    name: 'Kinetic Poster',
+    category: 'Text',
+    isNew: true,
+    description: 'Every line sized to run exactly edge to edge, like a Swiss poster; the words regroup every few seconds and each line springs to its new size.',
+    controls: [
+      { name: 'text', type: 'text', default: 'Type that fills the frame from edge to edge every time', maxLength: 120 },
+      { name: 'interval', type: 'range', min: 1, max: 10, step: 0.5, default: 3, unit: 's' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    fill: true,
+    preview: (p) => <KineticPoster {...p} style={{ position: 'absolute', inset: 0, fontFamily: "'Helvetica Neue', Arial, sans-serif", fontWeight: 800, textTransform: 'uppercase' }} />,
+    files: ['KineticPoster.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'bilingual-flip',
+    name: 'Bilingual Flip',
+    category: 'Text',
+    isNew: true,
+    description: 'A line that keeps swapping language word by word, each cross-fading into its translation while its slot eases to the new width.',
+    controls: [
+      { name: 'pairs', type: 'text', default: 'Light:Lumière, moves:bouge, through:à travers, the:la, quiet:calme, room:pièce', maxLength: 300 },
+      { name: 'interval', type: 'range', min: 1, max: 8, step: 0.2, default: 2.6, unit: 's' },
+      { name: 'stagger', type: 'range', min: 0, max: 300, step: 10, default: 90, unit: 'ms' },
+      { name: 'accent', type: 'color', default: '#ff4d1a' },
+    ],
+    preview: (p) => (
+      <div style={{ maxWidth: 900, padding: '0 24px' }}>
+        <BilingualFlip {...p} style={{ font: '400 clamp(36px, 6vw, 72px)/1.2 var(--serif)' }} />
+      </div>
+    ),
+    files: ['BilingualFlip.jsx'],
     deps: [],
   },
   {
