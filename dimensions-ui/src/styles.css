@@ -196,8 +196,7 @@ em {
   white-space: nowrap;
 }
 .logo b { color: var(--signal-ink); font-weight: 600; }
-.logo svg { width: 28px; height: 28px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.logo svg .arrow { stroke: var(--signal); }
+.logo .brand-mark { width: 32px; height: 29px; flex: none; }
 .links { display: flex; gap: 28px; }
 .links a {
   font: 500 12px/1 var(--mono);
