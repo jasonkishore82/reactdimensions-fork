@@ -120,8 +120,11 @@ import OceanModel from '../lib/OceanModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
+import GuitarModel from '../lib/GuitarModel.jsx'
+import GamepadModel from '../lib/GamepadModel.jsx'
 import LadderModel from '../lib/LadderModel.jsx'
 import ShirtModel from '../lib/ShirtModel.jsx'
+import EarbudsModel from '../lib/EarbudsModel.jsx'
 import HomeIcon from '../lib/HomeIcon.jsx'
 import SearchIcon from '../lib/SearchIcon.jsx'
 import HeartIcon from '../lib/HeartIcon.jsx'
@@ -144,7 +147,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../guitar/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -157,7 +160,7 @@ const src = (file) => SOURCES[`../lib/${file}`] ?? SOURCES[`../${file}`] ?? ''
 export const HIDDEN_CATEGORIES = ['Icons & Emojis']
 // Individual components kept in the code but left out of the site (the
 // sidebar, the section pages, search and the generated registry files).
-export const HIDDEN_COMPONENTS = ['shirt']
+export const HIDDEN_COMPONENTS = ['shirt', 'earbuds', 'gamepad']
 
 const ALL_CATEGORIES = ['Text', 'Animation', 'UI', 'Phone UI', '3D & Materials', 'Backgrounds', 'Icons & Emojis']
 export const CATEGORIES = ALL_CATEGORIES.filter((c) => !HIDDEN_CATEGORIES.includes(c))
@@ -1975,6 +1978,69 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'guitar',
+    name: 'Acoustic Guitar',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A dreadnought acoustic on a floor stand, with real string physics. Strum across the strings and watch each pluck run as Helmholtz motion; press frets or pick a chord; turn the open-gear 18:1 tuners and the tension and pitch follow, with a tuner readout. Knock the body and it rocks in its stand.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Spruce & rosewood', values: { topColor: '#d9a456', woodColor: '#4a2416', background: '#e9e6e1' } },
+          { name: 'Aged', values: { topColor: '#c9883a', woodColor: '#3a1a0e', background: '#e6e0d6' } },
+          { name: 'Mahogany', values: { topColor: '#e2b468', woodColor: '#7a3818', background: '#ebe6df' } },
+          { name: 'Blonde', values: { topColor: '#ecc985', woodColor: '#b98a52', background: '#ecebe8' } },
+        ],
+      },
+      { name: 'vibration', type: 'select', options: ['slow-motion', 'real-time'], default: 'slow-motion' },
+      { name: 'topColor', type: 'color', default: '#d9a456' },
+      { name: 'woodColor', type: 'color', default: '#4a2416' },
+      { name: 'background', type: 'color', default: '#e9e6e1' },
+      { name: 'showStand', type: 'toggle', default: true },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <GuitarModel {...p} height="100%" />,
+    fill: true,
+    files: ['GuitarModel.jsx', 'guitar/GuitarScene.jsx', 'guitar/Guitar.jsx', 'guitar/strings.js', 'guitar/audio.js', 'guitar/textures.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'gamepad',
+    name: 'Gamepad',
+    category: '3D & Materials',
+    style: 'Tech & gadgets',
+    isNew: true,
+    description: 'A twin-stick game controller with working parts: sticks that tilt and spring back, buttons with travel, a rocking d-pad, analog triggers with adjustable resistance, rumble and a light bar. Plug in a real gamepad and it mirrors every input.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Graphite', values: { bodyColor: '#2a2b2f', panelColor: '#292a2e', buttonColor: '#1b1c1f', lightColor: '#4c8dff', background: '#e4e4e4' } },
+          { name: 'Snow', values: { bodyColor: '#eef0f2', panelColor: '#1d1e22', buttonColor: '#24252a', lightColor: '#4c8dff', background: '#d9dbde' } },
+          { name: 'Crimson', values: { bodyColor: '#a3161f', panelColor: '#1d1e22', buttonColor: '#1b1c1f', lightColor: '#ff4d5e', background: '#e6e1df' } },
+          { name: 'Ocean', values: { bodyColor: '#1f3f7a', panelColor: '#16171b', buttonColor: '#15161a', lightColor: '#3ad6ff', background: '#dfe4ea' } },
+        ],
+      },
+      { name: 'triggerResistance', type: 'range', min: 0, max: 1, step: 0.05, default: 0.6 },
+      { name: 'bodyColor', type: 'color', default: '#2a2b2f' },
+      { name: 'panelColor', type: 'color', default: '#292a2e' },
+      { name: 'buttonColor', type: 'color', default: '#1b1c1f' },
+      { name: 'lightColor', type: 'color', default: '#4c8dff' },
+      { name: 'background', type: 'color', default: '#e4e4e4' },
+      { name: 'sound', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <GamepadModel {...p} height="100%" />,
+    fill: true,
+    files: ['GamepadModel.jsx', 'gamepad/GamepadScene.jsx', 'gamepad/Gamepad.jsx', 'gamepad/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
     slug: 'ladder',
     name: 'Ladder',
     category: '3D & Materials',
@@ -2080,6 +2146,37 @@ const ALL_COMPONENTS = [
     preview: (p) => <ReadingRing {...p} height="100%" />,
     fill: true,
     files: ['ReadingRing.jsx', 'ix/ReadingRing.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'earbuds',
+    name: 'Earbuds',
+    category: '3D & Materials',
+    style: 'Tech & gadgets',
+    isNew: true,
+    description: 'Wireless earbuds in a charging case: the lid snaps shut on a magnet and flips open past its detent. Lift a bud out and drop it, or put it back and the magnet pulls it in to charge.',
+    controls: [
+      { name: 'open', type: 'toggle', default: false },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'White', values: { color: '#f4f4f2', tipColor: '#dcdcdc' } },
+          { name: 'Graphite', values: { color: '#3a3b3f', tipColor: '#2a2b2e' } },
+          { name: 'Sand', values: { color: '#e8dccb', tipColor: '#d6c9b5' } },
+          { name: 'Sage', values: { color: '#b7c4b0', tipColor: '#a4b29d' } },
+        ],
+      },
+      { name: 'color', type: 'color', default: '#f4f4f2' },
+      { name: 'tipColor', type: 'color', default: '#dcdcdc' },
+      { name: 'background', type: 'color', default: '#cfcfcf' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (opening the lid sets `open`).
+    preview: (p, set) => <EarbudsModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['EarbudsModel.jsx', 'earbuds/EarbudsScene.jsx', 'earbuds/Earbuds.jsx', 'earbuds/shapes.js', 'earbuds/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
