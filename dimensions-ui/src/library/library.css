@@ -344,12 +344,14 @@
   --dim-bg: #e6e2d7;
   transition: max-width 0.35s var(--ease);
   box-shadow: var(--shadow);
+  /* whatever z-index a demo uses stays inside the stage, so it can't draw
+     over the sidebar drawer or menus */
+  isolation: isolate;
 }
 .lib-stage-inner { position: absolute; inset: 0; display: grid; place-items: center; padding: 48px 24px; }
 .lib-stage.fill .lib-stage-inner { padding: 0; display: block; }
-/* demo content inside the stage keeps the light-theme ink, whichever theme the page is in */
-.lib-stage { color: #15171a; --ink: #15171a; --ink-2: #4a4d52; --ink-3: #85878a; --paper: #efece4; --paper-2: #e6e2d7; --line: rgba(21, 23, 26, 0.14); --line-strong: rgba(21, 23, 26, 0.32); --signal-ink: #d93a0b; }
-:root[data-theme='light'] .lib-stage { --stage-bg: #f7f7f8; --dim-bg: #f7f7f8; --paper: #ffffff; --paper-2: #f7f7f8; }
+/* demo content inside the stage keeps the light theme (white stage, dark ink), whichever theme the page is in */
+.lib-stage { color: #15171a; --ink: #15171a; --ink-2: #4a4d52; --ink-3: #85878a; --stage-bg: #f7f7f8; --dim-bg: #f7f7f8; --paper: #ffffff; --paper-2: #f7f7f8; --line: rgba(21, 23, 26, 0.14); --line-strong: rgba(21, 23, 26, 0.32); --signal-ink: #d93a0b; }
 
 /* sections under the stage */
 .lib-section { margin-top: 38px; scroll-margin-top: 84px; }
@@ -462,6 +464,59 @@
 .ctl-color input::-webkit-color-swatch-wrapper { padding: 0; }
 .ctl-color input::-webkit-color-swatch { border: 0; border-radius: 50%; }
 .ctl-color-val { margin-left: auto; margin-right: 10px; font: 400 12px/1 var(--mono); color: var(--ink-3); }
+
+/* custom colour picker (ColorPicker.jsx): the control is a button, the picker a floating card */
+button.ctl-color { width: 100%; font: inherit; color: inherit; text-align: left; }
+button.ctl-color:hover { border-color: var(--line-strong); }
+button.ctl-color:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.cp-swatch { width: 30px; height: 30px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--line-strong); }
+.cp-pop {
+  position: fixed;
+  z-index: 1000;
+  width: 264px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 0 4px 14px rgba(0, 0, 0, 0.18);
+  animation: cp-in 0.16s var(--ease);
+}
+@keyframes cp-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+.cp-sv { position: relative; height: 156px; border-radius: 10px; cursor: crosshair; touch-action: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
+.cp-sv:focus-visible, .cp-hue:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.cp-thumb { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.35); pointer-events: none; }
+.cp-row { display: flex; align-items: center; gap: 10px; }
+.cp-icon { display: grid; place-items: center; width: 30px; height: 30px; flex: none; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--ink-2); cursor: pointer; }
+.cp-icon:hover { color: var(--ink); border-color: var(--line-strong); }
+/* before | after, so you can see what you're changing from */
+.cp-preview { display: flex; width: 30px; height: 30px; flex: none; border-radius: 50%; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--line); }
+.cp-preview span { flex: 1; }
+.cp-hue {
+  position: relative;
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: none;
+  background: linear-gradient(to right, #f00 0%, #ff0 16.67%, #0f0 33.33%, #0ff 50%, #00f 66.67%, #f0f 83.33%, #f00 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+.cp-fields { display: flex; align-items: flex-start; gap: 6px; }
+.cp-field { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.cp-field input { width: 100%; height: 30px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--paper-2); color: var(--ink); font: 500 12px/1 var(--mono); text-align: center; }
+.cp-field input:focus { outline: none; border-color: var(--signal); }
+.cp-field span { font: 500 10px/1 var(--mono); letter-spacing: 0.08em; color: var(--ink-3); }
+.cp-mode { display: flex; align-items: center; gap: 5px; height: 30px; margin-left: auto; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; background: none; color: var(--ink-2); font: 500 11px/1 var(--mono); cursor: pointer; }
+.cp-mode:hover { color: var(--ink); border-color: var(--line-strong); }
+.cp-recent { display: flex; flex-direction: column; gap: 7px; padding-top: 10px; border-top: 1px solid var(--line); }
+.cp-recent > span { font: 500 10px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.cp-recent div { display: flex; flex-wrap: wrap; gap: 6px; }
+.cp-recent button { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18); transition: transform 0.12s; }
+.cp-recent button:hover { transform: scale(1.15); }
 .seg { display: flex; flex-wrap: wrap; gap: 4px; }
 .seg button {
   border: 1px solid var(--line-strong);
@@ -692,7 +747,6 @@
   .width-presets { display: none; }
   .hover-card { display: none; }
   .ai-pop { right: auto; left: 0; max-width: calc(100vw - 32px); }
-  .tool-btn span { display: none; }
 }
 @media (max-width: 520px) {
   .pillswitch { width: 100%; }

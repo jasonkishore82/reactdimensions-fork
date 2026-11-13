@@ -162,11 +162,17 @@ function cavity(x, y, z) {
   return Math.max(body(x, y, z) + WALL, soleTop(x) + 0.25 - y)
 }
 
-// the opening at the top the foot goes in through
+// the opening at the top the foot goes in through. It only cuts away the top
+// of the upper (the rounded cap and a little below): the walls lean inward as
+// they rise, so a cut running all the way down would bite through the side
+// wall under the collar wherever the wall drifts inside the oval.
 function opening(x, y, z) {
   const u = (x + 7.6) / 5.4
   const v = (z - 0.15) / 2.3
-  return Math.max((Math.sqrt(u * u + v * v) - 1) * 2.3, soleTop(x) + 0.25 - y)
+  // the inside starts a wall's thickness (0.4) under the top, so cutting a
+  // little deeper than that opens into it while leaving each wall tall enough
+  // to blend into the collar roll
+  return Math.max((Math.sqrt(u * u + v * v) - 1) * 2.3, look(TT, x) - 0.55 - y)
 }
 
 // the tongue: a padded flap leaning back out of the throat, curling forward
