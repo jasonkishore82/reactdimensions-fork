@@ -10,7 +10,7 @@ const COLORS = ['#c0392b', '#d35400', '#e67e22', '#f39c12', '#b9770e', '#8e3b1f'
 
 export default function AutumnLeaves({
   text = 'AUTUMN',
-  leaves = 520,
+  leaves = 900,
   hold = 3,
   style,
 }) {
@@ -32,22 +32,33 @@ export default function AutumnLeaves({
     m.width = W
     m.height = H
     const mg = m.getContext('2d', { willReadFrequently: true })
-    let size = H * 0.42
+    // leave a margin so the leaves round the edges of the word don't clip
+    let size = H * 0.36
     const font = (s) => `900 ${s}px 'Arial Black', Impact, sans-serif`
     mg.font = font(size)
     const tw = mg.measureText(text).width
-    if (tw > W * 0.88) size *= (W * 0.88) / tw
+    if (tw > W * 0.8) size *= (W * 0.8) / tw
     mg.font = font(size)
     mg.textAlign = 'center'
     mg.textBaseline = 'middle'
-    mg.fillText(text, W / 2, H * 0.44)
+    mg.fillText(text, W / 2, H * 0.42)
     const md = mg.getImageData(0, 0, W, H).data
+    const inside = (x, y) => x >= 0 && y >= 0 && x < W && y < H && md[((y | 0) * W + (x | 0)) * 4 + 3] > 128
+    // spread the leaves evenly over the letters (a jittered grid, not pure
+    // random, which leaves bald patches) at a spacing that uses them all
+    let area = 0
+    for (let i = 3; i < md.length; i += 16) if (md[i] > 128) area += 4
+    const gap = Math.max(4, Math.sqrt(area / leaves))
     const targets = []
-    for (let tries = 0; targets.length < leaves && tries < leaves * 200; tries++) {
-      const x = Math.random() * W
-      const y = Math.random() * H
-      if (md[((y | 0) * W + (x | 0)) * 4 + 3] > 128) targets.push([x, y])
+    for (let y = gap / 2; y < H; y += gap) {
+      for (let x = gap / 2; x < W; x += gap) {
+        const px = x + (Math.random() - 0.5) * gap * 0.7
+        const py = y + (Math.random() - 0.5) * gap * 0.7
+        if (inside(px, py)) targets.push([px, py])
+      }
     }
+    // leaves sized to overlap their neighbours, so the strokes read solid
+    const leafScale = Math.min(0.6, (gap * 1.9) / 40)
 
     // a few leaf sprites
     const sprites = COLORS.map((col) => {
@@ -74,7 +85,7 @@ export default function AutumnLeaves({
     const ground = () => [W * (0.1 + Math.random() * 0.8), H * (0.8 + Math.random() * 0.15)]
     const L = targets.map((t) => {
       const [gx, gy] = ground()
-      return { t, x: gx, y: gy, vx: 0, vy: 0, a: Math.random() * 6, spin: 0, flip: Math.random() * 6, s: 0.38 + Math.random() * 0.3, sp: sprites[(Math.random() * sprites.length) | 0], delay: Math.random() * 0.8, rest: [gx, gy] }
+      return { t, x: gx, y: gy, vx: 0, vy: 0, a: Math.random() * 6, spin: 0, flip: Math.random() * 6, s: leafScale * (0.8 + Math.random() * 0.4), sp: sprites[(Math.random() * sprites.length) | 0], delay: Math.random() * 0.8, rest: [gx, gy] }
     })
     // phases: pile -> gather -> hold -> scatter -> fall -> pile
     let phase = 'pile'
@@ -114,7 +125,8 @@ export default function AutumnLeaves({
       for (const l of L) {
         if (phase === 'gather' || phase === 'hold') {
           // carried along by the gust on a curving path, then held
-          const k = Math.max(0, Math.min(1, (pt - l.delay) / 1.8))
+          // once gathered, stay gathered for the whole hold (pt restarts at 0 here)
+          const k = phase === 'hold' ? 1 : Math.max(0, Math.min(1, (pt - l.delay) / 1.8))
           if (k > 0) {
             const tx = l.t[0] + Math.sin(time * 2 + l.flip) * (phase === 'hold' ? 1.5 : 0)
             const ty = l.t[1] + Math.cos(time * 1.7 + l.flip) * (phase === 'hold' ? 1.5 : 0)
@@ -152,7 +164,8 @@ export default function AutumnLeaves({
         g.translate(l.x, l.y)
         g.rotate(l.a)
         // the flip: foreshortened as it turns over
-        g.scale(Math.max(0.15, Math.abs(Math.cos(l.flip * (l.spin ? 1 : 0.05)))), 1)
+        // (it eases flat again as it settles, so the held word has no gaps)
+        g.scale(Math.max(0.15, 1 - Math.min(1, l.spin / 4) * (1 - Math.abs(Math.cos(l.flip)))), 1)
         g.drawImage(l.sp, -sz / 2, -sz / 2, sz, sz)
         g.restore()
       }
