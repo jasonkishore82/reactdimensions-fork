@@ -36,7 +36,14 @@ function Rig() {
   return null
 }
 
-export default function StampScene({ autoRotate = false, ...props }) {
+export default function StampScene({ autoRotate = false, showFace = false, onChange, ...props }) {
+  // the scene owns the turned-over state too, so its own button can flip it
+  const [face, setFace] = useState(showFace)
+  useEffect(() => setFace(showFace), [showFace])
+  const change = (patch) => {
+    if ('showFace' in patch) setFace(patch.showFace)
+    onChange?.(patch)
+  }
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', touchAction: 'none' }}>
       <Canvas shadows dpr={[1, 1.75]} camera={{ position: [6, 14, 18], fov: 30, near: 0.1, far: 120 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}>
@@ -46,12 +53,19 @@ export default function StampScene({ autoRotate = false, ...props }) {
           <orthographicCamera attach="shadow-camera" args={[-14, 14, 14, -14, 0.5, 45]} />
         </directionalLight>
         <Studio />
-        <Stamp {...props} />
+        <Stamp {...props} showFace={face} onChange={change} />
         <ContactShadows position={[0, -0.002, 0]} opacity={0.45} scale={34} blur={2.4} far={6} resolution={1024} color="#25221e" />
         <Rig />
         <OrbitControls makeDefault enablePan={false} target={TARGET} autoRotate={autoRotate} autoRotateSpeed={0.8} minDistance={8} maxDistance={60} minPolarAngle={0.12} maxPolarAngle={1.5} />
       </Canvas>
-      <InfoHint>Click the stamp to print · drag it to move it across the paper · lower the ink level to see it run dry</InfoHint>
+      <button
+        type="button"
+        onClick={() => change({ showFace: !face })}
+        style={{ position: 'absolute', left: 12, bottom: 12, zIndex: 5, height: 30, padding: '0 14px', borderRadius: 15, border: 'none', cursor: 'pointer', background: face ? '#1c1a16' : 'rgba(255,255,255,0.88)', color: face ? '#f4f1ea' : '#2a2925', font: '600 11px/1 ui-monospace, Menlo, monospace', letterSpacing: '0.04em', boxShadow: '0 2px 8px rgba(0,0,0,.14), inset 0 0 0 1px rgba(0,0,0,.08)' }}
+      >
+        {face ? 'Set it down' : 'Show bottom'}
+      </button>
+      <InfoHint>Click the stamp to print · drag it to move it across the paper · Show bottom turns it over: drag it to spin it, click it to set it down</InfoHint>
     </div>
   )
 }

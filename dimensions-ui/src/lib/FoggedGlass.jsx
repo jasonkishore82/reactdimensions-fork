@@ -13,6 +13,7 @@ export default function FoggedGlass({
 }) {
   const box = useRef()
   const cv = useRef()
+  const ovRef = useRef()
 
   useEffect(() => {
     const el = box.current
@@ -60,11 +61,27 @@ export default function FoggedGlass({
     for (let x = 0; x < cols; x++) for (let y = 0; y < rows; y++) if (d[(y * cols + x) * 4 + 3] > 90) pts.push([x * cell, y * cell])
     const brush = Math.max(6, size * cell * 0.07)
 
+    const inStroke = (x, y) => {
+      const cx = (x / cell) | 0
+      const cy = (y / cell) | 0
+      return cx >= 0 && cy >= 0 && cx < cols && cy < rows && d[(cy * cols + cx) * 4 + 3] > 90
+    }
+
+    // water on the glass is drawn on its own layer, every frame, as lenses:
+    // static beads where the finger pushed condensation aside, and runs that
+    // slide down from the bottoms of the strokes
+    const ov = ovRef.current
+    const o = ov.getContext('2d')
+    ov.width = W * dpr
+    ov.height = H * dpr
+    o.scale(dpr, dpr)
+    const beads = []
+    const runs = []
+
     let i = 0
     let raf = 0
     let last = 0
     let user = null
-    const runs = []
     const wipe = (x, y, r) => {
       g.globalCompositeOperation = 'destination-out'
       const gr = g.createRadialGradient(x, y, r * 0.4, x, y, r)
@@ -76,6 +93,54 @@ export default function FoggedGlass({
       g.fill()
       g.globalCompositeOperation = 'source-over'
     }
+    // condensation the finger pushes ahead of it collects in beads along
+    // the edge of the stroke; at the bottom edge the bigger ones run
+    const shed = (x, y, r) => {
+      const a = Math.random() * Math.PI * 2
+      const bx = x + Math.cos(a) * r * 1.05
+      const by = y + Math.sin(a) * r * 1.05
+      if (!user && inStroke(bx, by)) return
+      if (beads.length < 500 && Math.random() < 0.35) beads.push({ x: bx, y: by, r: 0.8 + Math.random() * 2.2 })
+      const bottom = !inStroke(x, y + r * 1.2)
+      if (bottom && Math.random() < 0.05 && runs.length < 24) {
+        runs.push({ x, y: y + r * 0.9, r: 2.2 + Math.random() * 1.8, v: 0, stick: Math.random() * 0.6, len: 0, max: 30 + Math.random() * 120, drift: 0 })
+      }
+    }
+    // one water drop on glass: it works as a little lens, so it shows the
+    // dark sky above flipped to its lower half and the lights below flipped
+    // to its top: darker at the top, brighter at the bottom, with a sharp
+    // specular glint and a thin dark rim
+    const drop = (x, y, r, stretch = 1) => {
+      const ry = r * stretch
+      o.save()
+      o.translate(x, y)
+      o.beginPath()
+      if (stretch > 1) {
+        // a running drop is a teardrop: round below, drawn out above
+        o.moveTo(0, -ry * 1.5)
+        o.bezierCurveTo(r * 0.55, -ry * 0.9, r, -ry * 0.2, r, ry * 0.15)
+        o.arc(0, ry * 0.15, r, 0, Math.PI)
+        o.bezierCurveTo(-r, -ry * 0.2, -r * 0.55, -ry * 0.9, 0, -ry * 1.5)
+      } else {
+        o.ellipse(0, 0, r, r * 0.92, 0, 0, Math.PI * 2)
+      }
+      const body = o.createLinearGradient(0, -ry, 0, ry)
+      body.addColorStop(0, 'rgba(8,12,22,.32)')
+      body.addColorStop(0.55, 'rgba(255,255,255,.05)')
+      body.addColorStop(1, 'rgba(255,240,220,.32)')
+      o.fillStyle = body
+      o.fill()
+      o.strokeStyle = 'rgba(10,14,24,.38)'
+      o.lineWidth = Math.max(0.5, r * 0.16)
+      o.stroke()
+      // specular glint
+      o.fillStyle = 'rgba(255,255,255,.9)'
+      o.beginPath()
+      o.ellipse(-r * 0.35, -ry * 0.35, Math.max(0.4, r * 0.2), Math.max(0.3, r * 0.13), -0.6, 0, Math.PI * 2)
+      o.fill()
+      o.restore()
+    }
+
     const finger = el.querySelector('[data-finger]')
     const frame = (now) => {
       const dt = Math.min(0.05, (now - (last || now)) / 1000)
@@ -87,8 +152,7 @@ export default function FoggedGlass({
         const [x, y] = pts[i++]
         wipe(x, y, brush)
         tip = [x, y]
-        // condensation pushed aside beads up and sometimes runs
-        if (Math.random() < 0.004) runs.push({ x, y: y + brush * 0.6, v: 10 + Math.random() * 25, life: 1 + Math.random() * 2.5, r: 1.6 + Math.random() * 1.6 })
+        if (Math.random() < 0.06) shed(x, y, brush)
       }
       if (finger) {
         finger.style.opacity = tip ? '1' : '0'
@@ -96,30 +160,59 @@ export default function FoggedGlass({
       }
       if (user) {
         wipe(user.x, user.y, brush * 1.2)
-        if (Math.random() < 0.05) runs.push({ x: user.x, y: user.y + brush, v: 12 + Math.random() * 20, life: 1 + Math.random() * 2, r: 1.8 + Math.random() * 1.4 })
+        if (Math.random() < 0.25) shed(user.x, user.y, brush * 1.2)
       }
-      // drips run down, clearing a thin trail and slowing as they shrink
+      // runs move in fits and starts (stick-slip): they cling to the glass
+      // until enough water gathers, slide, and catch again, wandering a
+      // little sideways, and leave a clean wet channel through the fog
       for (let k = runs.length - 1; k >= 0; k--) {
         const r = runs[k]
-        r.life -= dt
-        if (r.life <= 0) {
-          runs.splice(k, 1)
+        if (r.stick > 0) {
+          r.stick -= dt
           continue
         }
-        const ny = r.y + r.v * dt
+        r.v = Math.min(90, r.v + 260 * dt)
+        const step = r.v * dt
+        r.drift += (Math.random() - 0.5) * 0.6
+        r.drift *= 0.9
+        const nx = r.x + r.drift * step * 0.08
+        const ny = r.y + step
         g.globalCompositeOperation = 'destination-out'
-        g.fillStyle = 'rgba(0,0,0,.85)'
-        g.fillRect(r.x - r.r * 0.5, r.y, r.r, ny - r.y + 0.5)
-        g.globalCompositeOperation = 'source-over'
-        g.fillStyle = 'rgba(255,255,255,.35)'
+        g.strokeStyle = '#000'
+        g.lineCap = 'round'
+        g.lineWidth = r.r * 1.3
         g.beginPath()
-        g.arc(r.x, ny, r.r, 0, Math.PI * 2)
-        g.fill()
-        r.y = ny + (Math.random() - 0.5) * 0.3
-        r.x += (Math.random() - 0.5) * 0.4
+        g.moveTo(r.x, r.y)
+        g.lineTo(nx, ny)
+        g.stroke()
+        g.globalCompositeOperation = 'source-over'
+        r.x = nx
+        r.y = ny
+        r.len += step
+        // it picks up any beads in its path and grows
+        for (let b = beads.length - 1; b >= 0; b--) {
+          const q = beads[b]
+          if (Math.abs(q.x - r.x) < r.r + q.r && Math.abs(q.y - r.y) < r.r + q.r) {
+            r.r = Math.min(4.5, Math.sqrt(r.r * r.r + q.r * q.r * 0.5))
+            beads.splice(b, 1)
+          }
+        }
+        // and loses water to the glass as it goes, so it catches again
+        r.r -= step * 0.006
+        if (Math.random() < dt * 1.6) {
+          r.stick = 0.15 + Math.random() * 0.7
+          r.v = 0
+        }
+        if (r.len > r.max || r.r < 1.4 || r.y > H + 10) {
+          beads.push({ x: r.x, y: r.y, r: Math.max(1.2, r.r) })
+          runs.splice(k, 1)
+        }
       }
+      o.clearRect(0, 0, W, H)
+      for (const b of beads) drop(b.x, b.y, b.r)
+      for (const r of runs) drop(r.x, r.y, r.r, r.v > 5 ? 1.25 : 1.05)
       // the fog creeps back
-      g.fillStyle = `rgba(214,222,228,${(0.012 * regrow * dt * 60) / 60})`
+      g.fillStyle = `rgba(214,222,228,${0.012 * regrow * dt})`
       g.fillRect(0, 0, W, H)
       raf = requestAnimationFrame(frame)
     }
@@ -151,6 +244,7 @@ export default function FoggedGlass({
       {/* the street at night, seen through the glass */}
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 20% 60%, #ffb85c, transparent 12%), radial-gradient(circle at 70% 40%, #ff5f6d, transparent 9%), radial-gradient(circle at 85% 75%, #6fd3ff, transparent 10%), radial-gradient(circle at 45% 80%, #ffe08a, transparent 8%), linear-gradient(#202a3c, #0f141d)', filter: 'blur(3px)' }} />
       <canvas ref={cv} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'blur(0.6px)' }} />
+      <canvas ref={ovRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
       <div data-finger aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 28, height: 28, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%, rgba(255,214,190,.55), rgba(220,150,120,.25))', opacity: 0, pointerEvents: 'none' }} />
     </div>
   )
