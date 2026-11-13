@@ -91,25 +91,49 @@ const WHITE_W_KEY = 2.21
 const NO_DAMPER = KEYS.map((k) => k.midi > DAMPER_TOP)
 const naturalDecay = (midi) => Math.max(0.6, 6.5 - (midi - 21) * 0.065)
 
-// the prop stick, which follows the lid round so its tip stays under it
+// The prop stick, which follows the lid round so its tip stays under it.
+// Its tip sits in a cup CONTACT cm along the lid from the hinge (measured
+// along the tilted lid, so it's always on the lid however far it's open).
 const LID_OPEN = 0.5
 const HINGE_X = -HALF - 0.6
-const STICK = [HALF - 2.4, RIM_TOP - 0.8, -52] // pivot
-const STICK_TIP = 0.08
-const STICK_LEN = (RIM_TOP - STICK[1] + (STICK[0] - HINGE_X) * Math.tan(LID_OPEN)) / (Math.cos(STICK_TIP) + Math.sin(STICK_TIP) * Math.tan(LID_OPEN))
+const STICK = [HALF - 3.4, RIM_TOP - 1.1, -46] // pivot, on a hinge block inside the rim, so it folds under the lid
+const CONTACT = 122
+const STICK_LEN = Math.hypot(
+  STICK[0] - (HINGE_X + CONTACT * Math.cos(LID_OPEN)),
+  RIM_TOP + CONTACT * Math.sin(LID_OPEN) - STICK[1],
+)
 function stickAngle(lid) {
-  const lidY = (x) => RIM_TOP + (x - HINGE_X) * Math.tan(lid)
-  const f = (a) => STICK[1] + STICK_LEN * Math.cos(a) - lidY(STICK[0] - STICK_LEN * Math.sin(a))
-  if (f(0) <= 0) return 0
-  let lo = 0
-  let hi = Math.PI / 2
-  for (let i = 0; i < 30; i++) {
-    const m = (lo + hi) / 2
-    if (f(m) > 0) lo = m
-    else hi = m
+  // how far the stick's tip is above (+) or below (-) the lid at angle a
+  const f = (a) => STICK[1] + STICK_LEN * Math.cos(a) - (RIM_TOP + (STICK[0] - STICK_LEN * Math.sin(a) - HINGE_X) * Math.tan(lid))
+  // swing it up from folded flat until the tip meets the lid
+  const STEPS = 90
+  let prev = Math.PI / 2
+  let best = prev
+  let bestF = -Infinity
+  for (let i = 1; i <= STEPS; i++) {
+    const a = (Math.PI / 2) * (1 - i / STEPS)
+    const v = f(a)
+    if (v >= 0) {
+      let lo = a
+      let hi = prev
+      for (let k = 0; k < 24; k++) {
+        const m = (lo + hi) / 2
+        if (f(m) >= 0) lo = m
+        else hi = m
+      }
+      return hi
+    }
+    if (v > bestF) (bestF = v), (best = a)
+    prev = a
   }
-  return hi
+  // can't quite reach: as close as it gets
+  return best
 }
+// the cup on the lid's underside goes where the tip lands when it's open
+const CUP = (() => {
+  const a = stickAngle(LID_OPEN)
+  return [(STICK[0] - STICK_LEN * Math.sin(a) - HINGE_X) / Math.cos(LID_OPEN), 0]
+})()
 
 const DYN = [[16, 'ppp'], [33, 'pp'], [49, 'p'], [64, 'mp'], [80, 'mf'], [96, 'f'], [112, 'ff'], [128, 'fff']]
 export const dynamic = (v) => DYN.find(([m]) => v < m)[1]
@@ -274,6 +298,18 @@ const Piano = forwardRef(function Piano({ lacquerColor = '#0c0c0e', woodColor = 
 
   // static instances: strings and tuning pins
   const pinRef = useRef()
+  // Instanced parts move every frame, so three's cached bounds (worked out
+  // once, on the first raycast) can be stale; if the pointer was over the
+  // canvas before the first frame they'd say every key is at the origin and
+  // no click would ever land. Give them fixed bounds round the whole piano.
+  useEffect(() => {
+    const all = new THREE.Sphere(new THREE.Vector3(0, 70, -85), 190)
+    for (const r of [whiteRef, blackRef, headRef, shankRef, feltRef, dheadRef, stringRef, pinRef]) {
+      if (!r.current) continue
+      r.current.boundingSphere = all.clone()
+      r.current.boundingBox = null
+    }
+  }, [])
   useEffect(() => {
     const m = new THREE.Object3D()
     const col = new THREE.Color()
@@ -571,7 +607,7 @@ const Piano = forwardRef(function Piano({ lacquerColor = '#0c0c0e', woodColor = 
       <instancedMesh ref={blackRef} args={[geo.black, mats.black, BLACKS.length]} frustumCulled={false} castShadow {...keyEvents(BLACKS)} />
 
       {/* music desk, pivoting on its bottom edge */}
-      <group ref={deskRef} position={[0, RIM_TOP - 1.6, -(CASE_FRONT + 6)]}>
+      <group ref={deskRef} position={[0, RIM_TOP - 3.4, -(CASE_FRONT + 6)]}>
         <mesh geometry={geo.desk} material={mats.lacquer} position={[0, 10.5, 0]} castShadow />
         <mesh material={mats.lacquer} position={[0, 0.8, 1.6]} castShadow>
           <boxGeometry args={[56, 1.1, 2.8]} />
@@ -594,7 +630,14 @@ const Piano = forwardRef(function Piano({ lacquerColor = '#0c0c0e', woodColor = 
           onPointerOver={() => (document.body.style.cursor = 'pointer')}
           onPointerOut={() => (document.body.style.cursor = '')}
         />
+        {/* the cup the stick's tip sits in */}
+        <mesh material={mats.lacquer} position={[CUP[0], CUP[1] - 0.75, STICK[2]]}>
+          <cylinderGeometry args={[1.5, 1.2, 1.1, 16]} />
+        </mesh>
       </group>
+      <mesh material={mats.brass} position={[HALF - 3.1, RIM_TOP - 1.6, STICK[2]]}>
+        <boxGeometry args={[1.6, 1.8, 3.6]} />
+      </mesh>
       <group ref={stickRef} position={STICK}>
         <mesh material={mats.lacquer} position={[0, STICK_LEN / 2, 0]} castShadow>
           <cylinderGeometry args={[0.7, 0.9, STICK_LEN, 12]} />
