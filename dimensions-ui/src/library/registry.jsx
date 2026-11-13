@@ -2531,7 +2531,7 @@ const ALL_COMPONENTS = [
     description: 'A gust lifts a pile of leaves into the shape of the word; the next scatters them, see-sawing down into a new pile. Click to call the next gust.',
     controls: [
       { name: 'text', type: 'text', default: 'AUTUMN', maxLength: 10 },
-      { name: 'leaves', type: 'range', min: 100, max: 1200, step: 20, default: 520 },
+      { name: 'leaves', type: 'range', min: 200, max: 2000, step: 20, default: 900 },
       { name: 'hold', type: 'range', min: 1, max: 10, step: 0.5, default: 3, unit: 's' },
     ],
     replay: true,
