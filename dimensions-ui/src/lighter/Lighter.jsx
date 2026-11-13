@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Billboard, useCursor } from '@react-three/drei'
+import { useCursor } from '@react-three/drei'
 import * as THREE from 'three'
 import { createLighterAudio } from './audio.js'
 
@@ -139,33 +139,69 @@ const FINISHES = {
 }
 export const LIGHTER_FINISHES = Object.keys(FINISHES)
 
-// The flame: a teardrop drawn in a shader, blue at the root, flickering, and
-// leaning with the wind. Added on top of the scene, so it glows.
+// The flame is a real volume, not a card: a teardrop of revolution (widest a
+// third of the way up, like a candle or wick flame) with a smaller bright core
+// inside it. Each shell glows by how much flame you look through: strongest
+// where its surface faces you, fading to nothing at the silhouette. So it
+// reads as a round, soft flame from any side, and as a glowing disc from
+// above. Blue at the root where the fuel is still mixing with air, flickering
+// and leaning with the wind, and added on top of the scene so it glows.
+const FLAME_H = 2.7
+const FLAME_R = 0.4
+function flameProfile(rScale, hScale) {
+  const pts = []
+  const N = 40
+  for (let i = 0; i <= N; i++) {
+    const y = i / N
+    const r = Math.pow(Math.max(Math.sin(Math.PI * Math.pow(y, 0.72)), 0), 0.85) * (1 - 0.3 * y)
+    pts.push(new THREE.Vector2(r * FLAME_R * rScale, y * FLAME_H * hScale))
+  }
+  return new THREE.LatheGeometry(pts, 36)
+}
 const flameVert = `
 uniform float wind; uniform float t;
-varying vec2 vUv;
+varying float vY; varying float vFace;
 void main() {
-  vUv = uv;
-  vec3 p = position;
   float y = uv.y;
-  p.x += (wind * 0.55 + sin(t * 9.0 + y * 5.0) * 0.04) * y * y;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  vY = y;
+  vec3 p = position;
+  // breathing and flicker grow toward the tip, the base stays anchored on the wick
+  p.xz *= 1.0 + 0.07 * sin(t * 11.0 + y * 6.0) * y;
+  p.x += (wind * 0.55 + sin(t * 9.0 + y * 5.0) * 0.04 + sin(t * 23.0 + y * 9.0) * 0.015) * y * y;
+  p.z += (cos(t * 7.3 + y * 4.0) * 0.035 + sin(t * 19.0 + y * 8.0) * 0.012) * y * y;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vec3 n = normalize(normalMatrix * normal);
+  vFace = abs(dot(n, normalize(-mv.xyz)));
+  gl_Position = projectionMatrix * mv;
 }`
 const flameFrag = `
-uniform float t; uniform float amount;
-varying vec2 vUv;
+uniform float t; uniform float amount; uniform float inner;
+varying float vY; varying float vFace;
 void main() {
-  float y = vUv.y;
-  float x = (vUv.x - 0.5) * 2.0;
-  x += sin(t * 13.0 + y * 7.0) * 0.05 * y;
-  float prof = pow(max(sin(3.14159 * pow(y, 0.72)), 0.0), 0.85) * (1.0 - 0.3 * y);
-  float d = abs(x) / max(prof, 1e-3);
-  float a = smoothstep(1.0, 0.5, d) * smoothstep(0.0, 0.06, y) * smoothstep(1.0, 0.82, y);
-  float core = smoothstep(0.85, 0.15, d) * smoothstep(0.9, 0.3, y);
-  vec3 col = mix(vec3(1.0, 0.42, 0.06), vec3(1.0, 0.86, 0.5), core);
-  col = mix(vec3(0.25, 0.42, 1.0), col, smoothstep(0.04, 0.2, y));
-  gl_FragColor = vec4(col * 1.8, a * amount);
+  float y = vY;
+  // how much flame the eye looks through: thick in the middle, none at the edge
+  float thick = pow(vFace, 1.6);
+  float a = thick * smoothstep(0.0, 0.05, y) * smoothstep(1.0, 0.7, y);
+  vec3 outer = mix(vec3(1.0, 0.38, 0.05), vec3(1.0, 0.7, 0.28), thick);
+  vec3 core = vec3(1.0, 0.9, 0.62);
+  vec3 col = mix(outer, core, inner);
+  // the blue root
+  col = mix(vec3(0.22, 0.4, 1.0), col, smoothstep(0.03, 0.18 + 0.1 * inner, y));
+  float gain = mix(1.25, 1.6, inner);
+  gl_FragColor = vec4(col * gain, a * amount * mix(0.85, 0.9, inner));
 }`
+
+function flameMaterial(inner) {
+  return new THREE.ShaderMaterial({
+    uniforms: { t: { value: 0 }, amount: { value: 0 }, wind: { value: 0 }, inner: { value: inner } },
+    vertexShader: flameVert,
+    fragmentShader: flameFrag,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  })
+}
 
 // A prop that can also be changed from inside the scene (clicking the lid or
 // the wheel); `onChange` lets the owner stay in sync.
@@ -220,7 +256,8 @@ export default function Lighter({
       wick: new THREE.CylinderGeometry(WICK.r, WICK.r * 1.1, WICK.top - INSERT_T, 10),
       wickTip: new THREE.SphereGeometry(WICK.r * 1.05, 10, 8),
       // tall enough to stand well clear of the chimney, as a real one does
-      flame: new THREE.PlaneGeometry(0.85, 2.7).translate(0, 1.35, 0),
+      flame: flameProfile(1, 1),
+      flameCore: flameProfile(0.5, 0.7),
       engrave: new THREE.PlaneGeometry(2.6, 1.79),
     }
   }, [])
@@ -237,16 +274,8 @@ export default function Lighter({
       wick: new THREE.MeshStandardMaterial({ color: '#d8cfbd', roughness: 1 }),
       char: new THREE.MeshStandardMaterial({ color: '#1a1714', roughness: 1 }),
       engrave: new THREE.MeshStandardMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, metalness: 0.7, roughness: 0.6 }),
-      flame: new THREE.ShaderMaterial({
-        uniforms: { t: { value: 0 }, amount: { value: 0 }, wind: { value: 0 } },
-        vertexShader: flameVert,
-        fragmentShader: flameFrag,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        toneMapped: false,
-        side: THREE.DoubleSide,
-      }),
+      flame: flameMaterial(0),
+      flameCore: flameMaterial(1),
       spark: new THREE.PointsMaterial({ color: '#ffcf6b', size: 0.09, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }),
     }
   }, [tex])
@@ -391,11 +420,13 @@ export default function Lighter({
     const burning = w.lit && s.a > OPEN * 0.55
     s.flame += ((burning ? 1 : 0) - s.flame) * (1 - Math.exp(-dt * (burning ? 6 : 14)))
     const flick = 1 + Math.sin(time * 17) * 0.04 + Math.sin(time * 29 + 1.3) * 0.03 + Math.sin(time * 7.3) * 0.05
-    const u = mats.flame.uniforms
-    u.t.value = time
-    u.amount.value = s.flame
-    u.wind.value = w.wind
-    flameRef.current.scale.set(w.flameSize * (0.9 + 0.1 * s.flame), w.flameSize * s.flame * flick, 1)
+    for (const m of [mats.flame, mats.flameCore]) {
+      m.uniforms.t.value = time
+      m.uniforms.amount.value = s.flame
+      m.uniforms.wind.value = w.wind
+    }
+    const girth = w.flameSize * (0.9 + 0.1 * s.flame)
+    flameRef.current.scale.set(girth, w.flameSize * s.flame * flick, girth)
     flameRef.current.visible = s.flame > 0.01
     lightRef.current.intensity = s.flame * 9 * w.flameSize * flick
   })
@@ -460,9 +491,10 @@ export default function Lighter({
         <mesh geometry={geo.wickTip} material={mats.char} position={[WICK.x, WICK.top, 0]} scale={[1, 0.7, 1]} />
         {/* the flame and its light */}
         <group position={[WICK.x, WICK.top - 0.04, 0]}>
-          <Billboard lockX lockZ>
-            <mesh ref={flameRef} geometry={geo.flame} material={mats.flame} renderOrder={5} />
-          </Billboard>
+          <group ref={flameRef}>
+            <mesh geometry={geo.flame} material={mats.flame} renderOrder={5} />
+            <mesh geometry={geo.flameCore} material={mats.flameCore} renderOrder={6} />
+          </group>
           <pointLight ref={lightRef} position={[0, 1.4, 0.3]} color="#ffb04a" intensity={0} distance={14} decay={2} />
         </group>
         <points geometry={sparks.geo} material={mats.spark} />
