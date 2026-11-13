@@ -1,10 +1,129 @@
 import * as THREE from 'three'
 
-// Tileable 3D noise for the cloud, baked once into two small 3D textures:
-//   shape  (64³): R = Perlin-Worley (the billowy body), G/B/A = Worley fBm at
-//                 rising frequencies (used to carve the body).
-//   detail (32³): R/G/B = finer Worley fBm, for the wispy, eroded edges.
+// Tileable 3D noise for the clouds, generated on the GPU (a few milliseconds)
+// into two 3D textures, one slice at a time:
+//   shape  (128³): R = Perlin-Worley (the billowy body), G/B/A = Worley fBm at
+//                  rising frequencies (used to carve the body).
+//   detail  (64³): R/G/B = finer Worley fBm, for the wispy, eroded edges.
 // Everything wraps, so the textures repeat without seams as the wind moves them.
+
+const noiseFragment = /* glsl */ `
+precision highp float;
+precision highp int;
+uniform float uZ;
+uniform float uSize;
+uniform int uMode; // 0 = shape, 1 = detail
+out vec4 fragColor;
+
+uvec3 pcg3d(uvec3 v) {
+  v = v * 1664525u + 1013904223u;
+  v.x += v.y * v.z; v.y += v.z * v.x; v.z += v.x * v.y;
+  v ^= v >> 16u;
+  v.x += v.y * v.z; v.y += v.z * v.x; v.z += v.x * v.y;
+  return v;
+}
+vec3 hash3(vec3 c, float salt) {
+  return vec3(pcg3d(uvec3(ivec3(c) + 4096) + uint(salt) * 7919u)) / 4294967295.0;
+}
+
+// cellular noise with 'cells' feature points per axis: 1 on a point, 0 far away
+float worley(vec3 p, float cells) {
+  p *= cells;
+  vec3 id = floor(p);
+  vec3 f = p - id;
+  float best = 1e9;
+  for (int z = -1; z <= 1; z++)
+  for (int y = -1; y <= 1; y++)
+  for (int x = -1; x <= 1; x++) {
+    vec3 o = vec3(x, y, z);
+    vec3 d = o + hash3(mod(id + o, cells), cells) - f;
+    best = min(best, dot(d, d));
+  }
+  return 1.0 - clamp(sqrt(best), 0.0, 1.0);
+}
+
+// gradient noise repeating every 'period' cells, about -1..1
+float perlin(vec3 p, float period) {
+  p *= period;
+  vec3 i = floor(p);
+  vec3 f = p - i;
+  vec3 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  float n[8];
+  for (int k = 0; k < 8; k++) {
+    vec3 c = vec3(k & 1, (k >> 1) & 1, (k >> 2) & 1);
+    vec3 g = normalize(hash3(mod(i + c, period), period + 101.0) * 2.0 - 1.0);
+    n[k] = dot(g, f - c);
+  }
+  return mix(mix(mix(n[0], n[1], u.x), mix(n[2], n[3], u.x), u.y), mix(mix(n[4], n[5], u.x), mix(n[6], n[7], u.x), u.y), u.z) * 1.6;
+}
+
+float fbm3(float a, float b, float c) { return a * 0.625 + b * 0.25 + c * 0.125; }
+
+void main() {
+  vec3 p = vec3(gl_FragCoord.xy / uSize, uZ);
+  if (uMode == 0) {
+    float a = worley(p, 4.0);
+    float b = worley(p, 8.0);
+    float c = worley(p, 16.0);
+    float d = worley(p, 32.0);
+    float e = worley(p, 64.0);
+    float per = clamp((perlin(p, 4.0) + perlin(p, 8.0) * 0.5 + perlin(p, 16.0) * 0.25) * 0.5 + 0.5, 0.0, 1.0);
+    float w = fbm3(a, b, c);
+    fragColor = vec4(w + per * (1.0 - w), w, fbm3(b, c, d), fbm3(c, d, e));
+  } else {
+    float a = worley(p, 2.0);
+    float b = worley(p, 4.0);
+    float c = worley(p, 8.0);
+    float d = worley(p, 16.0);
+    float e = worley(p, 32.0);
+    fragColor = vec4(fbm3(a, b, c), fbm3(b, c, d), fbm3(c, d, e), 1.0);
+  }
+}
+`
+
+function bake(gl, size, mode) {
+  const rt = new THREE.WebGL3DRenderTarget(size, size, size, { depthBuffer: false })
+  const t = rt.texture
+  t.format = THREE.RGBAFormat
+  t.type = THREE.UnsignedByteType
+  t.minFilter = t.magFilter = THREE.LinearFilter
+  t.wrapS = t.wrapT = t.wrapR = THREE.RepeatWrapping
+  const mat = new THREE.ShaderMaterial({
+    glslVersion: THREE.GLSL3,
+    vertexShader: 'void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: noiseFragment,
+    uniforms: { uZ: { value: 0 }, uSize: { value: size }, uMode: { value: mode } },
+    depthTest: false,
+    depthWrite: false,
+  })
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat)
+  quad.frustumCulled = false
+  const scene = new THREE.Scene()
+  scene.add(quad)
+  const cam = new THREE.OrthographicCamera()
+  const prev = gl.getRenderTarget()
+  for (let z = 0; z < size; z++) {
+    mat.uniforms.uZ.value = (z + 0.5) / size
+    gl.setRenderTarget(rt, z)
+    gl.render(scene, cam)
+  }
+  gl.setRenderTarget(prev)
+  quad.geometry.dispose()
+  mat.dispose()
+  return t
+}
+
+const cache = new WeakMap()
+
+// Built once per renderer and shared by every cloud on it.
+export function getCloudNoise(gl) {
+  let n = cache.get(gl)
+  if (!n) {
+    n = { shape: bake(gl, 128, 0), detail: bake(gl, 64, 1) }
+    cache.set(gl, n)
+  }
+  return n
+}
 
 function mulberry32(seed) {
   let a = seed >>> 0
@@ -15,140 +134,6 @@ function mulberry32(seed) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
-}
-
-// Worley (cellular) noise with `cells` feature points per axis; 1 at a point, 0 far away.
-function makeWorley(cells, rng) {
-  const pts = new Float32Array(cells * cells * cells * 3)
-  for (let i = 0; i < pts.length; i++) pts[i] = rng()
-  return (x, y, z) => {
-    const px = x * cells
-    const py = y * cells
-    const pz = z * cells
-    const cx = Math.floor(px)
-    const cy = Math.floor(py)
-    const cz = Math.floor(pz)
-    let best = 1e9
-    for (let dz = -1; dz <= 1; dz++) {
-      const kz = (((cz + dz) % cells) + cells) % cells
-      for (let dy = -1; dy <= 1; dy++) {
-        const ky = (((cy + dy) % cells) + cells) % cells
-        for (let dx = -1; dx <= 1; dx++) {
-          const kx = (((cx + dx) % cells) + cells) % cells
-          const o = ((kz * cells + ky) * cells + kx) * 3
-          const ox = cx + dx + pts[o] - px
-          const oy = cy + dy + pts[o + 1] - py
-          const oz = cz + dz + pts[o + 2] - pz
-          const d = ox * ox + oy * oy + oz * oz
-          if (d < best) best = d
-        }
-      }
-    }
-    return 1 - Math.min(Math.sqrt(best), 1)
-  }
-}
-
-// Gradient (Perlin) noise that repeats every `period` lattice cells. Returns about -1..1.
-function makePerlin(period, rng) {
-  const g = new Float32Array(period * period * period * 3)
-  for (let i = 0; i < g.length; i += 3) {
-    const u = rng() * 2 - 1
-    const a = rng() * Math.PI * 2
-    const s = Math.sqrt(1 - u * u)
-    g[i] = s * Math.cos(a)
-    g[i + 1] = s * Math.sin(a)
-    g[i + 2] = u
-  }
-  const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10)
-  const dot = (ix, iy, iz, fx, fy, fz) => {
-    const o = (((iz % period) * period + (iy % period)) * period + (ix % period)) * 3
-    return g[o] * fx + g[o + 1] * fy + g[o + 2] * fz
-  }
-  return (x, y, z) => {
-    const px = x * period
-    const py = y * period
-    const pz = z * period
-    const ix = Math.floor(px)
-    const iy = Math.floor(py)
-    const iz = Math.floor(pz)
-    const fx = px - ix
-    const fy = py - iy
-    const fz = pz - iz
-    const u = fade(fx)
-    const v = fade(fy)
-    const w = fade(fz)
-    const l = (a, b, t) => a + (b - a) * t
-    return (
-      l(
-        l(l(dot(ix, iy, iz, fx, fy, fz), dot(ix + 1, iy, iz, fx - 1, fy, fz), u), l(dot(ix, iy + 1, iz, fx, fy - 1, fz), dot(ix + 1, iy + 1, iz, fx - 1, fy - 1, fz), u), v),
-        l(l(dot(ix, iy, iz + 1, fx, fy, fz - 1), dot(ix + 1, iy, iz + 1, fx - 1, fy, fz - 1), u), l(dot(ix, iy + 1, iz + 1, fx, fy - 1, fz - 1), dot(ix + 1, iy + 1, iz + 1, fx - 1, fy - 1, fz - 1), u), v),
-        w,
-      ) * 1.6
-    )
-  }
-}
-
-function texture3D(data, size) {
-  const t = new THREE.Data3DTexture(data, size, size, size)
-  t.format = THREE.RGBAFormat
-  t.type = THREE.UnsignedByteType
-  t.minFilter = THREE.LinearFilter
-  t.magFilter = THREE.LinearFilter
-  t.wrapS = t.wrapT = t.wrapR = THREE.RepeatWrapping
-  t.unpackAlignment = 1
-  t.needsUpdate = true
-  return t
-}
-
-const byte = (v) => Math.max(0, Math.min(255, Math.round(v * 255)))
-
-let cache = null
-
-// Built once per page (about a quarter of a second) and shared by every cloud.
-export function getCloudNoise() {
-  if (cache) return cache
-  const rng = mulberry32(1337)
-  const W = {}
-  for (const f of [2, 4, 8, 16, 32, 64]) W[f] = makeWorley(f, rng)
-  const fbm = (f, x, y, z) => W[f](x, y, z) * 0.625 + W[f * 2](x, y, z) * 0.25 + (W[f * 4] ? W[f * 4](x, y, z) : 0.5) * 0.125
-  const P = [makePerlin(4, rng), makePerlin(8, rng), makePerlin(16, rng)]
-
-  const S = 64
-  const shape = new Uint8Array(S * S * S * 4)
-  for (let z = 0, i = 0; z < S; z++) {
-    for (let y = 0; y < S; y++) {
-      for (let x = 0; x < S; x++, i += 4) {
-        const u = (x + 0.5) / S
-        const v = (y + 0.5) / S
-        const w = (z + 0.5) / S
-        const perlin = Math.min(1, Math.max(0, (P[0](u, v, w) + P[1](u, v, w) * 0.5 + P[2](u, v, w) * 0.25) * 0.5 + 0.5))
-        const w4 = fbm(4, u, v, w)
-        shape[i] = byte(w4 + perlin * (1 - w4) - 0.0) // Perlin-Worley
-        shape[i + 1] = byte(w4)
-        shape[i + 2] = byte(fbm(8, u, v, w))
-        shape[i + 3] = byte(fbm(16, u, v, w))
-      }
-    }
-  }
-
-  const D = 32
-  const detail = new Uint8Array(D * D * D * 4)
-  for (let z = 0, i = 0; z < D; z++) {
-    for (let y = 0; y < D; y++) {
-      for (let x = 0; x < D; x++, i += 4) {
-        const u = (x + 0.5) / D
-        const v = (y + 0.5) / D
-        const w = (z + 0.5) / D
-        detail[i] = byte(fbm(2, u, v, w))
-        detail[i + 1] = byte(fbm(4, u, v, w))
-        detail[i + 2] = byte(fbm(8, u, v, w))
-        detail[i + 3] = 255
-      }
-    }
-  }
-
-  cache = { shape: texture3D(shape, S), detail: texture3D(detail, D) }
-  return cache
 }
 
 // A cumulus silhouette: a broad base of large puffs, smaller towers stacked on

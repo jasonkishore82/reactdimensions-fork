@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import Cricket from './Cricket.jsx'
 
 const BG = '#e6e5e2'
-const TARGET = [0.05, 0.4, -0.45]
+const TARGET = [0, 0.36, -0.25]
 
 // Soft studio light, like a product shot: long panels for the lacquer on the
 // stumps and the oil on the willow to catch.
@@ -21,13 +21,13 @@ function Studio() {
   )
 }
 
-// Frames the wicket and the bat in front of it, on any screen.
+// Frames the wicket with the pitch running away behind it, on any screen.
 function Rig() {
   const { camera, size } = useThree()
   useEffect(() => {
     const aspect = size.width / size.height
     const tan = Math.tan(THREE.MathUtils.degToRad(16))
-    const dist = Math.max(1.25 / 2 / tan, 1.9 / 2 / (tan * aspect)) * 1.12
+    const dist = Math.max(1.1 / 2 / tan, 1.6 / 2 / (tan * aspect)) * 1.12
     const el = 0.32
     const az = 0.95
     camera.position.set(TARGET[0] + Math.sin(az) * Math.cos(el) * dist, TARGET[1] + Math.sin(el) * dist, TARGET[2] + Math.cos(az) * Math.cos(el) * dist)
@@ -50,16 +50,13 @@ const btn = (dark) => ({
 })
 
 export default function CricketScene({ autoRotate = false, ...props }) {
-  const [cmd, setCmd] = useState({ bowl: 0, swing: 0, reset: 0 })
+  const [cmd, setCmd] = useState({ bowl: 0, reset: 0 })
   const fire = (k) => setCmd((c) => ({ ...c, [k]: c[k] + 1 }))
   useEffect(() => {
-    // space to swing, B to bowl, R to reset (when the page is not typing)
+    // B to bowl, R to reset (when the page is not typing)
     const key = (e) => {
       if (e.target.closest?.('input, textarea, select, [contenteditable]')) return
-      if (e.code === 'Space') {
-        e.preventDefault()
-        fire('swing')
-      } else if (e.key === 'b' || e.key === 'B') fire('bowl')
+      if (e.key === 'b' || e.key === 'B') fire('bowl')
       else if (e.key === 'r' || e.key === 'R') fire('reset')
     }
     window.addEventListener('keydown', key)
@@ -89,14 +86,11 @@ export default function CricketScene({ autoRotate = false, ...props }) {
         <button type="button" style={btn(true)} onClick={() => fire('bowl')}>
           Bowl
         </button>
-        <button type="button" style={btn(false)} onClick={() => fire('swing')}>
-          Swing
-        </button>
         <button type="button" style={btn(false)} onClick={() => fire('reset')}>
           Reset
         </button>
       </div>
-      <InfoHint>Bowl (or click the stumps) · Swing (or click the bat, or Space) to hit it · leave it and it takes the stumps · raise the pace to uproot one · Reset puts the wicket back</InfoHint>
+      <InfoHint>Bowl (or click the stumps, or press B) · the ball takes the stumps and the bails fly · raise the pace to uproot one · Reset (R) puts the wicket back</InfoHint>
     </div>
   )
 }

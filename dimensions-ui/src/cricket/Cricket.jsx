@@ -5,28 +5,14 @@ import * as THREE from 'three'
 import { createCricketAudio } from './audio.js'
 import { BAIL, BAIL_Y, BALL, STUMP, STUMP_COM, STUMP_X, PlantedStump, ballBody, bailBody, closestOnSegment, collide, stumpBody } from './physics.js'
 
-// A cricket wicket and bat, with the physics that makes them interesting.
-// Bowl and the ball is released from the far end, pitches, and comes on to
-// the stumps. Leave it and it hits them: the struck stump is driven back in
-// the soil (or, at pace, uprooted), the bails jump out of their grooves and
-// tumble to the turf. Swing the bat in time and willow meets leather: the
-// ball comes off the face with the bat's speed added to it.
+// A cricket wicket, with the physics that makes it interesting. Bowl and the
+// ball is released from the far end, pitches, and comes on to the stumps: the
+// struck stump is driven back in the soil (or, at pace, uprooted), and the
+// bails jump out of their grooves and tumble to the turf.
 // SI units: metres. The stumps stand on the crease at z = 0, the bowler is
-// off along -z, the batter's bat is held just in front of the stumps.
+// off along -z.
 
-// ---- the bat (dimensions of a short-handle senior bat) ----
-const BLADE_L = 0.56
-const BLADE_HW = 0.054 // half width
-const FACE_Z = -0.022 // the face looks at the bowler, along -z
-const EDGE_T = 0.038
-const BAT_L = 0.955
-const PIVOT_Y = 0.8 // the hands, up the handle from the toe
-const BAT_Z = -0.62
-const BACKLIFT = -0.62
-const FOLLOW = 2.25
-const T_BACK = 0.22
-const T_DOWN = 0.16
-const REST_X = { leave: 0.42, block: 0, drive: 0 }
+
 
 const BOWL_Z = -9 // release point
 const RELEASE_Y = 2.1
@@ -77,7 +63,7 @@ function valueNoise(seed) {
   }
 }
 
-// Wood with its grain running along the texture's v (up the stump or bat):
+// Wood with its grain running along the texture's v (up the stump):
 // fine straight streaks, with ash's bolder growth lines when `rings` is high.
 function woodTexture(base, dark, { rings = 1, seed = 2 } = {}) {
   const S = 512
@@ -119,45 +105,6 @@ function woodTexture(base, dark, { rings = 1, seed = 2 } = {}) {
     return t
   }
   return { map: mk(c, true), bump: mk(bm) }
-}
-
-// A rubber bat grip: a field of little raised diamonds, wound on as a spiral
-// so the wraps show as a faint helical seam.
-function gripTexture() {
-  const S = 256
-  const c = Object.assign(document.createElement('canvas'), { width: S, height: S })
-  const g = c.getContext('2d')
-  g.fillStyle = '#9a9a9a'
-  g.fillRect(0, 0, S, S)
-  const n = 16
-  const s = S / n
-  for (let i = 0; i < n; i++)
-    for (let j = 0; j < n; j++) {
-      const x = i * s + (j % 2 ? s / 2 : 0)
-      const y = j * s
-      g.fillStyle = '#ececec'
-      g.beginPath()
-      g.moveTo(x, y + s * 0.12)
-      g.lineTo(x + s * 0.38, y + s / 2)
-      g.lineTo(x, y + s * 0.88)
-      g.lineTo(x - s * 0.38, y + s / 2)
-      g.closePath()
-      g.fill()
-    }
-  // the wrap seam
-  g.strokeStyle = '#6d6d6d'
-  g.lineWidth = 3
-  for (const o of [-S, 0, S]) {
-    g.beginPath()
-    g.moveTo(o, S)
-    g.lineTo(o + S, 0)
-    g.stroke()
-  }
-  const t = new THREE.CanvasTexture(c)
-  t.wrapS = t.wrapT = THREE.RepeatWrapping
-  t.repeat.set(2, 7)
-  t.anisotropy = 8
-  return t
 }
 
 // The ball: polished leather in four quarters, a raised seam of six rows of
@@ -271,119 +218,19 @@ function bailGeometry() {
   return lathe(full, 28).rotateZ(-Math.PI / 2)
 }
 
-// The blade: a flat face, the back built up into a spine (thickest low down
-// where the middle of the bat is), rounded edges, the slight bow of the face,
-// and shoulders sloping in to the handle. Toe at y = 0, face toward -z.
-function bladeGeometry() {
-  const N = 72
-  const M = 32 // across the back
-  const F = 10 // across the face
-  const rows = []
-  const sm = (a, b, x) => {
-    const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
-    return t * t * (3 - 2 * t)
-  }
-  for (let i = 0; i <= N; i++) {
-    const y = (i / N) * BLADE_L
-    const sh = sm(BLADE_L - 0.055, BLADE_L, y) // the shoulder slope
-    const toe = 1 - sm(0, 0.014, y) * 1
-    const hw = BLADE_HW * (1 - 0.66 * sh) * (1 - 0.06 * toe)
-    const spine = 0.064 * Math.exp(-(((y - 0.17) / 0.2) ** 2)) + 0.046 * (1 - Math.exp(-(((y - 0.17) / 0.2) ** 2)))
-    const ts = (spine - 0.008 * toe) * (1 - 0.55 * sh)
-    const te = (EDGE_T - 0.006 * toe) * (1 - 0.6 * sh)
-    const z0 = FACE_Z + 0.004 * Math.sin((Math.PI * y) / BLADE_L) * (1 - sh)
-    const ring = []
-    // the back, edge to edge, with the edges rolled round to the face
-    for (let k = 0; k <= M; k++) {
-      const s = -1 + (2 * k) / M
-      const roll = Math.sqrt(Math.max(0, 1 - Math.pow(Math.abs(s), 10)))
-      const zb = z0 + (te + (ts - te) * Math.pow(1 - s * s, 0.75)) * roll
-      ring.push([s * hw, y, zb, (s + 1) / 2])
-    }
-    // the face, back across
-    for (let k = 1; k < F; k++) {
-      const s = 1 - (2 * k) / F
-      ring.push([s * hw, y, z0 - 0.0015 * (1 - s * s), (s + 1) / 2])
-    }
-    rows.push(ring)
-  }
-  const P = rows[0].length
-  const pos = []
-  const uv = []
-  const idx = []
-  for (const ring of rows) {
-    for (const [x, y, z, u] of ring) {
-      pos.push(x, y, z)
-      uv.push(u * 0.25, y / BLADE_L)
-    }
-  }
-  for (let i = 0; i < N; i++)
-    for (let k = 0; k < P; k++) {
-      const a = i * P + k
-      const b = i * P + ((k + 1) % P)
-      const c = (i + 1) * P + k
-      const d = (i + 1) * P + ((k + 1) % P)
-      idx.push(a, c, b, b, c, d)
-    }
-  // caps: a fan at the toe and at the top of the shoulders
-  for (const [i, flip] of [
-    [0, true],
-    [N, false],
-  ]) {
-    const ring = rows[i]
-    const cx = 0
-    const cz = ring.reduce((t, p) => t + p[2], 0) / P
-    const ci = pos.length / 3
-    pos.push(cx, ring[0][1], cz)
-    uv.push(0.12, i ? 1 : 0)
-    for (let k = 0; k < P; k++) {
-      const a = i * P + k
-      const b = i * P + ((k + 1) % P)
-      flip ? idx.push(ci, a, b) : idx.push(ci, b, a)
-    }
-  }
-  const g = new THREE.BufferGeometry()
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
-  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2))
-  g.setIndex(idx)
-  g.computeVertexNormals()
-  return g
-}
 
-// the V of the splice where the handle is let into the blade
-function spliceTexture() {
-  const c = Object.assign(document.createElement('canvas'), { width: 64, height: 256 })
-  const g = c.getContext('2d')
-  g.fillStyle = '#fff'
-  g.beginPath()
-  g.moveTo(8, 0)
-  g.lineTo(56, 0)
-  g.lineTo(32, 256)
-  g.closePath()
-  g.fill()
-  return new THREE.CanvasTexture(c)
-}
-
-const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
-const clamp01 = (t) => Math.min(1, Math.max(0, t))
-
-// batting: leave | block | drive (drive swings by itself, timed to the ball).
 // line: middle | off | leg | random. pace: km/h. slowMotion: how fast time
 // runs (1 = real time). autoBowl: bowl again by itself once things settle.
-// bowl, swing, reset: bump these numbers to do it. sound: the cracks.
+// bowl, reset: bump these numbers to do it. sound: the cracks.
 export default function Cricket({
-  batting = 'leave',
   line = 'middle',
   pace = 110,
   slowMotion = 0.3,
   autoBowl = false,
   stumpWood = '#c99447',
-  batWood = '#e4cba0',
-  gripColor = '#f4f4f2',
   ball: ballColor = 'red',
   sound = false,
   bowl = 0,
-  swing = 0,
   reset = 0,
 }) {
   const [hover, setHover] = useState(false)
@@ -395,12 +242,6 @@ export default function Cricket({
       stump: stumpGeometry(),
       notch: new THREE.BoxGeometry(STUMP.r * 2.05, 0.004, 0.008),
       bail: bailGeometry(),
-      blade: bladeGeometry(),
-      handle: new THREE.CylinderGeometry(0.0158, 0.0162, BAT_L - BLADE_L + 0.01, 24),
-      grip: new THREE.CylinderGeometry(0.0188, 0.0188, BAT_L - BLADE_L - 0.04, 40, 1, true),
-      gripEnd: new THREE.SphereGeometry(0.0188, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2),
-      twine: new THREE.CylinderGeometry(0.0192, 0.021, 0.026, 32),
-      splice: new THREE.PlaneGeometry(0.03, 0.105),
       ball: new THREE.SphereGeometry(BALL.r, 48, 32),
       pitch: new THREE.PlaneGeometry(3.05, 12),
       crease: new THREE.PlaneGeometry(1, 1),
@@ -410,37 +251,25 @@ export default function Cricket({
   useEffect(() => () => Object.values(geo).forEach((g) => g.dispose()), [geo])
 
   const stumpTex = useMemo(() => woodTexture(stumpWood, new THREE.Color(stumpWood).multiplyScalar(0.62).getStyle(), { rings: 1, seed: 4 }), [stumpWood])
-  const batTex = useMemo(() => woodTexture(batWood, new THREE.Color(batWood).multiplyScalar(0.8).getStyle(), { rings: 0.35, seed: 9 }), [batWood])
-  const gripTex = useMemo(() => gripTexture(), [])
   const ballTex = useMemo(() => ballTexture(BALL_COLORS[ballColor] || BALL_COLORS.red), [ballColor])
   const pitch = useMemo(() => pitchTexture(), [])
-  const spliceTex = useMemo(() => spliceTexture(), [])
   useEffect(() => () => [stumpTex.map, stumpTex.bump].forEach((t) => t.dispose()), [stumpTex])
-  useEffect(() => () => [batTex.map, batTex.bump].forEach((t) => t.dispose()), [batTex])
   useEffect(() => () => ballTex.dispose(), [ballTex])
   useEffect(
     () => () => {
-      gripTex.dispose()
       pitch.tex.dispose()
-      spliceTex.dispose()
     },
-    [gripTex, pitch, spliceTex],
+    [pitch],
   )
 
   const mats = useMemo(() => {
-    // stumps are lacquered ash; the bat is oiled willow
+    // stumps are lacquered ash
     const stump = new THREE.MeshPhysicalMaterial({ roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.25, bumpScale: 0.6 })
     const bail = stump.clone()
-    const blade = new THREE.MeshPhysicalMaterial({ roughness: 0.55, clearcoat: 0.18, clearcoatRoughness: 0.5, bumpScale: 0.4 })
     return {
       stump,
       bail,
-      blade,
       notch: new THREE.MeshStandardMaterial({ color: '#4a2f15', roughness: 0.8 }),
-      handle: new THREE.MeshStandardMaterial({ color: '#c9a66a', roughness: 0.6 }),
-      grip: new THREE.MeshStandardMaterial({ roughness: 0.75 }),
-      twine: new THREE.MeshStandardMaterial({ color: '#8a6b3d', roughness: 0.8 }),
-      splice: new THREE.MeshStandardMaterial({ color: '#b48d55', roughness: 0.7, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
       ball: new THREE.MeshPhysicalMaterial({ roughness: 0.38, clearcoat: 0.7, clearcoatRoughness: 0.2 }),
       pitch: new THREE.MeshStandardMaterial({ roughness: 0.95 }),
       crease: new THREE.MeshStandardMaterial({ color: '#fbfaf6', roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -1 }),
@@ -453,27 +282,16 @@ export default function Cricket({
       m.bumpMap = stumpTex.bump
       m.needsUpdate = true
     }
-    mats.blade.map = batTex.map
-    mats.blade.bumpMap = batTex.bump
-    mats.blade.needsUpdate = true
-    mats.grip.map = gripTex
-    mats.grip.bumpMap = gripTex
-    mats.grip.bumpScale = 1.5
-    mats.grip.color.set(gripColor)
-    mats.grip.needsUpdate = true
-    mats.splice.alphaMap = spliceTex
-    mats.splice.color.set(batWood).multiplyScalar(0.72)
-    mats.splice.needsUpdate = true
     mats.ball.map = ballTex
     mats.ball.needsUpdate = true
     mats.pitch.map = pitch.tex
     mats.pitch.needsUpdate = true
-  }, [mats, stumpTex, batTex, gripTex, gripColor, spliceTex, batWood, ballTex, pitch])
+  }, [mats, stumpTex, ballTex, pitch])
 
   // ---- sound ----
   const audio = useRef(null)
   const live = useRef({})
-  live.current = { batting, line, pace, slowMotion, autoBowl, sound }
+  live.current = { line, pace, slowMotion, autoBowl, sound }
   useEffect(() => {
     if (!sound) {
       audio.current?.dispose()
@@ -504,8 +322,6 @@ export default function Cricket({
       ],
       ball: ballBody(),
       bowledAt: -1,
-      bat: { x: REST_X.leave, tx: REST_X.leave, theta: 0, omega: 0, phase: 'rest', t: 0, from: 0, hold: false, backDur: T_BACK },
-      autoSwingAt: -1,
       settleTimer: 0,
       disturbed: false,
     }
@@ -535,13 +351,7 @@ export default function Cricket({
     w.ball.active = false
     w.ball.pos.set(0, -1, BOWL_Z)
     w.bowledAt = -1
-    w.autoSwingAt = -1
     w.disturbed = false
-    const bt = w.bat
-    bt.phase = 'rest'
-    bt.theta = 0
-    bt.omega = 0
-    bt.tx = REST_X[live.current.batting] ?? 0
   }
 
   // where the ball should go: aim it so that, after pitching, it arrives at
@@ -556,15 +366,13 @@ export default function Cricket({
       ghost.ang.set(0, 0, 0)
       ghost.quat.identity()
       let t = 0
-      let tBat = -1
       while (t < 3) {
         ghost.step(SUB)
         t += SUB
-        if (tBat < 0 && ghost.pos.z >= BAT_Z + FACE_Z) tBat = t
-        if (ghost.pos.z >= 0) return { y: ghost.pos.y, tBat }
+        if (ghost.pos.z >= 0) return { y: ghost.pos.y }
         if (!ghost.active) break
       }
-      return { y: -1, tBat }
+      return { y: -1 }
     }
     // Two releases reach the stumps at any height: a full toss, and one that
     // pitches first. Search only among those that pitch before the crease
@@ -575,17 +383,15 @@ export default function Cricket({
     const vyCrease = (BALL.r - RELEASE_Y + 0.5 * 9.81 * T * T) / T
     let lo = vyCrease - 14
     let hi = vyCrease - 0.05
-    let best = { y: 0, tBat: 0.3 }
     let bestVy = -4
     for (let i = 0; i < 22; i++) {
       const mid = (lo + hi) / 2
       const r = fly(mid)
-      best = r
       bestVy = mid
       if (r.y < target) hi = mid
       else lo = mid
     }
-    return { vy: bestVy, tBat: best.tBat }
+    return bestVy
   }
 
   const doBowl = () => {
@@ -594,7 +400,7 @@ export default function Cricket({
     const L = live.current
     const lineX = { middle: 0, off: 0.085, leg: -0.085 }[L.line] ?? (Math.random() - 0.5) * 0.36
     const v = L.pace / 3.6
-    const { vy, tBat } = aim(lineX, v)
+    const vy = aim(lineX, v)
     const b = w.ball
     b.active = true
     b.still = 0
@@ -604,35 +410,6 @@ export default function Cricket({
     b.quat.identity()
     w.bowledAt = w.t
     w.settleTimer = 0
-    // the batter lines up with the ball
-    w.bat.tx = L.batting === 'leave' ? REST_X.leave : lineX
-    if (L.batting === 'drive') {
-      // the backlift goes up as the ball is released and waits at the top;
-      // the downswing starts so the bat is vertical as the ball arrives
-      const tVert = T_DOWN * Math.sqrt(-BACKLIFT / (FOLLOW - BACKLIFT))
-      const bt = w.bat
-      bt.phase = 'back'
-      bt.t = 0
-      bt.from = bt.theta
-      bt.hold = true
-      bt.backDur = Math.min(T_BACK, Math.max(0.05, tBat - tVert - 0.01))
-      w.autoSwingAt = w.t + Math.max(0, tBat - tVert)
-    }
-  }
-
-  const doSwing = () => {
-    const bt = world.bat
-    if (bt.phase === 'ready') {
-      bt.phase = 'down'
-      bt.t = 0
-      return
-    }
-    if (bt.phase !== 'rest') return
-    bt.phase = 'back'
-    bt.t = 0
-    bt.from = bt.theta
-    bt.hold = false
-    bt.backDur = T_BACK
   }
 
   // commands from the scene's buttons
@@ -643,99 +420,14 @@ export default function Cricket({
   }, [bowl]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (first.current) return
-    doSwing()
-  }, [swing]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (first.current) return
     resetWorld()
   }, [reset]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     first.current = false
     resetWorld()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (world.bat.phase === 'rest' && world.bowledAt < 0) world.bat.tx = REST_X[batting] ?? 0
-  }, [batting, world])
 
   // ---- one physics substep ----
-  const batKinematics = (h) => {
-    const bt = world.bat
-    const prev = bt.theta
-    bt.t += h
-    if (bt.phase === 'back') {
-      const k = clamp01(bt.t / bt.backDur)
-      bt.theta = bt.from + (BACKLIFT - bt.from) * easeInOut(k)
-      if (k >= 1) {
-        bt.phase = bt.hold ? 'ready' : 'down'
-        bt.t = 0
-      }
-    } else if (bt.phase === 'ready') {
-      bt.theta = BACKLIFT
-    } else if (bt.phase === 'down') {
-      const k = clamp01(bt.t / T_DOWN)
-      bt.theta = BACKLIFT + (FOLLOW - BACKLIFT) * k * k
-      if (k >= 1) {
-        bt.phase = 'through'
-        bt.t = 0
-      }
-    } else if (bt.phase === 'through') {
-      const k = clamp01(bt.t / 0.14)
-      bt.theta = FOLLOW + 0.3 * (1 - (1 - k) * (1 - k))
-      if (bt.t > 0.45) {
-        bt.phase = 'return'
-        bt.t = 0
-        bt.from = bt.theta
-      }
-    } else if (bt.phase === 'return') {
-      const k = clamp01(bt.t / 0.6)
-      bt.theta = bt.from * (1 - easeInOut(k))
-      if (k >= 1) bt.phase = 'rest'
-    }
-    bt.omega = (bt.theta - prev) / h
-    bt.x += (bt.tx - bt.x) * (1 - Math.exp(-h * 9))
-  }
-
-  // ball against the bat: the blade as a box in the bat's own frame
-  const batHit = () => {
-    const b = world.ball
-    const bt = world.bat
-    const c = Math.cos(-bt.theta)
-    const s = Math.sin(-bt.theta)
-    const px = b.pos.x - bt.x
-    const py = b.pos.y - PIVOT_Y
-    const pz = b.pos.z - BAT_Z
-    // into the bat frame (undo its turn about x)
-    const ly = py * c - pz * s
-    const lz = py * s + pz * c
-    const qx = THREE.MathUtils.clamp(px, -BLADE_HW, BLADE_HW)
-    const qy = THREE.MathUtils.clamp(ly, -PIVOT_Y, -PIVOT_Y + BLADE_L)
-    const qz = THREE.MathUtils.clamp(lz, FACE_Z, FACE_Z + 0.06)
-    let nx = px - qx
-    let ny = ly - qy
-    let nz = lz - qz
-    const d = Math.hypot(nx, ny, nz)
-    if (d >= BALL.r) return
-    if (d < 1e-6) {
-      nx = 0
-      ny = 0
-      nz = -1
-    } else {
-      nx /= d
-      ny /= d
-      nz /= d
-    }
-    // back to the world
-    const c2 = Math.cos(bt.theta)
-    const s2 = Math.sin(bt.theta)
-    const n = tmp.n.set(nx, ny * c2 - nz * s2, ny * s2 + nz * c2)
-    const cp = tmp.p.set(bt.x + qx, PIVOT_Y + qy * c2 - qz * s2, BAT_Z + qy * s2 + qz * c2)
-    const vb = new THREE.Vector3(bt.omega, 0, 0).cross(new THREE.Vector3(0, cp.y - PIVOT_Y, cp.z - BAT_Z))
-    const speed = collide(b, null, cp, n, 0.48, 0.2, vb)
-    // push out of the blade
-    b.pos.copy(cp).addScaledVector(n, BALL.r + 0.0005)
-    if (speed > 0.5) play('bat', speed / 25)
-  }
-
   // ball against a stump given its axis a→b
   const ballStump = (a, bEnd, target) => {
     const b = world.ball
@@ -787,17 +479,11 @@ export default function Cricket({
   const substep = (h) => {
     const w = world
     w.t += h
-    if (w.autoSwingAt >= 0 && w.t >= w.autoSwingAt) {
-      w.autoSwingAt = -1
-      doSwing()
-    }
-    batKinematics(h)
 
     // the ball
     const b = w.ball
     if (b.active) {
       b.step(h, (_, s) => play('pitch', s / 8))
-      batHit()
       w.stumps.forEach((s) => {
         if (s.planted) ballStump(s.base, s.top(tmp.b).clone(), s)
       })
@@ -879,7 +565,6 @@ export default function Cricket({
 
   // ---- render ----
   const ballRef = useRef()
-  const batRef = useRef()
   const stumpRefs = [useRef(), useRef(), useRef()]
   const bailRefs = [useRef(), useRef()]
   const autoT = useRef(0)
@@ -895,7 +580,7 @@ export default function Cricket({
     const w = world
     // bowl again by itself once everything has come to rest
     if (L.autoBowl) {
-      const busy = w.ball.active || w.free.some((f) => f?.active) || w.bails.some((b) => b.body.active) || w.bat.phase !== 'rest'
+      const busy = w.ball.active || w.free.some((f) => f?.active) || w.bails.some((b) => b.body.active)
       autoT.current = busy ? 0 : autoT.current + real
       if (autoT.current > (w.bowledAt < 0 ? 0.8 : 1.6)) {
         autoT.current = 0
@@ -908,9 +593,6 @@ export default function Cricket({
     ballRef.current.visible = b.active || w.bowledAt >= 0
     ballRef.current.position.copy(b.pos)
     ballRef.current.quaternion.copy(b.quat)
-    // bat
-    batRef.current.position.set(w.bat.x, PIVOT_Y, BAT_Z)
-    batRef.current.rotation.x = w.bat.theta
     // stumps: drawn about their centre of mass either way
     w.stumps.forEach((s, i) => {
       const g = stumpRefs[i].current
@@ -974,18 +656,6 @@ export default function Cricket({
           <mesh geometry={geo.bail} material={mats.bail} castShadow />
         </group>
       ))}
-
-      {/* the bat, held at the hands and swung about them */}
-      <group ref={batRef} {...clickable(doSwing)}>
-        <group position={[0, -PIVOT_Y, 0]}>
-          <mesh geometry={geo.blade} material={mats.blade} castShadow receiveShadow />
-          <mesh geometry={geo.splice} material={mats.splice} position={[0, BLADE_L - 0.052, FACE_Z - 0.0025]} rotation={[0, Math.PI, 0]} />
-          <mesh geometry={geo.handle} material={mats.handle} position={[0, BLADE_L + (BAT_L - BLADE_L) / 2 - 0.02, -0.009]} castShadow />
-          <mesh geometry={geo.twine} material={mats.twine} position={[0, BLADE_L + 0.006, -0.009]} castShadow />
-          <mesh geometry={geo.grip} material={mats.grip} position={[0, BLADE_L + 0.02 + (BAT_L - BLADE_L - 0.04) / 2, -0.009]} castShadow />
-          <mesh geometry={geo.gripEnd} material={mats.grip} position={[0, BAT_L - 0.02, -0.009]} scale={[1, 0.6, 1]} castShadow />
-        </group>
-      </group>
 
       {/* the ball */}
       <mesh ref={ballRef} geometry={geo.ball} material={mats.ball} castShadow visible={false} />

@@ -204,6 +204,7 @@ import LighterModel from '../lib/LighterModel.jsx'
 import InkPadModel from '../lib/InkPadModel.jsx'
 import StampModel from '../lib/StampModel.jsx'
 import CricketModel from '../lib/CricketModel.jsx'
+import CricketBatModel from '../lib/CricketBatModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
 import PenModel from '../lib/PenModel.jsx'
 import LorryModel from '../lib/LorryModel.jsx'
@@ -213,6 +214,7 @@ import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import CloudModel from '../lib/CloudModel.jsx'
+import CloudSeaModel from '../lib/CloudSeaModel.jsx'
 import DiceModel from '../lib/DiceModel.jsx'
 import PuzzleCubeModel from '../lib/PuzzleCubeModel.jsx'
 import RingModel from '../lib/RingModel.jsx'
@@ -3343,23 +3345,41 @@ const ALL_COMPONENTS = [
     category: '3D & Materials',
     style: 'Everyday objects',
     isNew: true,
-    description: 'Stumps, bails, bat and ball with real rigid-body physics. Bowl and leave it: the stump is driven back in the soil or uprooted, and the bails jump their grooves and tumble. Swing in time and willow meets leather.',
+    description: 'Three stumps and two bails with real rigid-body physics. Bowl and the ball pitches and comes on to the stumps: the struck stump is driven back in the soil or uprooted at pace, and the bails jump their grooves and tumble.',
     controls: [
-      { name: 'batting', type: 'select', options: ['leave', 'block', 'drive'], default: 'leave' },
       { name: 'line', type: 'select', options: ['middle', 'off', 'leg', 'random'], default: 'middle' },
       { name: 'pace', type: 'range', min: 60, max: 160, step: 5, default: 110, unit: 'km/h' },
       { name: 'slowMotion', type: 'range', min: 0.05, max: 1, step: 0.05, default: 0.3 },
       { name: 'autoBowl', type: 'toggle', default: false },
       { name: 'ball', type: 'select', options: ['red', 'white', 'pink'], default: 'red' },
       { name: 'stumpWood', type: 'color', default: '#c99447' },
-      { name: 'batWood', type: 'color', default: '#e4cba0' },
-      { name: 'gripColor', type: 'color', default: '#f4f4f2' },
       { name: 'sound', type: 'toggle', default: false },
       { name: 'autoRotate', type: 'toggle', default: false },
     ],
     preview: (p) => <CricketModel {...p} height="100%" />,
     fill: true,
     files: ['CricketModel.jsx', 'cricket/CricketScene.jsx', 'cricket/Cricket.jsx', 'cricket/physics.js', 'cricket/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'cricket-bat',
+    name: 'Cricket Bat',
+    category: '3D & Materials',
+    style: 'Everyday objects',
+    isNew: true,
+    description: 'A solid English willow bat: cambered face, spine, rolled edges, spliced cane handle and rubber grip. Pick it up and swing it through the ball, drop it and it lands on an edge and rocks to rest, or knock it over and stand it back up.',
+    controls: [
+      { name: 'wood', type: 'color', default: '#e6cfa3' },
+      { name: 'grains', type: 'range', min: 4, max: 16, step: 1, default: 10 },
+      { name: 'gripColor', type: 'color', default: '#f4f4f2' },
+      { name: 'ball', type: 'toggle', default: true },
+      { name: 'ballColor', type: 'color', default: '#8f1a17' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <CricketBatModel {...p} height="100%" />,
+    fill: true,
+    files: ['CricketBatModel.jsx', 'bat/BatScene.jsx', 'bat/Bat.jsx', 'bat/physics.js', 'bat/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
@@ -3660,12 +3680,47 @@ const ALL_COMPONENTS = [
       { name: 'detail', type: 'range', min: 0, max: 2, step: 0.01, default: 1 },
       { name: 'wind', type: 'range', min: 0, max: 5, step: 0.1, default: 1 },
       { name: 'seed', type: 'range', min: 1, max: 20, step: 1, default: 3 },
-      { name: 'quality', type: 'range', min: 40, max: 160, step: 1, default: 90 },
+      { name: 'quality', type: 'range', min: 32, max: 140, step: 1, default: 72 },
       { name: 'autoRotate', type: 'toggle', default: true },
     ],
     preview: (p) => <CloudModel {...p} height="100%" />,
     fill: true,
-    files: ['CloudModel.jsx', 'cloud/CloudScene.jsx', 'cloud/Cloud.jsx', 'cloud/cloudShader.js', 'cloud/noise.js'],
+    files: ['CloudModel.jsx', 'cloud/CloudScene.jsx', 'cloud/Cloud.jsx', 'cloud/cloudShader.js', 'cloud/noise.js', 'cloud/sun.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'cloud-sea',
+    name: 'Cloud Sea',
+    category: '3D & Materials',
+    style: 'Nature & world',
+    isNew: true,
+    description: 'The view from above the clouds: an endless cumulus deck rolling past below, a thin high overcast above and the sun breaking through between them. Raymarched with the same volume lighting as Cloud.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Breakthrough', values: { elevation: 10, azimuth: 200, exposure: 0.42, coverage: 0.9, density: 1, ceiling: 0.75, sunIntensity: 1 } },
+          { name: 'Clear above', values: { elevation: 25, azimuth: 160, exposure: 0.4, coverage: 0.85, density: 1, ceiling: 0, sunIntensity: 1 } },
+          { name: 'Golden hour', values: { elevation: 3, azimuth: 190, exposure: 0.6, coverage: 0.95, density: 1.1, ceiling: 0.35, sunIntensity: 1.3 } },
+          { name: 'Broken', values: { elevation: 35, azimuth: 150, exposure: 0.4, coverage: 0.65, density: 1.2, ceiling: 0.2, sunIntensity: 1 } },
+        ],
+      },
+      { name: 'elevation', type: 'range', min: 0, max: 60, step: 0.5, default: 10, unit: '°' },
+      { name: 'azimuth', type: 'range', min: -180, max: 360, step: 1, default: 200, unit: '°' },
+      { name: 'exposure', type: 'range', min: 0.1, max: 1.5, step: 0.01, default: 0.42 },
+      { name: 'sunIntensity', type: 'range', min: 0.2, max: 2, step: 0.05, default: 1 },
+      { name: 'coverage', type: 'range', min: 0.4, max: 1.2, step: 0.01, default: 0.9 },
+      { name: 'density', type: 'range', min: 0.2, max: 3, step: 0.01, default: 1 },
+      { name: 'detail', type: 'range', min: 0, max: 2, step: 0.01, default: 1 },
+      { name: 'ceiling', type: 'range', min: 0, max: 1, step: 0.01, default: 0.75 },
+      { name: 'speed', type: 'range', min: 0, max: 30, step: 0.5, default: 6 },
+      { name: 'quality', type: 'range', min: 24, max: 120, step: 1, default: 56 },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <CloudSeaModel {...p} height="100%" />,
+    fill: true,
+    files: ['CloudSeaModel.jsx', 'cloud/CloudSeaScene.jsx', 'cloud/CloudSea.jsx', 'cloud/cloudSeaShader.js', 'cloud/noise.js', 'cloud/sun.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
