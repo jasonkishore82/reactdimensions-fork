@@ -7,7 +7,7 @@ import Cloud from './Cloud.jsx'
 export default function CloudScene({ autoRotate = true, ...props }) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', touchAction: 'none' }}>
-      <Canvas dpr={[1, 1.25]} camera={{ position: [-30, 10, 95], fov: 45, near: 0.5, far: 30000 }} gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}>
+      <Canvas dpr={[1, 1.5]} camera={{ position: [-30, 10, 95], fov: 45, near: 0.5, far: 30000 }} gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}>
         <Cloud {...props} />
         <OrbitControls makeDefault enablePan={false} target={[0, 22, 0]} autoRotate={autoRotate} autoRotateSpeed={0.25} minDistance={20} maxDistance={260} minPolarAngle={0.35} maxPolarAngle={2.1} />
       </Canvas>

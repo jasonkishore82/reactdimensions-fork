@@ -121,7 +121,8 @@ export default function StencilSpray({
     let user = null
     const frame = (now) => {
       t0 ||= now
-      const dt = Math.min(0.05, (now - (last || now)) / 1000)
+      const rdt = Math.min(0.5, (now - (last || now)) / 1000)
+      const dt = Math.min(0.05, rdt)
       last = now
       const t = now - t0
       if (t < passes * passMs && !user) {
@@ -130,7 +131,8 @@ export default function StencilSpray({
         const f = p - k
         const x = W * (0.06 + 0.88 * (k % 2 ? 1 - f : f))
         const y = H * (0.28 + (0.44 * (k + f * 0.6)) / passes)
-        spray(x, y, H * 0.16, 260)
+        // droplets per second, not per frame, so the coat is the same at any frame rate
+        spray(x, y, H * 0.16, Math.round(260 * rdt * 60))
       } else if (!liftAt && !user && t > passes * passMs + 500) {
         liftAt = now
         lifted = true
@@ -143,7 +145,7 @@ export default function StencilSpray({
           { duration: 1100, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' },
         )
       }
-      if (user) spray(user.x, user.y, H * 0.12, 160)
+      if (user) spray(user.x, user.y, H * 0.12, Math.round(160 * rdt * 60))
       // drips run down and slow as the paint thins
       for (const r of runs) {
         if (r.done >= r.len) continue

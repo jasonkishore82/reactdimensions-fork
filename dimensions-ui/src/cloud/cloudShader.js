@@ -4,7 +4,7 @@
 // march toward the sun (Beer's law with a multiple-scattering approximation
 // and a two-lobe phase function, for the silver lining), plus sky light from
 // above and a dim bounce from below, integrated energy-conservingly.
-export const MAX_PUFFS = 24
+
 
 export const cloudVertex = /* glsl */ `
 varying vec3 vWorld;
@@ -19,14 +19,12 @@ export const cloudFragment = /* glsl */ `
 precision highp float;
 precision highp sampler3D;
 
-#define MAX_PUFFS ${MAX_PUFFS}
 #define PI 3.14159265
 
 uniform sampler3D uShape;
 uniform sampler3D uDetail;
 uniform samplerCube uEnv;
-uniform vec4 uPuffs[MAX_PUFFS];
-uniform int uCount;
+uniform sampler3D uSdf;
 uniform vec3 uBoxMin;
 uniform vec3 uBoxMax;
 uniform float uScale;
@@ -47,19 +45,11 @@ float remap(float v, float l0, float h0, float l1, float h1) {
   return l1 + (v - l0) * (h1 - l1) / (h0 - l0);
 }
 
-float smin(float a, float b, float k) {
-  float h = max(k - abs(a - b), 0.0) / k;
-  return min(a, b) - h * h * k * 0.25;
-}
-
+// The puffs' smooth union is baked into a 3D texture over the box (see
+// Cloud.jsx), so a lookup costs one fetch instead of a loop over every puff.
 float shapeSDF(vec3 p) {
-  float d = 1e5;
-  for (int i = 0; i < MAX_PUFFS; i++) {
-    if (i >= uCount) break;
-    vec4 s = uPuffs[i];
-    d = smin(d, length(p - s.xyz) - s.w, uScale * 0.4);
-  }
-  return d;
+  vec3 uvw = (p - uBoxMin) / (uBoxMax - uBoxMin);
+  return (textureLod(uSdf, uvw, 0.0).r * 2.0 - 1.0) * uScale;
 }
 
 vec2 boxHit(vec3 ro, vec3 rd) {
@@ -79,7 +69,7 @@ float heightFrac(vec3 p) {
 float density(vec3 p, float sdf, bool hi) {
   float hf = heightFrac(p);
   // soft field from the silhouette: 1 well inside, 0 a little outside
-  float field = smoothstep(0.22 * uScale, -0.6 * uScale, sdf);
+  float field = smoothstep(0.12 * uScale, -0.4 * uScale, sdf);
   // cumulus have flat, sharp bases at the condensation level
   field *= smoothstep(uBase, uBase + 0.1 * uScale, p.y);
   // and round, slightly thinner tops
@@ -87,7 +77,7 @@ float density(vec3 p, float sdf, bool hi) {
   if (field <= 0.0) return 0.0;
 
   vec3 wind = vec3(uTime * uWind, 0.0, uTime * uWind * 0.35);
-  vec4 n = texture(uShape, (p + wind) / (uScale * 2.4));
+  vec4 n = textureLod(uShape, (p + wind) / (uScale * 1.8), 0.0);
   float wfbm = n.g * 0.625 + n.b * 0.25 + n.a * 0.125;
   float body = remap(n.r, wfbm - 1.0, 1.0, 0.0, 1.0);
   float cov = clamp(field * uCoverage, 0.0, 1.0);
@@ -95,12 +85,12 @@ float density(vec3 p, float sdf, bool hi) {
   if (!hi || d <= 0.0) return d;
 
   // billowing detail: rises and churns faster than the body drifts
-  vec3 q = (p + wind * 1.6 + vec3(0.0, uTime * uWind * 0.8, 0.0)) / (uScale * 0.42);
-  vec3 dn = texture(uDetail, q).rgb;
+  vec3 q = (p + wind * 1.6 + vec3(0.0, uTime * uWind * 0.8, 0.0)) / (uScale * 0.3);
+  vec3 dn = textureLod(uDetail, q, 0.0).rgb;
   float dfbm = dn.r * 0.625 + dn.g * 0.25 + dn.b * 0.125;
   // wispy at the base, cauliflower-like higher up
   float m = mix(dfbm, 1.0 - dfbm, clamp(hf * 4.0, 0.0, 1.0));
-  return clamp(remap(d, m * 0.4 * uDetailAmt, 1.0, 0.0, 1.0), 0.0, 1.0);
+  return clamp(remap(d, m * 0.45 * uDetailAmt, 1.0, 0.0, 1.0), 0.0, 1.0);
 }
 
 float hg(float c, float g) {
@@ -118,12 +108,12 @@ float sunDepth(vec3 p) {
   float od = 0.0;
   float step = uScale * 0.06;
   float t = step * 0.5;
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     vec3 q = p + uSunDir * t;
     float s = shapeSDF(q);
     if (s < 0.25 * uScale) od += density(q, s, false) * step;
     t += step;
-    step *= 1.55;
+    step *= 1.7;
   }
   return od * uDensity;
 }
@@ -141,9 +131,9 @@ void main() {
   float t1 = tb.y;
   if (t1 <= t0) discard;
 
-  vec3 skyUp = texture(uEnv, vec3(0.0, 1.0, 0.0)).rgb;
+  vec3 skyUp = textureLod(uEnv, vec3(0.0, 1.0, 0.0), 0.0).rgb;
   vec3 skyH = vec3(0.0);
-  for (int i = 0; i < 4; i++) skyH += texture(uEnv, uSkyDirs[i]).rgb;
+  for (int i = 0; i < 4; i++) skyH += textureLod(uEnv, uSkyDirs[i], 0.0).rgb;
   skyH *= 0.25;
   vec3 ground = skyH * vec3(0.18, 0.22, 0.26); // dim bounce off the sea below
 
@@ -158,16 +148,12 @@ void main() {
   vec3 col = vec3(0.0);
   float T = 1.0;
 
-  for (int i = 0; i < 256; i++) {
+  for (int i = 0; i < 160; i++) {
     if (t > t1 || T < 0.01) break;
     vec3 p = ro + rd * t;
     float sdf = shapeSDF(p);
     // empty space: jump ahead by the distance to the silhouette
-    if (sdf > 0.3 * uScale) {
-      t += max(sdf - 0.25 * uScale, baseStep);
-      continue;
-    }
-    float d = density(p, sdf, true);
+    float d = sdf > 0.3 * uScale ? 0.0 : density(p, sdf, true);
     if (d > 0.002) {
       float sig = d * uDensity;
       float od = sunDepth(p);
@@ -177,13 +163,13 @@ void main() {
       float powder = 1.0 - exp(-sig * uScale * 0.35);
       sun *= mix(1.0, powder, 0.55 * (0.5 - 0.5 * cosT) + 0.25);
       float hf = heightFrac(p);
-      vec3 amb = skyUp * mix(0.25, 1.0, hf) * 0.9 + ground * (1.0 - hf);
-      vec3 S = (uSunColor * sun * 4.0 * PI + amb) * sig;
+      vec3 amb = skyUp * mix(0.2, 0.75, hf) + ground * (1.0 - hf);
+      vec3 S = (uSunColor * sun * 7.0 * PI + amb) * sig;
       float tr = exp(-sig * baseStep);
       col += T * (S - S * tr) / max(sig, 1e-5);
       T *= tr;
     }
-    t += baseStep;
+    t += sdf > 0.3 * uScale ? max(sdf - 0.25 * uScale, baseStep) : baseStep;
   }
 
   if (T > 0.995) discard;
@@ -192,7 +178,5 @@ void main() {
   col = mix(col, skyH * (1.0 - T), haze);
 
   gl_FragColor = vec4(col, 1.0 - T);
-  #include <tonemapping_fragment>
-  #include <colorspace_fragment>
 }
 `
