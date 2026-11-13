@@ -1,0 +1,100 @@
+import { useEffect, useRef } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
+import { ContactShadows, Environment, Lightformer, OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
+import Dumbbell from './Dumbbell.jsx'
+
+// soft studio, like a product shot: a big overhead box and two strip lights
+function Studio() {
+  return (
+    <Environment resolution={256}>
+      <color attach="background" args={['#a8a8a8']} />
+      <Lightformer form="rect" intensity={2.2} color="#ffffff" position={[0, 9, 0]} rotation-x={Math.PI / 2} scale={[12, 8, 1]} />
+      <Lightformer form="rect" intensity={1.8} color="#ffffff" position={[-6, 3, 4]} rotation-y={Math.PI / 3} scale={[3, 9, 1]} />
+      <Lightformer form="rect" intensity={1.4} color="#ffffff" position={[6, 3, 3]} rotation-y={-Math.PI / 3} scale={[3, 9, 1]} />
+      <Lightformer form="rect" intensity={0.8} color="#ffffff" position={[0, 2, -7]} scale={[10, 4, 1]} />
+    </Environment>
+  )
+}
+
+const TARGET = new THREE.Vector3(0, 0.07, 0)
+
+function Rig() {
+  const { camera, size } = useThree()
+  useEffect(() => {
+    const aspect = size.width / size.height
+    const tan = Math.tan(THREE.MathUtils.degToRad(15))
+    const span = 0.72
+    const dist = Math.max(span / 2 / tan, span / 2 / (tan * aspect)) * 1.05
+    camera.position.copy(new THREE.Vector3(0.42, 0.62, 1).normalize().multiplyScalar(dist).add(TARGET))
+    camera.lookAt(TARGET)
+  }, [camera, size.width, size.height])
+  return null
+}
+
+const btn = {
+  pointerEvents: 'auto',
+  font: '600 12px/1 ui-monospace, Menlo, monospace',
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  padding: '11px 16px',
+  borderRadius: 999,
+  border: 'none',
+  background: '#1c1a16',
+  color: '#f4f1ea',
+  cursor: 'pointer',
+  boxShadow: '0 6px 18px rgba(0,0,0,.18)',
+}
+
+export default function DumbbellScene({ background = '#e4e4e4', autoRotate = false, ...props }) {
+  const pair = useRef()
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.code === 'Space' || e.code === 'Enter') && e.target === document.body) {
+        e.preventDefault()
+        pair.current?.drop()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', touchAction: 'none', background, userSelect: 'none', WebkitUserSelect: 'none' }}>
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        camera={{ position: [0.5, 0.7, 1.4], fov: 30, near: 0.01, far: 50 }}
+        gl={{ antialias: true, toneMapping: THREE.NeutralToneMapping, toneMappingExposure: 1.0 }}
+      >
+        <color attach="background" args={[background]} />
+        <directionalLight position={[-0.8, 3, 1.2]} intensity={0.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.00005} shadow-normalBias={0.0015} shadow-camera-left={-0.9} shadow-camera-right={0.9} shadow-camera-top={0.9} shadow-camera-bottom={-0.9} shadow-camera-near={0.5} shadow-camera-far={6} />
+        <Studio />
+        <Dumbbell ref={pair} {...props} />
+        <mesh rotation-x={-Math.PI / 2} receiveShadow>
+          <planeGeometry args={[20, 20]} />
+          <shadowMaterial opacity={0.1} />
+        </mesh>
+        <ContactShadows position={[0, 0.0005, 0]} opacity={0.55} scale={3} blur={1.8} far={0.4} resolution={1024} />
+        <Rig />
+        <OrbitControls makeDefault enablePan={false} target={TARGET} autoRotate={autoRotate} autoRotateSpeed={0.5} minDistance={0.3} maxDistance={4} maxPolarAngle={1.5} />
+      </Canvas>
+
+      <div style={{ position: 'absolute', top: 14, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 8, pointerEvents: 'none' }}>
+        <button onClick={() => pair.current?.drop()} style={btn}>
+          Drop
+        </button>
+        <button onClick={() => pair.current?.stand()} style={{ ...btn, background: 'rgba(255,255,255,0.78)', color: '#2a2925' }}>
+          Stand up
+        </button>
+        <button onClick={() => pair.current?.lay()} style={{ ...btn, background: 'rgba(255,255,255,0.78)', color: '#2a2925' }}>
+          Lay down
+        </button>
+      </div>
+      <div style={{ position: 'absolute', left: 12, right: 12, bottom: 12, textAlign: 'center', pointerEvents: 'none', font: '500 11px/1.5 ui-monospace, Menlo, monospace', letterSpacing: '0.04em', color: '#4a4844' }}>
+        Drag a dumbbell to pick it up by that point, let go to drop or throw it · click one to roll it · drag the background to look
+      </div>
+    </div>
+  )
+}
