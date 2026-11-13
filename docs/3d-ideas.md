@@ -28,6 +28,7 @@ dispose of its geometry, materials and textures.
 | ✓ | Dice (extra: rigid-body physics, no physics library) |
 | ✓ | Ladder (extra: friction statics against a wall, checked against the textbook slip angle) |
 | ✓ | Shirt (extra: cloth simulation, buttons as constraints, oxford, poplin, linen and denim) |
+| ✓ | Earbuds (extra: a magnet-and-detent lid, buds that drop as rigid bodies and dock by magnet, charging) |
 
 Already in the library but not on this list: clear-coat card, pickup, snake,
 turntable, vinyl record, sunglasses, watch, laptop, glass bottle, TV, phone,
