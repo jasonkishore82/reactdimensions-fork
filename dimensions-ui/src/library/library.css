@@ -348,6 +348,12 @@
      over the sidebar drawer or menus */
   isolation: isolate;
 }
+/* UI components are whole app screens: give them a screen-sized stage, and
+   the page drops the "On this page" column so the preview can run wider */
+.lib-stage.screen { height: clamp(600px, 84vh, 960px); }
+.lib.lib-wide { grid-template-columns: var(--side-w) minmax(0, 1fr); }
+.lib-wide .lib-toc { display: none; }
+.lib-wide .lib-main { max-width: 1400px; }
 .lib-stage-inner { position: absolute; inset: 0; display: grid; place-items: center; padding: 48px 24px; }
 .lib-stage.fill .lib-stage-inner { padding: 0; display: block; }
 /* demo content inside the stage keeps the light theme (white stage, dark ink), whichever theme the page is in */

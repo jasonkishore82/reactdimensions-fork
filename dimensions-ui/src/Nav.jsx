@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
+import { BrandMark } from './BrandLogo.jsx'
 
 export function Logo() {
   return (
     <Link className="logo" to="/" aria-label="React Dimensions home">
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M7 9v14M25 9v14M7 16h18" />
-        <path className="arrow" d="M11 13.5 7.5 16 11 18.5M21 13.5l3.5 2.5-3.5 2.5" />
-      </svg>
+      <BrandMark words={false} />
       <span>
         React <b>Dimensions</b>
       </span>

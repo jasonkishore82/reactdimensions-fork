@@ -672,7 +672,7 @@ export default function Library() {
   const typeOf = (c) => (c.type === 'range' ? 'number' : c.type === 'toggle' ? 'boolean' : c.type === 'select' ? c.options.map((o) => `'${o}'`).join(' | ') : 'string')
 
   return (
-    <div className="lib">
+    <div className={`lib${comp.category === 'UI' ? ' lib-wide' : ''}`}>
       <Sidebar active={slug} open={drawer} onClose={() => setDrawer(false)} favs={favs} />
 
       <div className="lib-main">
@@ -734,7 +734,7 @@ export default function Library() {
         {tab === 'preview' ? (
           <>
             <div className="stage-shell" id="preview">
-              <div className={`lib-stage${comp.fill ? ' fill' : ''}`} style={{ maxWidth: WIDTHS[width] }}>
+              <div className={`lib-stage${comp.fill ? ' fill' : ''}${comp.category === 'UI' ? ' screen' : ''}`} style={{ maxWidth: WIDTHS[width] }}>
                 <div className="lib-stage-inner" key={`${slug}-${reload}`}>
                   {comp.preview(props, (patch) => setValues((s) => ({ ...s, ...patch })))}
                 </div>
