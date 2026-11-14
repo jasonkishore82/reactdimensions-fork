@@ -85,24 +85,24 @@ export function labelTexture({ brand = 'RD', capacity = '700', finish = 'silver'
   // brand, top left of the hub
   g.fillStyle = ink
   g.textBaseline = 'alphabetic'
-  g.font = `700 ${0.0066 * k}px ${SERIF}`
+  g.font = `700 ${0.0072 * k}px ${SERIF}`
   g.textAlign = 'center'
   if ('letterSpacing' in g) g.letterSpacing = `${0.0011 * k}px`
-  g.fillText(brand.toUpperCase().slice(0, 8), cx - 0.0365 * k, cy - 0.0015 * k)
+  g.fillText(brand.toUpperCase().slice(0, 8), cx - 0.0395 * k, cy - 0.002 * k)
   if ('letterSpacing' in g) g.letterSpacing = '0px'
 
   // the format, big italic with a rose-to-gold ink
-  g.font = `italic 400 ${0.0145 * k}px ${SERIF}`
-  const fg = g.createLinearGradient(cx - 0.055 * k, cy, cx - 0.018 * k, cy + 0.012 * k)
+  g.font = `italic 400 ${0.0118 * k}px ${SERIF}`
+  const fg = g.createLinearGradient(cx - 0.056 * k, cy, cx - 0.024 * k, cy + 0.012 * k)
   fg.addColorStop(0, '#c97b93')
   fg.addColorStop(0.5, '#e1a2b4')
   fg.addColorStop(1, '#d8b48c')
   g.fillStyle = fg
-  g.fillText('CD-R', cx - 0.0365 * k, cy + 0.0135 * k)
+  g.fillText('CD-R', cx - 0.0395 * k, cy + 0.0125 * k)
   // a thin darker edge on the letters, as a second print pass
   g.lineWidth = 0.00012 * k
   g.strokeStyle = 'rgba(150,80,100,0.6)'
-  g.strokeText('CD-R', cx - 0.0365 * k, cy + 0.0135 * k)
+  g.strokeText('CD-R', cx - 0.0395 * k, cy + 0.0125 * k)
 
   // a "Recordable" badge of our own, top right
   const bx = cx + 0.0365 * k
@@ -214,7 +214,7 @@ export function hubTexture({ seed = 3 }) {
   g.font = `500 ${0.0009 * k}px ui-monospace, Menlo, monospace`
   g.fillStyle = 'rgba(70,72,78,0.4)'
   a = -Math.PI * 0.32
-  for (const ch of 'IFPI L201  ·  52X') {
+  for (const ch of 'SID L201  ·  52X') {
     g.save()
     g.translate(cx + Math.cos(a) * radius, cx + Math.sin(a) * radius)
     g.rotate(a + Math.PI / 2)

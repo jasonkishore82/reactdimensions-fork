@@ -255,6 +255,7 @@ import PickupModel from '../lib/PickupModel.jsx'
 import SnakeModel from '../lib/SnakeModel.jsx'
 import TurntableModel from '../lib/TurntableModel.jsx'
 import VinylRecord from '../lib/VinylRecord.jsx'
+import CompactDiscModel from '../lib/CompactDiscModel.jsx'
 import SunglassesModel from '../lib/SunglassesModel.jsx'
 import WatchModel from '../lib/WatchModel.jsx'
 import LaptopModel from '../lib/LaptopModel.jsx'
@@ -274,6 +275,9 @@ import InkPadModel from '../lib/InkPadModel.jsx'
 import StampModel from '../lib/StampModel.jsx'
 import CricketModel from '../lib/CricketModel.jsx'
 import CricketBatModel from '../lib/CricketBatModel.jsx'
+import BowlingMachineModel from '../lib/BowlingMachineModel.jsx'
+import BowlingPinModel from '../lib/BowlingPinModel.jsx'
+import FaceBoardModel from '../lib/FaceBoardModel.jsx'
 import KnifeModel from '../lib/KnifeModel.jsx'
 import PistolModel from '../lib/PistolModel.jsx'
 import ColorCardsModel from '../lib/ColorCardsModel.jsx'
@@ -348,7 +352,7 @@ import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 // Loaded on demand: each file is its own small chunk, fetched the first time
 // a page needs it (the eager version put 3.5 MB of source text in the
 // main bundle that every visit downloaded).
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pistol/*.{js,jsx}', '../deck/*.{js,jsx}','../pitch/*.{js,jsx}', '../tenniscourt/*.{js,jsx}', '../badmintoncourt/*.{js,jsx}', '../gameboard/*.{js,jsx}', '../chessboard/*.{js,jsx}', '../playingcards/*.{js,jsx}', '../carrom/*.{js,jsx}', '../arrow/*.{js,jsx}', '../archery/*.{js,jsx}', '../pokerchips/*.{js,jsx}', '../spinner/*.{js,jsx}', '../electric/*.{js,jsx}', '../wineglass/*.{js,jsx}', '../roulette/*.{js,jsx}', '../poker/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../airliner/*.{js,jsx}', '../suv/*.{js,jsx}', '../helicopter/*.{js,jsx}','../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../cloud/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../cd/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pistol/*.{js,jsx}', '../deck/*.{js,jsx}','../pitch/*.{js,jsx}', '../tenniscourt/*.{js,jsx}', '../badmintoncourt/*.{js,jsx}', '../gameboard/*.{js,jsx}', '../chessboard/*.{js,jsx}', '../playingcards/*.{js,jsx}', '../carrom/*.{js,jsx}', '../arrow/*.{js,jsx}', '../archery/*.{js,jsx}', '../pokerchips/*.{js,jsx}', '../spinner/*.{js,jsx}', '../electric/*.{js,jsx}', '../inkpad/*.{js,jsx}', '../stamp/*.{js,jsx}', '../cricket/*.{js,jsx}', '../bat/*.{js,jsx}', '../bowler/*.{js,jsx}', '../pin/*.{js,jsx}', '../faceboard/*.{js,jsx}', '../tennisball/*.{js,jsx}', '../cricketball/*.{js,jsx}', '../wineglass/*.{js,jsx}', '../roulette/*.{js,jsx}', '../poker/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../airliner/*.{js,jsx}', '../suv/*.{js,jsx}', '../helicopter/*.{js,jsx}','../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../cloud/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
 })
@@ -2881,6 +2885,31 @@ const ALL_COMPONENTS = [
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
+    slug: 'compact-disc',
+    name: 'Compact Disc',
+    category: '3D & Materials',
+    style: 'Music & audio',
+    isNew: true,
+    description: 'A recordable CD to the real dimensions: clear polycarbonate, a dye and mirror layer and a printed label. Its spiral track splits light into true rainbows; spin it, flip it and burn 700 MB onto it.',
+    controls: [
+      { name: 'view', type: 'select', options: ['Top', 'Front', 'Front-L', 'Front-R', 'Back', 'Low', 'Edge', 'A · Hub', 'B · Label', 'C · Edge', 'D · Rainbow'], default: 'Front' },
+      { name: 'side', type: 'select', options: ['label', 'data'], default: 'label' },
+      { name: 'brand', type: 'text', default: 'RD', maxLength: 8 },
+      { name: 'capacity', type: 'text', default: '700', maxLength: 4 },
+      { name: 'finish', type: 'select', options: ['silver', 'white', 'gold'], default: 'silver' },
+      { name: 'dye', type: 'select', options: ['cyanine', 'phthalo', 'azo'], default: 'cyanine' },
+      { name: 'burned', type: 'range', min: 0, max: 1, step: 0.05, default: 0 },
+      { name: 'rainbow', type: 'range', min: 0, max: 2, step: 0.1, default: 1 },
+      { name: 'dimensions', type: 'toggle', default: false },
+      { name: 'ambientOcclusion', type: 'toggle', default: true },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <CompactDiscModel {...p} height="100%" />,
+    fill: true,
+    files: ['CompactDiscModel.jsx', 'cd/DiscScene.jsx', 'cd/Disc.jsx', 'cd/textures.js', 'gameboard/stage.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing', 'postprocessing'],
+  },
+  {
     slug: 'sunglasses',
     name: 'Sunglasses',
     category: '3D & Materials',
@@ -3510,6 +3539,76 @@ const ALL_COMPONENTS = [
     preview: (p) => <CricketBatModel {...p} height="100%" />,
     fill: true,
     files: ['CricketBatModel.jsx', 'bat/BatScene.jsx', 'bat/Bat.jsx', 'bat/physics.js', 'bat/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'bowling-machine',
+    name: 'Bowling Machine',
+    category: '3D & Materials',
+    style: 'Sports & fitness',
+    isNew: true,
+    description: 'A one-wheel cricket bowling machine fed by a spiral hopper. Balls roll down the spiral, drop through the gate onto the spinning wheel and fly down the pitch with real drag, Magnus swing and bounce. Fires the library tennis and cricket balls.',
+    controls: [
+      { name: 'ball', type: 'select', options: ['tennis', 'cricket'], default: 'tennis' },
+      { name: 'speed', type: 'range', min: 30, max: 150, step: 5, default: 70, unit: 'km/h' },
+      { name: 'elevation', type: 'range', min: -8, max: 12, step: 0.5, default: 0, unit: '°' },
+      { name: 'line', type: 'range', min: -6, max: 6, step: 0.5, default: 0, unit: '°' },
+      { name: 'delivery', type: 'select', options: ['backspin', 'outswing', 'inswing', 'offspin', 'legspin'], default: 'backspin' },
+      { name: 'interval', type: 'range', min: 1.5, max: 8, step: 0.5, default: 3, unit: 's' },
+      { name: 'power', type: 'toggle', default: true },
+      { name: 'autoFeed', type: 'toggle', default: true },
+      { name: 'recycle', type: 'toggle', default: true },
+      { name: 'bodyColor', type: 'color', default: '#d4161b' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    // `set` lets the scene update the controls (the power switch on the motor).
+    preview: (p, set) => <BowlingMachineModel {...p} onChange={set} height="100%" />,
+    fill: true,
+    files: ['BowlingMachineModel.jsx', 'bowler/BowlingMachineScene.jsx', 'bowler/BowlingMachine.jsx', 'bowler/audio.js', 'tennisball/TennisBall.jsx', 'tennisball/physics.js', 'tennisball/audio.js', 'cricketball/CricketBall.jsx'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'bowling-pin',
+    name: 'Bowling Pin',
+    category: '3D & Materials',
+    style: 'Sports & fitness',
+    isNew: true,
+    description: 'A tenpin to the USBC specification with a glossy Surlyn coat and red neck stripes, as a real rigid body: tap it and it wobbles, press longer and it goes over, pick it up and throw it, or rack all ten on an oiled maple lane and bowl a strike.',
+    controls: [
+      { name: 'pins', type: 'select', options: ['1', '10'], default: '1' },
+      { name: 'finish', type: 'select', options: ['classic', 'black', 'gold', 'blue'], default: 'classic' },
+      { name: 'wear', type: 'range', min: 0, max: 1, step: 0.05, default: 0.25 },
+      { name: 'ball', type: 'select', options: ['cosmic', 'ruby', 'pearl', 'emerald'], default: 'cosmic' },
+      { name: 'speed', type: 'range', min: 4, max: 10, step: 0.25, default: 8, unit: 'm/s' },
+      { name: 'reflections', type: 'toggle', default: true },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <BowlingPinModel {...p} height="100%" />,
+    fill: true,
+    files: ['BowlingPinModel.jsx', 'pin/BowlingPinScene.jsx', 'pin/BowlingPin.jsx', 'pin/shape.js', 'pin/physics.js', 'pin/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'face-board',
+    name: 'Face Board',
+    category: '3D & Materials',
+    style: 'Physics & play',
+    isNew: true,
+    description: 'A face-guessing board of hinged flip frames, empty until you fill them with your own photos: add them, or drop image files onto the board or onto one frame. Each frame tips forward on a real hinge, lands face down on the tray and can be flicked back up.',
+    controls: [
+      { name: 'rows', type: 'range', min: 1, max: 5, step: 1, default: 3 },
+      { name: 'cols', type: 'range', min: 2, max: 10, step: 1, default: 8 },
+      { name: 'labels', type: 'toggle', default: true },
+      { name: 'trayColor', type: 'color', default: '#2b62d9' },
+      { name: 'frameColor', type: 'color', default: '#f3f2ee' },
+      { name: 'sound', type: 'toggle', default: false },
+      { name: 'autoRotate', type: 'toggle', default: false },
+    ],
+    preview: (p) => <FaceBoardModel {...p} height="100%" />,
+    fill: true,
+    files: ['FaceBoardModel.jsx', 'faceboard/FaceBoardScene.jsx', 'faceboard/FaceBoard.jsx', 'faceboard/audio.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
