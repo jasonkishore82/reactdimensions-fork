@@ -212,6 +212,7 @@ import ClockModel from '../lib/ClockModel.jsx'
 import LampModel from '../lib/LampModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
+import FoxModel from '../lib/FoxModel.jsx'
 import LyricSync, { DEMO_LRC } from '../lib/LyricSync.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import CloudModel from '../lib/CloudModel.jsx'
@@ -250,7 +251,7 @@ import FireEmoji from '../lib/FireEmoji.jsx'
 import PleadingEmoji from '../lib/PleadingEmoji.jsx'
 
 // Raw source of every component, for the Code tab.
-const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../cloud/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
+const SOURCES = import.meta.glob(['../lib/*.jsx', '../Card.jsx', '../Hero3D.jsx', '../pickup/*.{js,jsx}', '../snake/*.{js,jsx}', '../turntable/*.{js,jsx}', '../vinyl/*.{js,jsx}', '../sunglasses/*.{js,jsx}', '../watch/*.{js,jsx}', '../laptop/*.{js,jsx}', '../bottle/*.{js,jsx}', '../book/*.{js,jsx}','../tv/*.{js,jsx}', '../phone/*.{js,jsx}', '../headphones/*.{js,jsx}', '../ipad/*.{js,jsx}', '../tablet/*.{js,jsx}', '../cradle/*.{js,jsx}', '../fox/*.{js,jsx}', '../keyboard/*.{js,jsx}', '../typewriter/*.{js,jsx}', '../lighter/*.{js,jsx}', '../knife/*.{js,jsx}', '../pen/*.{js,jsx}', '../lorry/*.{js,jsx}', '../clock/*.{js,jsx}', '../lamp/*.{js,jsx}', '../tape/*.{js,jsx}', '../butterfly/*.{js,jsx}', '../ocean/*.{js,jsx}', '../cloud/*.{js,jsx}', '../dice/*.{js,jsx}', '../cube/*.{js,jsx}', '../ring/*.{js,jsx}', '../sneaker/*.{js,jsx}', '../piano/*.{js,jsx}', '../guitar/*.{js,jsx}', '../dumbbell/*.{js,jsx}', '../mug/*.{js,jsx}', '../gamepad/*.{js,jsx}', '../ladder/*.{js,jsx}', '../shirt/*.{js,jsx}', '../earbuds/*.{js,jsx}', '../ix/*.{js,jsx}', '../liquid/*.{js,jsx}', '../ui/*.{js,jsx}'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -3620,6 +3621,43 @@ const ALL_COMPONENTS = [
     preview: (p, set) => <TapeModel {...p} onChange={set} height="100%" />,
     fill: true,
     files: ['TapeModel.jsx', 'tape/TapeScene.jsx', 'tape/Tape.jsx', 'tape/audio.js'],
+    deps: ['three', '@react-three/fiber', '@react-three/drei'],
+  },
+  {
+    slug: 'fox-404',
+    name: 'Fox 404',
+    category: '3D & Materials',
+    style: 'Nature & world',
+    isNew: true,
+    description: 'A fluffy fox kit with real shell fur, puzzling over a map on a 404 page. Its head follows your pointer anywhere on the page, eyes leading.',
+    controls: [
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Red fox', values: { furColor: '#e07a2e', bellyColor: '#f7efe3', pawColor: '#9a4a1c', skyColor: '#f6d773' } },
+          { name: 'Arctic', values: { furColor: '#eef0f2', bellyColor: '#ffffff', pawColor: '#b9bec6', skyColor: '#bfe0f2' } },
+          { name: 'Silver', values: { furColor: '#6d6f78', bellyColor: '#eceae6', pawColor: '#2c2d33', skyColor: '#d6d3f0' } },
+          { name: 'Fennec', values: { furColor: '#e9c99a', bellyColor: '#fbf4e8', pawColor: '#b88a55', skyColor: '#f7e2b3' } },
+        ],
+      },
+      { name: 'tracking', type: 'select', options: ['head + eyes', 'eyes only', 'off'], default: 'head + eyes' },
+      { name: 'furLength', type: 'range', min: 0.5, max: 1.6, step: 0.05, default: 1 },
+      { name: 'quality', type: 'select', options: ['high', 'medium'], default: 'high' },
+      { name: 'furColor', type: 'color', default: '#e07a2e' },
+      { name: 'bellyColor', type: 'color', default: '#f7efe3' },
+      { name: 'earColor', type: 'color', default: '#f3d2c4' },
+      { name: 'pawColor', type: 'color', default: '#9a4a1c' },
+      { name: 'eyeColor', type: 'color', default: '#7a3a12' },
+      { name: 'skyColor', type: 'color', default: '#f6d773' },
+      { name: 'accentColor', type: 'color', default: '#e8873a' },
+      { name: 'title', type: 'text', default: 'Uh-oh! This map is wrong' },
+      { name: 'subtitle', type: 'text', default: 'We’ll guide you back to a place you know' },
+      { name: 'buttonLabel', type: 'text', default: 'Take me home' },
+    ],
+    preview: (p) => <FoxModel {...p} height="100%" />,
+    fill: true,
+    files: ['FoxModel.jsx', 'fox/FoxScene.jsx', 'fox/Fox.jsx', 'fox/fur.js'],
     deps: ['three', '@react-three/fiber', '@react-three/drei'],
   },
   {
