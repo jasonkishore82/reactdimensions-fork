@@ -44,7 +44,7 @@ A component browser in the style of React Bits. Sidebar with search (press `/`),
 
 | Category | Components |
 | --- | --- |
-| Text | Measure Text, Decode Text, Handwriting Text |
+| Text | Measure Text, Decode Text, Handwriting Text, Lyric Sync (Apple Music, Spotify and karaoke looks) |
 | Animation | Tilt Card, Spring Button, Magnetic Button, Peek Card, Hover Scrub, Cursor Trail, Morph Cursor, Tilt Reveal, Proximity Glow, Long-hover Preview, Edge Peek Nav, Inertia Snap, Throw Cards |
 | UI | **Flat:** Flat Dashboard, Flat Onboarding, Flat Utility, Flat Shop, Flat Docs, Flat UI Kit · **Glassmorphism:** Glass Player, Glass Weather, Glass Login, Glass Finance, Glass Desktop, Glass Dashboard · **Neumorphism:** Neu Home Remote, Neu Calculator, Neu Fitness, Neu Mixer, Neu Settings · **Liquid glass:** Liquid Tab Bar, Liquid Lens, Liquid Control Centre, Liquid Media Controls, Liquid Hero · **Bento:** Bento Features, Bento Portfolio, Bento Analytics, Bento Home, Bento Specs · **Minimalism:** Min Reader, Min To-do, Min Portfolio, Min Checkout, Min Settings, Min Dashboard · **Maximalism:** Max Festival, Max Drop, Max Editorial, Max Kids, Max Profile · **Skeuomorphism:** Skeu Delay, Skeu Journal, Skeu Camera, Skeu Hi-Fi, Skeu Calendar, Skeu Console |
 | Phone UI | (coming soon) |

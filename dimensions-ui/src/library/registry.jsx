@@ -212,6 +212,7 @@ import ClockModel from '../lib/ClockModel.jsx'
 import LampModel from '../lib/LampModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
+import LyricSync, { DEMO_LRC } from '../lib/LyricSync.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import CloudModel from '../lib/CloudModel.jsx'
 import CloudSeaModel from '../lib/CloudSeaModel.jsx'
@@ -2487,6 +2488,42 @@ const ALL_COMPONENTS = [
     fill: true,
     preview: (p) => <ShatterText {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['ShatterText.jsx'],
+    deps: [],
+  },
+  {
+    slug: 'lyric-sync',
+    name: 'Lyric Sync',
+    category: 'Text',
+    isNew: true,
+    description: 'Synced lyrics like Apple Music, Spotify and karaoke screens: the line being sung fills word by word and the rest glide up, soft and blurred by distance. Paste your own timed lyrics.',
+    controls: [
+      { name: 'look', type: 'select', options: ['Apple Music', 'Spotify', 'Karaoke'], default: 'Apple Music' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Violet', values: { bgColor: '#0e0f14', accentColor: '#7c5cff', textColor: '#ffffff' } },
+          { name: 'Sunset', values: { bgColor: '#1a0d12', accentColor: '#ff6a3d', textColor: '#ffffff' } },
+          { name: 'Ocean', values: { bgColor: '#06141a', accentColor: '#1fb6c9', textColor: '#ffffff' } },
+          { name: 'Forest', values: { bgColor: '#08160e', accentColor: '#1db954', textColor: '#ffffff' } },
+          { name: 'Rose', values: { bgColor: '#1a0b14', accentColor: '#e0508a', textColor: '#ffffff' } },
+        ],
+      },
+      { name: 'speed', type: 'range', min: 0.5, max: 2, step: 0.1, default: 1 },
+      { name: 'size', type: 'range', min: 0.7, max: 1.4, step: 0.05, default: 1 },
+      { name: 'depthBlur', type: 'toggle', default: true },
+      { name: 'loop', type: 'toggle', default: true },
+      { name: 'showPlayer', type: 'toggle', default: true },
+      { name: 'bgColor', type: 'color', default: '#0e0f14' },
+      { name: 'accentColor', type: 'color', default: '#7c5cff' },
+      { name: 'textColor', type: 'color', default: '#ffffff' },
+      { name: 'title', type: 'text', default: '', maxLength: 40 },
+      { name: 'artist', type: 'text', default: '', maxLength: 40 },
+      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics: [mm:ss.xx] line, with <mm:ss.xx> before a word to time it exactly', default: DEMO_LRC },
+    ],
+    fill: true,
+    preview: (p) => <LyricSync {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['LyricSync.jsx', 'ui/onscreen.js', 'ui/color.js'],
     deps: [],
   },
   {
