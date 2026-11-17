@@ -1,31 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, OBJECT_STYLES, defaultsFor, sourceFor, usageFor, valueControls } from './registry.jsx'
+import { CATEGORIES, COMPONENTS, UI_STYLES, ICON_STYLES, OBJECT_STYLES, SCENE_STYLES, defaultsFor, loadSources, sourceFor, sourcesLoaded, usageFor, valueControls } from './registry.jsx'
 import { highlight } from './highlight.js'
 import { markdownFor, openPromptFor, promptFor, sourceText, typesFor } from './ai.js'
 import { Icon } from '../Nav.jsx'
 import ColorPicker from './ColorPicker.jsx'
+import StageLoader from './StageLoader.jsx'
 import './library.css'
 
 const CAT_ICON = {
   All: <path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4zM11 11h5v5h-5z" />,
   Text: <path d="M4 5.5V4h12v1.5M10 4v12M7.5 16h5" />,
   Animation: <path d="m5 3.5 9 5.2-3.9 1.2 2.4 4.1-1.8 1-2.4-4.1-2.7 2.9z" />,
-  UI: <path d="M3 4.5h14v11H3zM3 7.5h14M6 11.5h4M13 11.5h1" />,
+  'UI and Backgrounds': <path d="M3 4.5h14v11H3zM3 7.5h14M6 11.5h4M13 11.5h1" />,
   'Phone UI': <path d="M6.5 2.5h7a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 5 16V4a1.5 1.5 0 0 1 1.5-1.5zM8.5 4.5h3M9.5 15h1" />,
   '3D & Materials': <path d="M10 2.5 16.5 6v8L10 17.5 3.5 14V6zM10 10 3.5 6M10 10l6.5-4M10 10v7.5" />,
-  Backgrounds: <path d="M3.500 3.500h13v13h-13zM3.500 8h13M3.500 12h13M8 3.500v13M12 3.500v13" />,
+  // a ball moving with speed lines trailing behind it
+  'Motion Graphics': <path d="M11.5 10a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0zM2.5 7h6M4.5 10h4.5M2.5 13h6" />,
+  // a person: head and shoulders
+  Characters: <path d="M6.8 6.5a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0zM3.5 17c0-3.400 2.900-5.600 6.500-5.600s6.500 2.200 6.500 5.600" />,
+  // a landscape: sun over two hills
+  'Scenes & Assets': <path d="M2.5 16h15M2.5 16l5-7 3.5 4.5 2-2.5 4.5 5M13 5.5a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0z" />,
   'Icons & Emojis': <path d="M3.2 6.2a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0-5.6 0zM11.5 3.4h5v5h-5zM10 11l4.5 6h-9z" />,
 }
 
 // Categories that are placeholders until their components land.
 // A small copy button that sits on an icon/emoji card and copies its source.
-function CopyChip({ code }) {
+function CopyChip({ comp }) {
   const [done, setDone] = useState(false)
   const copy = async (e) => {
     e.preventDefault()
     e.stopPropagation()
     try {
+      const code = (await loadSources(comp))[0]?.code ?? ''
       await navigator.clipboard.writeText(code)
       setDone(true)
       setTimeout(() => setDone(false), 1400)
@@ -42,10 +49,25 @@ function CopyChip({ code }) {
   )
 }
 
-// Categories whose pages are split into sections.
-const SECTIONS = { UI: UI_STYLES, '3D & Materials': OBJECT_STYLES, 'Icons & Emojis': ICON_STYLES }
+// The Source section: fetches the component's files on first view.
+function SourceFiles({ comp }) {
+  const [files, setFiles] = useState(() => (sourcesLoaded(comp) ? sourceFor(comp) : null))
+  useEffect(() => {
+    let live = true
+    setFiles(sourcesLoaded(comp) ? sourceFor(comp) : null)
+    loadSources(comp).then((f) => live && setFiles(f))
+    return () => {
+      live = false
+    }
+  }, [comp])
+  if (!files) return comp.files.map((f) => <CodeBlock key={f} title={f} code="// Loading source…" />)
+  return files.map((f) => <CodeBlock key={f.file} title={f.file} code={f.code} />)
+}
 
-const COMING_SOON = ['Phone UI', 'Icons & Emojis']
+// Categories whose pages are split into sections.
+const SECTIONS = { 'UI and Backgrounds': UI_STYLES, '3D & Materials': OBJECT_STYLES, 'Scenes & Assets': SCENE_STYLES, 'Icons & Emojis': ICON_STYLES }
+
+const COMING_SOON = ['Characters', 'Icons & Emojis']
 
 const PM = { npm: 'npm i', pnpm: 'pnpm add', yarn: 'yarn add', bun: 'bun add' }
 const WIDTHS = { desktop: '100%', tablet: '768px', mobile: '390px' }
@@ -256,9 +278,19 @@ function AiMenu({ comp, props }) {
       document.removeEventListener('keydown', key)
     }
   }, [open])
-  const copy = (label, text) => {
-    navigator.clipboard?.writeText(text).catch(() => {})
-    setDone(label)
+  // the source loads on demand: start fetching as the menu opens, so it is
+  // usually there by the time an item is picked
+  useEffect(() => {
+    if (open) loadSources(comp)
+  }, [open, comp])
+  const copy = async (label, make) => {
+    if (!sourcesLoaded(comp)) await loadSources(comp)
+    let ok = false
+    try {
+      await navigator.clipboard.writeText(make())
+      ok = true
+    } catch {}
+    setDone(ok ? label : 'Copy failed')
     setOpen(false)
     setTimeout(() => setDone(''), 1800)
   }
@@ -272,19 +304,19 @@ function AiMenu({ comp, props }) {
   return (
     <div className="ai-menu" ref={box}>
       <button className="tool-btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {done ? `✓ ${done}` : '✦ Copy for AI ▾'}
+        {done ? `${done === 'Copy failed' ? '✕' : '✓'} ${done}` : '✦ Copy for AI ▾'}
       </button>
       {open && (
         <div className="ai-pop" role="menu">
-          <button role="menuitem" onClick={() => copy('Prompt copied', promptFor(comp, props))}>
+          <button role="menuitem" onClick={() => copy('Prompt copied', () => promptFor(comp, props))}>
             <strong>Copy as prompt</strong>
             <small>Usage, props table, full source and integration steps, ready to paste into an assistant</small>
           </button>
-          <button role="menuitem" onClick={() => copy('Markdown copied', markdownFor(comp, props))}>
+          <button role="menuitem" onClick={() => copy('Markdown copied', () => markdownFor(comp, props))}>
             <strong>Copy as Markdown</strong>
             <small>This page as a .md document</small>
           </button>
-          <button role="menuitem" onClick={() => copy('Source copied', sourceText(comp))}>
+          <button role="menuitem" onClick={() => copy('Source copied', () => sourceText(comp))}>
             <strong>Copy source only</strong>
             <small>{comp.files.length} file{comp.files.length > 1 ? 's' : ''}, with file names as comments</small>
           </button>
@@ -341,7 +373,7 @@ function Sidebar({ active, open, onClose, favs, category }) {
   const [edge, setEdge] = useState({ top: true, bottom: false })
   const scroller = useRef(null)
   const search = useRef(null)
-  const tabs = ['All', ...CATEGORIES]
+  const tabs = CATEGORIES
   const q = query.trim().toLowerCase()
   const catMatch = cat === 'All' ? CATEGORIES : [cat]
   const visible = CATEGORIES.map((c) => ({
@@ -383,8 +415,9 @@ function Sidebar({ active, open, onClose, favs, category }) {
             </svg>
             Browse all components
           </Link>
+          {/* "All" lives in the Browse all link above, so the picker holds only the categories. */}
           <div className="cat-picker" role="tablist" aria-label="Category" style={{ '--col': Math.max(0, tabs.indexOf(cat)) % 4, '--row': Math.floor(Math.max(0, tabs.indexOf(cat)) / 4) }}>
-            <span className="pill-bg" aria-hidden="true" />
+            {tabs.includes(cat) && <span className="pill-bg" aria-hidden="true" />}
             {tabs.map((t) => (
               <button key={t} role="tab" aria-selected={cat === t} aria-label={t} title={t} onClick={() => { onClose(); navigate(`/library/c/${catSlug(t)}`) }}>
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -534,7 +567,8 @@ export function CategoryPage() {
     return () => window.removeEventListener('rd:sidebar', on)
   }, [])
 
-  if (!name) return <Navigate to="/library/c/all" replace />
+  // UI and Backgrounds were separate categories; keep their old links working
+  if (!name) return <Navigate to={cat === 'ui' || cat === 'backgrounds' ? '/library/c/ui-and-backgrounds' : '/library/c/all'} replace />
 
   const q = query.trim().toLowerCase()
   const items = COMPONENTS.filter((c) => (name === 'All' || c.category === name) && (style === 'All' || c.style === style) && (!q || c.name.toLowerCase().includes(q) || (c.style ?? '').toLowerCase().includes(q)))
@@ -576,7 +610,7 @@ export function CategoryPage() {
               {c.category === 'Icons & Emojis' ? (
                 <span className="browse-icon">
                   {c.preview({ ...defaultsFor(c), size: 36, color: 'currentColor' })}
-                  <CopyChip code={sourceFor(c)[0]?.code ?? ''} />
+                  <CopyChip comp={c} />
                 </span>
               ) : (
                 <img src={`/previews/${c.slug}.jpg`} alt="" loading="lazy" />
@@ -602,6 +636,7 @@ export default function Library() {
   const [tab, setTab] = useState('preview')
   const [values, setValues] = useState(() => (comp ? defaultsFor(comp) : {}))
   const [reload, setReload] = useState(0)
+  const stageRef = useRef(null)
   const [width, setWidth] = useState('desktop')
   const [pm, setPm] = useState('npm')
   const [drawer, setDrawer] = useState(false)
@@ -672,13 +707,32 @@ export default function Library() {
   const typeOf = (c) => (c.type === 'range' ? 'number' : c.type === 'toggle' ? 'boolean' : c.type === 'select' ? c.options.map((o) => `'${o}'`).join(' | ') : 'string')
 
   return (
-    <div className={`lib${comp.category === 'UI' ? ' lib-wide' : ''}`}>
+    <div className={`lib${comp.category === 'UI and Backgrounds' || comp.category === 'Phone UI' ? ' lib-wide' : ''}`}>
       <Sidebar active={slug} open={drawer} onClose={() => setDrawer(false)} favs={favs} />
 
       <div className="lib-main">
-        <p className="lib-crumb">
-          Library <span>/</span> {comp.category} <span>/</span> <b>{comp.name}</b>
-        </p>
+        <div className="lib-crumb-row">
+          <p className="lib-crumb">
+            Library <span>/</span> {comp.category} <span>/</span> <b>{comp.name}</b>
+          </p>
+          {/* the same previous / next as the bottom of the page, compact */}
+          <nav className="lib-pager-top" aria-label="Previous and next component (top)">
+            {prev ? (
+              <Link to={`/library/${prev.slug}`} title={`Previous: ${prev.name}`}>
+                ← <span>{prev.name}</span>
+              </Link>
+            ) : (
+              <span className="off">←</span>
+            )}
+            {next ? (
+              <Link to={`/library/${next.slug}`} title={`Next: ${next.name}`}>
+                <span>{next.name}</span> →
+              </Link>
+            ) : (
+              <span className="off">→</span>
+            )}
+          </nav>
+        </div>
         <h1 className="lib-title">
           {comp.name}
           {comp.isNew && <span className="badge badge-lg">New</span>}
@@ -734,10 +788,11 @@ export default function Library() {
         {tab === 'preview' ? (
           <>
             <div className="stage-shell" id="preview">
-              <div className={`lib-stage${comp.fill ? ' fill' : ''}${comp.category === 'UI' ? ' screen' : ''}`} style={{ maxWidth: WIDTHS[width] }}>
-                <div className="lib-stage-inner" key={`${slug}-${reload}`}>
+              <div className={`lib-stage${comp.fill ? ' fill' : ''}${comp.category === 'UI and Backgrounds' || comp.category === 'Phone UI' ? ' screen' : ''}`} style={{ maxWidth: WIDTHS[width] }}>
+                <div className="lib-stage-inner" key={`${slug}-${reload}`} ref={stageRef}>
                   {comp.preview(props, (patch) => setValues((s) => ({ ...s, ...patch })))}
                 </div>
+                <StageLoader key={`load-${slug}-${reload}`} target={stageRef} expectCanvas={!!comp.deps?.includes('@react-three/fiber')} />
               </div>
             </div>
 
@@ -828,9 +883,7 @@ export default function Library() {
               </Section>
             )}
             <Section id="source" title="Source" note={`${comp.files.length} file${comp.files.length > 1 ? 's' : ''}`}>
-              {sourceFor(comp).map((f) => (
-                <CodeBlock key={f.file} title={f.file} code={f.code} />
-              ))}
+              <SourceFiles comp={comp} />
             </Section>
           </>
         )}
@@ -852,7 +905,7 @@ export default function Library() {
           </div>
         </section>
 
-        <nav className="lib-pager">
+        <nav className="lib-pager" aria-label="Previous and next component">
           {prev ? (
             <Link to={`/library/${prev.slug}`}>
               <small>Previous</small>← {prev.name}
