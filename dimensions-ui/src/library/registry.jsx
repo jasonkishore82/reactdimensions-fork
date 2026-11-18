@@ -487,6 +487,7 @@ import CompanionRobotModel from '../lib/CompanionRobotModel.jsx'
 import TapeModel from '../lib/TapeModel.jsx'
 import ButterflyModel from '../lib/ButterflyModel.jsx'
 import LyricSync, { DEMO_LRC } from '../lib/LyricSync.jsx'
+import PosterLyrics, { DEMO_POSTER_LRC } from '../lib/PosterLyrics.jsx'
 import OceanModel from '../lib/OceanModel.jsx'
 import CloudModel from '../lib/CloudModel.jsx'
 import CloudSeaModel from '../lib/CloudSeaModel.jsx'
@@ -2867,6 +2868,38 @@ const ALL_COMPONENTS = [
     fill: true,
     preview: (p) => <LyricSync {...p} style={{ position: 'absolute', inset: 0 }} />,
     files: ['LyricSync.jsx', 'ui/onscreen.js', 'ui/color.js'],
+    deps: [],
+  },
+  {
+    slug: 'poster-lyrics',
+    name: 'Poster Lyrics',
+    category: 'Text',
+    isNew: true,
+    description: 'Lyric-video posters: each line becomes a flat three-colour scene with the words stretched to fill the frame, bent into an arch, laid on a road in perspective or split around a little drawing that moves with them.',
+    controls: [
+      { name: 'layout', type: 'select', options: ['auto', 'stack', 'arch', 'between', 'drive', 'perspective'], default: 'auto' },
+      {
+        name: 'palette',
+        type: 'presets',
+        options: [
+          { name: 'Berry', values: { colorA: '#7a2b50', colorB: '#f5a44b', colorC: '#43898b' } },
+          { name: 'Navy', values: { colorA: '#1f2a52', colorB: '#f4e3b5', colorC: '#e2674a' } },
+          { name: 'Plum', values: { colorA: '#4a2a6b', colorB: '#ffd36b', colorC: '#4fc2a8' } },
+          { name: 'Tomato', values: { colorA: '#c8402f', colorB: '#fbe6c8', colorC: '#26413c' } },
+          { name: 'Forest', values: { colorA: '#1f4d3a', colorB: '#f2c75a', colorC: '#e0734e' } },
+        ],
+      },
+      { name: 'speed', type: 'range', min: 0.5, max: 2, step: 0.1, default: 1 },
+      { name: 'loop', type: 'toggle', default: true },
+      { name: 'showPlayer', type: 'toggle', default: true },
+      { name: 'colorA', type: 'color', default: '#7a2b50' },
+      { name: 'colorB', type: 'color', default: '#f5a44b' },
+      { name: 'colorC', type: 'color', default: '#43898b' },
+      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics: [mm:ss.xx] line. Start a line with {layout|drawing} to choose its look, e.g. {arch|moon}', default: DEMO_POSTER_LRC },
+    ],
+    fill: true,
+    preview: (p) => <PosterLyrics {...p} style={{ position: 'absolute', inset: 0 }} />,
+    files: ['PosterLyrics.jsx', 'LyricSync.jsx', 'ui/onscreen.js', 'ui/color.js'],
     deps: [],
   },
   {

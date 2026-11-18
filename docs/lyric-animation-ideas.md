@@ -20,6 +20,11 @@ Already built as looks of Lyric Sync: Apple Music (blur by distance, word
 fill), Spotify (line colour, sung lines stay bright) and Karaoke (centred,
 the sung word pops). These 20 are new.
 
+Also built, as its own component: Poster Lyrics, flat three-colour poster scenes
+where each line is set as a stretched stack, an arch, words around a drawing,
+a road in perspective, or a drawing that drives through the words. It is the
+starting point for idea 1 (Kinetic pop).
+
 ---
 
 ## Typographic motion
