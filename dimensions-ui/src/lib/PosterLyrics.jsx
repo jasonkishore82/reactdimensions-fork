@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useOnScreen } from '../ui/onscreen.js'
-import { parseLrc } from './LyricSync.jsx'
+import { parseLrc, autoTime } from './LyricSync.jsx'
 
 // Poster lyrics: every line becomes a flat, three-colour poster scene, like the
 // animated lyric videos made of big type and little drawings. Words are
@@ -13,7 +13,9 @@ import { parseLrc } from './LyricSync.jsx'
 //   [00:26.00] {arch|waves} Down the silver stream
 // Layouts: stack, arch, between, drive, perspective. Drawings: lamp, city,
 // boat, moon, stars, sun, window, waves, heart, bird, cloud, key, note, leaf.
-// Leave it out and the layout and drawing are picked from the words.
+// Leave it out and the layout and drawing are picked from the words; use
+// {|none} for a line with no drawing. Plain lyrics with no times are timed
+// for you, and [00:12.00][01:30.00] repeats a line.
 
 export const DEMO_POSTER_LRC = `[ti:Paper Boat]
 [ar:Mira Vale]
@@ -45,20 +47,22 @@ const stamp = (m, s) => Number(m) * 60 + Number(s)
 
 // {layout|drawing} hints are lifted off the lines before the normal LRC parse
 function parsePoster(src) {
+  src = String(src)
+  if (!/\[\d+:\d+(?:\.\d+)?\]/.test(src) && /\S/.test(src.replace(/^\s*\[[a-z]{2,}:.*\]\s*$/gim, ''))) src = autoTime(src)
   const hints = new Map()
-  const clean = String(src)
+  const clean = src
     .split(/\r?\n/)
     .map((row) => {
-      const m = row.match(/^(\s*\[(\d+):(\d+(?:\.\d+)?)\])\s*\{([^}]*)\}\s*(.*)$/)
+      const m = row.match(/^((?:\s*\[\d+:\d+(?:\.\d+)?\])+)\s*\{([^}]*)\}\s*(.*)$/)
       if (!m) return row
-      const [layout, icon] = m[4].split('|').map((x) => x.trim().toLowerCase())
-      hints.set(stamp(m[2], m[3]).toFixed(2), { layout, icon })
-      return `${m[1]} ${m[5]}`
+      const [layout, icon] = m[2].split('|').map((x) => x.trim().toLowerCase())
+      for (const t of m[1].matchAll(/\[(\d+):(\d+(?:\.\d+)?)\]/g)) hints.set(stamp(t[1], t[2]).toFixed(2), { layout, icon })
+      return `${m[1]} ${m[3]}`
     })
     .join('\n')
   const parsed = parseLrc(clean)
   let scene = 0
-  const lines = parsed.lines.map((l) => ({ ...l, hint: hints.get(l.t.toFixed(2)) || {}, scene: l.type === 'gap' ? -1 : scene++ }))
+  const lines = parsed.lines.map((l) => ({ ...l, hint: (l.t0 !== undefined && hints.get(l.t0.toFixed(2))) || {}, scene: l.type === 'gap' ? -1 : scene++ }))
   return { ...parsed, lines }
 }
 
@@ -70,12 +74,21 @@ const KEYWORDS = [
   ['note', /tune|song|sing|hum|music/], ['leaf', /leaf|green|grow/],
 ]
 const ICON_ORDER = ['moon', 'boat', 'stars', 'lamp', 'sun', 'waves', 'heart', 'bird', 'city', 'window', 'note', 'leaf', 'cloud', 'key']
-function pickIcon(text, n) {
+function matchIcon(text) {
   const t = text.toLowerCase()
   for (const [name, re] of KEYWORDS) if (re.test(t)) return name
-  return ICON_ORDER[n % ICON_ORDER.length]
+  return null
 }
-function pickLayout(line, n) {
+// drawings: 'auto' picks by the words (or the next one in turn), 'matching'
+// only draws when a word calls for it, 'off' draws nothing; a hint always wins
+function pickIcon(line, n, mode) {
+  const h = line.hint.icon
+  if (h === 'none') return null
+  if (ICONS[h]) return h
+  if (mode === 'off') return null
+  return matchIcon(line.text) || (mode === 'matching' ? null : ICON_ORDER[n % ICON_ORDER.length])
+}
+function pickLayout(line, n, hasIcon) {
   const words = line.words.length
   const chars = line.text.length
   if (words >= 6 || chars > 30) return 'stack'
@@ -84,12 +97,18 @@ function pickLayout(line, n) {
   if (l === 'between' && (words < 2 || words > 4 || chars > 22)) l = 'stack'
   if (l === 'arch' && (words < 2 || chars > 24)) l = 'stack'
   if (l === 'perspective' && chars > 28) l = 'stack'
+  if (l === 'drive' && !hasIcon) l = 'stack'
   return l
 }
 
 // --- fitting words to a box, with no font measuring: SVG textLength does the stretch ---
 const cw = (c) => ('Iil1.,;:\'!|'.includes(c) ? 0.45 : 'ftrj'.includes(c) ? 0.7 : 'MW'.includes(c) ? 1.25 : 'mw'.includes(c) ? 1.15 : 1)
-const weightOf = (s) => [...s].reduce((a, c) => a + cw(c), 0)
+const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
+const graphemes = (s) => (seg ? Array.from(seg.segment(s), (x) => x.segment) : [...s])
+const EMOJI = /\p{Extended_Pictographic}/u
+const weightOf = (s) => graphemes(s).reduce((a, c) => a + (EMOJI.test(c) ? 1.5 : cw(c)), 0)
+// scripts and emoji that stand taller than Latin capitals (Indic, CJK, emoji...)
+const isTall = (w) => /[^\u0000-\u024F\u2000-\u206F]/.test(w)
 
 // split words into at most R rows of even weight
 function split(words, R) {
@@ -269,7 +288,7 @@ const wordProps = (extra = {}) => ({ className: 'pl-w', 'data-w': '', ...extra }
 
 function Row({ row, fill, hop }) {
   return row.items.map((it, k) => (
-    <text key={k} {...wordProps({ 'data-cx': it.x + it.w / 2, 'data-hopper': hop ? '' : undefined })} x={it.x} y={row.y + row.h} fontSize={row.h / CAP} textLength={it.w} lengthAdjust="spacingAndGlyphs" fill={fill}>
+    <text key={k} {...wordProps({ 'data-cx': it.x + it.w / 2, 'data-hopper': hop ? '' : undefined })} x={it.x} y={row.y + row.h * (isTall(it.text) ? 0.84 : 1)} fontSize={row.h / (isTall(it.text) ? 1.05 : CAP)} textLength={it.w} lengthAdjust="spacingAndGlyphs" fill={fill}>
       {it.text.toUpperCase()}
     </text>
   ))
@@ -314,7 +333,7 @@ function Scene({ line, w, h, pad, layout, icon, colors, hasPlayer, big }) {
     const L = words.slice(0, half), Rr = words.slice(half)
     const wl = L.reduce((a, t) => a + weightOf(t), 0) + SP * (L.length - 1)
     const wr = Rr.reduce((a, t) => a + weightOf(t), 0) + SP * Math.max(0, Rr.length - 1)
-    const IW = 1.3, G = 0.4
+    const IW = icon ? 1.65 : 0, G = icon ? 0.4 : SP / 2
     const U = wl + wr + IW + 2 * G
     let ch = box.w / (U * CH) // the cap height that fills the row
     ch = Math.min(ch, box.h * 0.6)
@@ -336,7 +355,7 @@ function Scene({ line, w, h, pad, layout, icon, colors, hasPlayer, big }) {
     body = (
       <>
         {[left, right].map((items, s) => <Row key={s} row={{ y, h: ch, items }} fill={s === 0 ? ink : accent} />)}
-        {icon && <Icon name={icon} x={ix} y={y - ch * 0.12} size={Math.max(ch * 1.35, IW * unit)} ink={accent === bg ? ink : accent} accent={ink} />}
+        {icon && <Icon name={icon} x={ix} y={y - ch * 0.12} size={IW * unit} ink={accent === bg ? ink : accent} accent={ink} />}
       </>
     )
   } else if (layout === 'drive') {
@@ -403,6 +422,7 @@ function Scene({ line, w, h, pad, layout, icon, colors, hasPlayer, big }) {
 export default function PosterLyrics({
   lyrics = DEMO_POSTER_LRC,
   layout = 'auto',
+  drawings = 'auto',
   colorA = '#7a2b50',
   colorB = '#f5a44b',
   colorC = '#43898b',
@@ -439,13 +459,13 @@ export default function PosterLyrics({
   const line = lines[Math.min(active, lines.length - 1)]
   const hasPlayer = showPlayer
   const pad = Math.round(Math.min(size.w, size.h) * 0.06)
+  const icon = line && line.type !== 'gap' ? pickIcon(line, line.scene, drawings) : null
   const chosen = line
     ? line.type === 'gap' ? 'gap'
       : LAYOUTS.includes(line.hint.layout) ? line.hint.layout
       : layout !== 'auto' && LAYOUTS.includes(layout) ? layout
-      : pickLayout(line, line.scene)
+      : pickLayout(line, line.scene, !!icon)
     : 'stack'
-  const icon = line && line.type !== 'gap' ? (ICONS[line.hint.icon] ? line.hint.icon : pickIcon(line.text, line.scene)) : null
   const colors = sceneColors(Math.max(line?.scene ?? 0, 0), colorA, colorB, colorC)
 
   // after each scene mounts, collect its words and the travelling drawing

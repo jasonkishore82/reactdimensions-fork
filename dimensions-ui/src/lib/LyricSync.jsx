@@ -40,17 +40,49 @@ export const DEMO_LRC = `[ti:Paper Boat]
 
 const stamp = (m, s) => Number(m) * 60 + Number(s)
 const GAP_MIN = 5 // seconds of silence before the dots appear
+const STAMPS = /\[(\d+):(\d+(?:\.\d+)?)\]/g
+const hasStamps = (src) => /\[\d+:\d+(?:\.\d+)?\]/.test(src)
+const stampText = (t) => {
+  const cs = Math.max(0, Math.round(t * 100))
+  return `${String(Math.floor(cs / 6000)).padStart(2, '0')}:${((cs % 6000) / 100).toFixed(2).padStart(5, '0')}`
+}
+// move every <mm:ss.xx> word time in a line by `delta` seconds
+const shiftTags = (body, delta) => (delta === 0 ? body : body.replace(/<(\d+):(\d+(?:\.\d+)?)>/g, (_, m, s) => `<${stampText(stamp(m, s) + delta)}>`))
+
+// Plain lyrics with no times at all: give each line a time from its length, so
+// pasted words just work. A blank line is a short breath between verses.
+export function autoTime(src) {
+  let t = 1
+  const out = []
+  for (const row of String(src).split(/\r?\n/)) {
+    if (/^\s*\[[a-z]{2,}:.*\]\s*$/i.test(row)) { out.push(row); continue }
+    const text = row.trim()
+    if (!text) { t += 1.6; continue }
+    out.push(`[${stampText(t)}] ${text}`)
+    t += Math.max(1.8, text.length * 0.09 + 1) + 0.4
+  }
+  out.push(`[${stampText(t)}] `)
+  return out.join('\n')
+}
 
 // -> { lines: [{ t, end, type, words: [{ t, e, text }] }], duration, title, artist }
 export function parseLrc(src) {
+  src = String(src)
+  if (!hasStamps(src) && /\S/.test(src.replace(/^\s*\[[a-z]{2,}:.*\]\s*$/gim, ''))) src = autoTime(src)
   const meta = {}
   const raw = []
-  for (const row of String(src).split(/\r?\n/)) {
+  for (const row of src.split(/\r?\n/)) {
     const tag = row.match(/^\s*\[([a-z]{2,}):(.*)\]\s*$/i)
     if (tag) { meta[tag[1].toLowerCase()] = tag[2].trim(); continue }
-    const m = row.match(/^\s*\[(\d+):(\d+(?:\.\d+)?)\](.*)$/)
-    if (m) raw.push({ t: stamp(m[1], m[2]), body: m[3] })
+    // one or more times in front: [00:12.00][01:30.00] repeats the line
+    const m = row.match(/^((?:\s*\[\d+:\d+(?:\.\d+)?\])+)(.*)$/)
+    if (!m) continue
+    const times = [...m[1].matchAll(STAMPS)].map((x) => stamp(x[1], x[2]))
+    times.forEach((t) => raw.push({ t0: t, t, body: shiftTags(m[2], t - times[0]) }))
   }
+  // [offset:+500] makes the words come 500 ms sooner
+  const off = (parseFloat(String(meta.offset || '0').replace('+', '')) || 0) / 1000
+  if (off) raw.forEach((r) => { r.t = Math.max(0, r.t - off); r.body = shiftTags(r.body, -off) })
   raw.sort((a, b) => a.t - b.t)
 
   const lines = []
@@ -82,7 +114,7 @@ export function parseLrc(src) {
     const lastAt = parts[parts.length - 1].at
     const lineEnd = lastAt + 0.4 > end ? Math.min(next ? next.t - 0.1 : Infinity, lastAt + 0.9) : end
     const words = parts.map((p, k) => ({ text: p.text, t: p.at, e: k + 1 < parts.length ? Math.max(p.at + 0.05, parts[k + 1].at) : Math.max(p.at + 0.2, lineEnd) }))
-    lines.push({ t: r.t, end: lineEnd, type: 'line', text, words })
+    lines.push({ t: r.t, t0: r.t0, end: lineEnd, type: 'line', text, words })
   })
 
   // breathing dots where the singer rests

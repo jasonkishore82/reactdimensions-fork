@@ -2863,7 +2863,7 @@ const ALL_COMPONENTS = [
       { name: 'textColor', type: 'color', default: '#ffffff' },
       { name: 'title', type: 'text', default: '', maxLength: 40 },
       { name: 'artist', type: 'text', default: '', maxLength: 40 },
-      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics: [mm:ss.xx] line, with <mm:ss.xx> before a word to time it exactly', default: DEMO_LRC },
+      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics, [mm:ss.xx] line, with <mm:ss.xx> before a word to time it exactly (or plain lyrics, which are timed for you)', default: DEMO_LRC },
     ],
     fill: true,
     preview: (p) => <LyricSync {...p} style={{ position: 'absolute', inset: 0 }} />,
@@ -2878,6 +2878,7 @@ const ALL_COMPONENTS = [
     description: 'Lyric-video posters: each line becomes a flat three-colour scene with the words stretched to fill the frame, bent into an arch, laid on a road in perspective or split around a little drawing that moves with them.',
     controls: [
       { name: 'layout', type: 'select', options: ['auto', 'stack', 'arch', 'between', 'drive', 'perspective'], default: 'auto' },
+      { name: 'drawings', type: 'select', options: ['auto', 'matching', 'off'], default: 'auto' },
       {
         name: 'palette',
         type: 'presets',
@@ -2895,7 +2896,7 @@ const ALL_COMPONENTS = [
       { name: 'colorA', type: 'color', default: '#7a2b50' },
       { name: 'colorB', type: 'color', default: '#f5a44b' },
       { name: 'colorC', type: 'color', default: '#43898b' },
-      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics: [mm:ss.xx] line. Start a line with {layout|drawing} to choose its look, e.g. {arch|moon}', default: DEMO_POSTER_LRC },
+      { name: 'lyrics', type: 'textarea', rows: 10, hint: 'timed lyrics, [mm:ss.xx] line (or plain lyrics, which are timed for you). Start a line with {layout|drawing} to choose its look, e.g. {arch|moon}', default: DEMO_POSTER_LRC },
     ],
     fill: true,
     preview: (p) => <PosterLyrics {...p} style={{ position: 'absolute', inset: 0 }} />,
